@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+
+@theme {
+    --background-color: #111827;
+    --background-secondary: #111827;
+    --logo-name-color: #fdfdfd;
+    --text-color: #ffffff;
+    --secondary-color: #4d5365;
+}
+
+@layer base {
+    * {
+        @apply font-[Inter];
+    }
+}
