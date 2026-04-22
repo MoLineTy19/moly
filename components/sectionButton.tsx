@@ -1,11 +1,25 @@
-import {faShieldHalved} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+"use client"
 
-export default function SectionButton({title}: {title: string}) {
+import Link from "next/link";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
+import {usePathname} from "next/navigation";
+
+interface SectionButtonDetails {
+    href: string;
+    icon: IconDefinition,
+    title: string;
+    data?: string;
+}
+
+export default function SectionButton({href, icon, title, data}: SectionButtonDetails) {
+    const path = usePathname()
+
     return (
-        <button className="flex rounded-lg gap-2 items-center p-2 cursor-pointer  hover:bg-dark-800/50 transition-colors text-(--text-color)/70 hover:text-(--text-color) hover:bg-white/10 font-light">
-            <FontAwesomeIcon icon={faShieldHalved} style={{color: "#00c74f", margin: "6px 4px"}}/>
+        <Link href={href} className={"flex items-center gap-3 px-3 py-2.5 rounded-lg text-(--text-color) font-medium transition-colors hover:bg-white/15 " + `${path === href? "bg-white/15": null}`}>
+            <FontAwesomeIcon icon={icon}/>
             {title}
-        </button>
+            { data ? <span className="ml-auto text-xs bg-(--background-color) text-gray-400 py-0.5 px-2 rounded-full border border-(--border-color)"> {data} </span> : null}
+        </Link>
     )
 }
