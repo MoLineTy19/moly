@@ -1,7 +1,8 @@
 import React from "react";
-import Sidebar from "@/components/sidebar";
 import Topbar from "@/components/topbar";
 import './global.css'
+import {Toaster} from "react-hot-toast";
+import Sidebar from "@/components/sidebar";
 
 export default function RootLayout({
   children,
@@ -10,17 +11,18 @@ export default function RootLayout({
 }>) {
   return (
       <html>
-          <body>
-          <div className="grid grid-cols-[1fr_7fr] grid-rows-[auto_1fr] bg-(--background-secondary)">
-              <div className="row-span-2">
-                  <Sidebar/>
-              </div>
-              <Topbar/>
-              <div className="col-span-1 text-(--text-color)">
+      <body className="min-h-screen">
+      <Toaster position="top-right" />
+      <div className="flex min-h-screen bg-(--background-color)">
+          <Sidebar />
+          <div className="flex flex-col flex-1">
+              <Topbar />
+              <main className="flex-1 text-(--text-color)">
                   {children}
-              </div>
+              </main>
           </div>
-          </body>
+      </div>
+      </body>
       </html>
 
   );

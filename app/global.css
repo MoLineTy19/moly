@@ -1,15 +1,39 @@
 @import 'tailwindcss';
 
 @theme {
-    --background-color: #111827;
+    --background-color: #030712;
     --background-secondary: #111827;
     --logo-name-color: #fdfdfd;
     --text-color: #ffffff;
     --secondary-color: #4d5365;
+    --text-muted: #6a7282;
+    --accent-color: #00c950;
+    --border-color: #1e2939;
+    --border-input-color: #364153;
 }
 
 @layer base {
     * {
         @apply font-[Inter];
     }
+}
+
+.custom-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 4px rgba(0,0,0,0.3);
+}
+
+.custom-range::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
 }
