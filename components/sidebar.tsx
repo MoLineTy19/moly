@@ -14,20 +14,25 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import SectionButton from "@/components/sectionButton";
 import {faFolder, faStar} from "@fortawesome/free-regular-svg-icons";
 import {useCountPassword} from "@/store/use-passwords-store";
+import Link from "next/link";
 
 export default function Sidebar() {
     return (
         <aside className="w-75 shrink-0 bg-(--background-secondary) border-r border-(--border-color) flex flex-col pt-6 pb-6 overflow-y-auto z-20">
             <div className="px-6 mb-8 flex items-center justify-between">
-                <div className="flex items-center gap-3 text-(--text-color) font-semibold text-lg">
-                    <div className="w-8 h-8 rounded-lg bg-(--accent-color) flex items-center justify-center shadow-glow">
-                        <FontAwesomeIcon icon={faShieldHalved} style={{color: "#ffffff", margin: "8px 6px"}}/>
+                <Link href="/passwords">
+                    <div className="flex items-center gap-3 text-(--text-color) font-semibold text-lg">
+                        <div className="w-8 h-8 rounded-lg bg-(--accent-color) flex items-center justify-center shadow-glow">
+                            <FontAwesomeIcon icon={faShieldHalved} style={{color: "#ffffff", margin: "8px 6px"}}/>
+                        </div>
+                        Moly
                     </div>
-                    Moly
-                </div>
-                <button className="text-gray-400 hover:text-(--text-color) transition-colors">
-                    <FontAwesomeIcon icon={faPenToSquare} />
-                </button>
+                </Link>
+                <Link href="/passwords/addPassword">
+                    <button className="text-gray-400 hover:text-(--text-color) transition-colors">
+                        <FontAwesomeIcon icon={faPenToSquare} />
+                    </button>
+                </Link>
             </div>
             <div className="px-4 mb-8 flex gap-2">
                 <button className="grow flex items-center justify-between bg-dark-800 border border-(--border-input-color) hover:border-(--border-input-color)/80 rounded-lg px-3 py-2 text-xs text-gray-300 transition-colors">

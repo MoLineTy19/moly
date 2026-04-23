@@ -1,10 +1,11 @@
 import {create} from "zustand";
 
 
-interface PasswordStructure {
+export interface PasswordStructure {
     name: string;
     login: string;
     category: string;
+    password: string;
     status: string;
     updatedAt: string;
 }
@@ -16,7 +17,7 @@ interface IPasswordState {
 }
 
 const usePasswordStore = create<IPasswordState>()((set) => ({
-    data: [{name: 'Valorant', status: 'Надежный', login: '123@gmail.com', category: 'Личное', updatedAt: "12 января 2025"}],
+    data: [{name: 'Valorant', status: 'Надежный', login: '123@gmail.com', password: '123', category: 'Личное', updatedAt: "12 января 2025"}],
     addPassword: (password) => set((state) => ({
         data: [...state.data, password],
     })),
