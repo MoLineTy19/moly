@@ -1,5 +1,4 @@
 import React from "react";
-import Topbar from "@/components/topbar";
 import './global.css'
 import {Toaster} from "react-hot-toast";
 import Sidebar from "@/components/sidebar";

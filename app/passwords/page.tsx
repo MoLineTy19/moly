@@ -13,13 +13,24 @@ import {
 import {faCalendar, faFolder, faUser} from "@fortawesome/free-regular-svg-icons";
 import {useState} from "react";
 import Link from "next/link";
+import {useCountPassword, useData} from "@/store/use-passwords-store";
 
-const Passwords: Array<RowConfig> = [
-    {isSelected: false, name: 'Valorant', status: 'Надежный', login: '123@gmail.com', category: 'Личное', updatedAt: "12 января 2025"}
-]
+
+
+
+// const Passwords: Array<RowConfig> = [
+//     {isSelected: false, name: 'Valorant', status: 'Надежный', login: '123@gmail.com', category: 'Личное', updatedAt: "12 января 2025"}
+// ]
 
 export default function PasswordPage() {
     const [isChecked, setIsChecked] = useState(false);
+
+    const data = useData()
+    const Passwords: Array<RowConfig> = data.map(value => ({
+        ...value,
+        isSelected: false
+    }))
+
 
     return (
         <div className="grow overflow-y-auto p-8">
@@ -27,7 +38,7 @@ export default function PasswordPage() {
                 <div>
                     <h1 className="text-3xl font-bold text-(--text-color) flex items-center gap-3 mb-2">
                         Все пароли
-                        <span className="text-sm font-normal bg-dark-800 text-(--text-muted) brightness-130 py-0.5 px-2.5 rounded-md border border-(--border-input-color)">123</span>
+                        <span className="text-sm font-normal bg-dark-800 text-(--text-muted) brightness-130 py-0.5 px-2.5 rounded-md border border-(--border-input-color)"> {useCountPassword()} </span>
                     </h1>
                     <h4 className="mt-3">Управляйте вашими сохраненными учетными записями и безопасными заметками.</h4>
                 </div>
