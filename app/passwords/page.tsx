@@ -11,26 +11,37 @@ import {
     faTableList, faTag
 } from "@fortawesome/free-solid-svg-icons";
 import {faCalendar, faFolder, faUser} from "@fortawesome/free-regular-svg-icons";
-import {useState} from "react";
+import React, {useState} from "react";
 import Link from "next/link";
 import {PasswordData, PasswordCount} from "@/store/passwordStore";
 
 
-
-
-// const Passwords: Array<RowConfig> = [
-//     {isSelected: false, name: 'Valorant', status: 'Надежный', login: '123@gmail.com', category: 'Личное', updatedAt: "12 января 2025"}
-// ]
-
 export default function PasswordPage() {
     const [isChecked, setIsChecked] = useState(false);
+    const [pagePassword, setPagePassword] = useState();
+    const passwordCount = PasswordCount();
 
-    const data = PasswordData()
-    const Passwords: Array<RowConfig> = data.map(value => ({
-        ...value,
-        isSelected: false
-    }))
+    const allPasswords = PasswordData();
+    const [currentPage, setCurrentPage] = useState(0);
+    const itemPerPage = 10;
 
+    const totalPage = Math.ceil(allPasswords.length / itemPerPage);
+
+    const paginatedPasswords = allPasswords
+        .slice(currentPage * itemPerPage, (currentPage + 1) * itemPerPage)
+        .map(value => ({
+            ...value,
+            isSelected: false
+        }))
+
+
+    const goToNextPage = () => {
+        setCurrentPage(prev => Math.min(prev + 1, totalPage - 1));
+    };
+
+    const goToPreviousPage = () => {
+        setCurrentPage(prev => Math.max(prev - 1, 0))
+    }
 
     return (
         <div className="grow overflow-y-auto p-8">
@@ -38,7 +49,7 @@ export default function PasswordPage() {
                 <div>
                     <h1 className="text-3xl font-bold text-(--text-color) flex items-center gap-3 mb-2">
                         Все пароли
-                        <span className="text-sm font-normal bg-dark-800 text-(--text-muted) brightness-130 py-0.5 px-2.5 rounded-md border border-(--border-input-color)"> {PasswordCount()} </span>
+                        <span className="text-sm font-normal bg-dark-800 text-(--text-muted) brightness-130 py-0.5 px-2.5 rounded-md border border-(--border-input-color)"> {passwordCount} </span>
                     </h1>
                     <h4 className="mt-3">Управляйте вашими сохраненными учетными записями и безопасными заметками.</h4>
                 </div>
@@ -126,7 +137,7 @@ export default function PasswordPage() {
                     </thead>
                     <tbody className="text-sm text-gray-300">
                     {
-                        Passwords.map((item, index) => (
+                        paginatedPasswords.map((item, index) => (
                             <Row isSelected={item.isSelected} username={item.service} service={item.username} category={item.category} status={item.status} createdAt={item.createdAt} key={index}/>
                         ))
                     }
@@ -134,12 +145,12 @@ export default function PasswordPage() {
                 </table>
             </div>
             <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
-                <div>Показано 1-4 из 123 записей</div>
+                <div>Показано {currentPage * itemPerPage + 1} - {Math.min((currentPage + 1) * itemPerPage, passwordCount)} из {passwordCount} записей</div>
                 <div className="flex gap-2">
-                    <button className="px-3 py-1.5 rounded-md bg-dark-900 border border-(--border-input-color) hover:text-(--text-color) hover:border-(--border-input-color)/90 transition-colors disabled:opacity-50">
+                    <button className="px-3 py-1.5 rounded-md bg-dark-900 border border-(--border-input-color) hover:text-(--text-color) hover:border-(--border-input-color)/90 transition-colors disabled:opacity-50" onClick={goToPreviousPage}>
                         Предыдущая
                     </button>
-                    <button className="px-3 py-1.5 rounded-md bg-dark-900 border border-(--border-input-color) hover:text-(--text-color) hover:border-(--border-input-color)/90 transition-colors">
+                    <button className="px-3 py-1.5 rounded-md bg-dark-900 border border-(--border-input-color) hover:text-(--text-color) hover:border-(--border-input-color)/90 transition-colors" onClick={goToNextPage}>
                         Следующая
                     </button>
                 </div>

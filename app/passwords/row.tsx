@@ -38,6 +38,11 @@ export const categoryList: Record<string, categoryDetails> = {
         background: "bg-blue-500/10",
         textColor: "text-blue-400",
         borderColor: "border-blue-500/20"
+    },
+    "personal": {
+        background: "bg-blue-500/10",
+        textColor: "text-blue-400",
+        borderColor: "border-blue-500/20"
     }
 }
 
