@@ -1,5 +1,12 @@
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 
+export interface Category {
+    id: number;
+    name: string;
+    icon: string;
+    color: string;
+}
+
 export interface Password {
     id: string;
     title: string;
@@ -9,6 +16,14 @@ export interface Password {
     strengthScore: number;
     lastModified: number;
     createdAt: number;
+}
+
+export interface PasswordStrengthConfig {
+    minLength: number;
+    requireLowercase: boolean;
+    requireUppercase: boolean;
+    requireNumber: boolean;
+    requireSymbol: boolean;
 }
 
 

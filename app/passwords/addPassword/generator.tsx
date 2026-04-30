@@ -5,8 +5,10 @@ import {faArrowsRotate, faEyeLowVision, faKey, faWandMagicSparkles} from "@forta
 import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
 import AdditionOption from "@/app/passwords/addPassword/additionalOptions";
 import CheckBox from "@/app/passwords/addPassword/checkBox";
+import {calculatePasswordStrength} from "@/utils/passwordStrength";
+import {STRENGTH_COLORS, STRENGTH_LEVELS} from "@/config";
 
-export default function Generator({password, setPassword}: {password: string, setPassword:  React.Dispatch<React.SetStateAction<string>>}) {
+export default function Generator({password, setPassword, reliability, setReliability}: {password: string, setPassword:  React.Dispatch<React.SetStateAction<string>>, reliability: number, setReliability: React.Dispatch<React.SetStateAction<number>>}) {
     const [isShow, setShow] = useState(false);
     const [passwordLength, setPasswordLength] = useState(16);
     const [isTextUppercase, setTextUppercase] = useState(true);
@@ -22,33 +24,26 @@ export default function Generator({password, setPassword}: {password: string, se
         const numbers = "0123456789"
         const specSymbol = "!@#$%^&*()_~"
 
+        const ambiguousChars = "0OilI";
+
         let charset = "";
-        if (isTextLowercase) {
-            charset = charset + charsetL;
-        }
-        if (isTextUppercase) {
-            charset = charset + charsetU;
-        }
-        if (isNumber) {
-            charset = charset + numbers;
-        }
-        if (isSpecialSymbol) {
-            charset = charset + specSymbol;
+        if (isTextLowercase) charset += charsetL;
+        if (isTextUppercase) charset += charsetU;
+        if (isNumber)        charset += numbers;
+        if (isSpecialSymbol) charset += specSymbol;
+
+        if (isSimilar) {
+            charset = charset.split('').filter(ch => !ambiguousChars.includes(ch)).join('');
         }
 
         let res = '';
-
         for (let i = 0, n = charset.length; i < length; ++i) {
             const randomChar = charset.charAt(Math.floor(Math.random() * n));
             if (isUnique) {
-                if (!res.includes(randomChar)) {
-                    res += randomChar
-                }
+                if (!res.includes(randomChar)) res += randomChar
             } else {
                 res += randomChar
             }
-            // if (isSimilar) {
-            // }
         }
         return res;
     }
@@ -57,10 +52,13 @@ export default function Generator({password, setPassword}: {password: string, se
         e.preventDefault()
         const newPassword = generatePassword(passwordLength)
         setPassword(newPassword)
+        setReliability(calculatePasswordStrength(newPassword))
     }
 
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setPassword(e.target.value)
+        const newPassword = e.target.value;
+        setPassword(newPassword)
+        setReliability(calculatePasswordStrength(newPassword))
     }
 
     const handleClickShow: MouseEventHandler = (e) => {
@@ -120,13 +118,16 @@ export default function Generator({password, setPassword}: {password: string, se
                         <div className="mt-3">
                             <div className="flex justify-between items-center mb-1.5">
                                 <span className="text-xs font-medium text-(--text-muted)">Надежность пароли</span>
-                                <span className="text-xs font-medium text-(--accent-color)">Надежный</span>
+                                <span className={`text-xs font-medium`} style={{color: STRENGTH_COLORS[reliability]}}>{STRENGTH_LEVELS[reliability]}</span>
                             </div>
                             <div className="flex gap-1 h-1.5 rounded-full overflow-hidden bg-dark-800">
-                                <div className="w-1/4 bg-(--accent-color)"></div>
-                                <div className="w-1/4 bg-(--accent-color)"></div>
-                                <div className="w-1/4 bg-(--accent-color)"></div>
-                                <div className="w-1/4 bg-gray-500"></div>
+                                {
+                                    [1, 2, 3, 4].map(level => (
+                                        <div key={level} className={`w-1/4 ${level <= reliability ? 'bg-(--accent-color)' : 'bg-gray-500'}`}>
+
+                                        </div>
+                                    ))
+                                }
                             </div>
                         </div>
                     </div>

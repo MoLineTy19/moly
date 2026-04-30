@@ -16,7 +16,7 @@ export default function AddPage() {
     const [login, setLogin] = useState("");
     const [category, setCategory] = useState(1);
     const [password, setPassword] = useState("");
-    const [reliability, setReliability] = useState(3);
+    const [reliability, setReliability] = useState(0);
     const [selectedTags, setTag] = useState<Array<string>>([]);
     const [note, setNote] = useState("");
 
@@ -54,7 +54,7 @@ export default function AddPage() {
                 </div>
                 <form className="space-y-6">
                     <MetaData url={url} setUrl={setUrl} name={name} setName={setName} login={login} setLogin={setLogin} category={category} setCategory={setCategory}/>
-                    <Generator password={password} setPassword={setPassword}/>
+                    <Generator password={password} setPassword={setPassword} reliability={reliability} setReliability={setReliability}/>
                     <Tags selectedTags={selectedTags} setTag={setTag} note={note} setNote={setNote}/>
                     <div className="flex items-center justify-end gap-4 pt-4">
                         <Link href={'/passwords'}>

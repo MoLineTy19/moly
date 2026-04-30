@@ -7,6 +7,7 @@ import Link from "next/link";
 import {RowConfig, statusDetails} from "@/types";
 import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
 import toast from "react-hot-toast";
+import {STRENGTH_LEVELS} from "@/config";
 
 
 export const statuses: Record<number, statusDetails> = {
@@ -117,8 +118,7 @@ export default function Row({isSelected, title, login, category, strengthScore, 
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50">
                 <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-${statusDetails.color}/10 text-${statusDetails.color} border border-${statusDetails.color}/20 text-xs`}>
-                    {/*<span className="w-1.5 h-1.5 rounded-full text-(--accent-color)"></span>*/}
-                    {strengthScore}
+                    {STRENGTH_LEVELS[strengthScore]}
                 </span>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted)">{createdAt}</td>

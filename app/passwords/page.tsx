@@ -1,9 +1,9 @@
 "use client"
 
-import Row, {RowConfig} from "@/app/passwords/row";
+import Row from "@/app/passwords/row";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
-    faBorderAll, faGlobe,
+    faBorderAll, faGlobe, faKey,
     faListUl,
     faMagnifyingGlass,
     faPlus,
@@ -122,7 +122,7 @@ export default function PasswordPage() {
                             ЛОГИН
                         </th>
                         <th className="py-4 px-4 font-medium w-1/6 border-l border-(--border-color)">
-                            <FontAwesomeIcon icon={faUser} className="mr-2"/>
+                            <FontAwesomeIcon icon={faKey} className="mr-2"/>
                             Пароль
                         </th>
                         <th className="py-4 px-4 font-medium border-l border-(--border-color)">
