@@ -13,8 +13,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 import SectionButton from "@/components/sectionButton";
 import {faFolder, faStar} from "@fortawesome/free-regular-svg-icons";
-import {useCountPassword} from "@/store/use-passwords-store";
 import Link from "next/link";
+import {PasswordCount} from "@/store/passwordStore";
 
 export default function Sidebar() {
     return (
@@ -52,7 +52,7 @@ export default function Sidebar() {
                 <div className="px-3 mb-2 text-xs font-medium text-(--text-muted) uppercase tracking-wider">
                     Разделы
                 </div>
-                <SectionButton title="Все пароли" icon={faListUl} href="/passwords" data={useCountPassword().toString()}/>
+                <SectionButton title="Все пароли" icon={faListUl} href="/passwords" data={PasswordCount().toString()}/>
                 <SectionButton title="Избранное" icon={faStar} href="/favorites"/>
                 <div className="px-3 mt-8 mb-2 text-xs font-medium text-(--text-muted) uppercase tracking-wider flex items-center justify-between">
                     Управление

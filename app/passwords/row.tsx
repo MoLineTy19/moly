@@ -7,11 +7,11 @@ import Link from "next/link";
 
 export interface RowConfig {
     isSelected: boolean;
-    name: string;
-    login: string;
+    service: string;
+    username: string;
     category: string;
-    status: string;
-    updatedAt: string;
+    status: number;
+    createdAt: number;
 }
 
 export interface statusDetails {
@@ -19,10 +19,10 @@ export interface statusDetails {
 }
 
 export const statuses: Record<string, statusDetails> = {
-    "Надежный": {
+    3: {
         color: "(--accent-color)"
     },
-    "Слабый": {
+    1: {
         color: "red-500"
     }
 }
@@ -34,7 +34,7 @@ export interface categoryDetails {
 }
 
 export const categoryList: Record<string, categoryDetails> = {
-    "Личное": {
+    "Работа": {
         background: "bg-blue-500/10",
         textColor: "text-blue-400",
         borderColor: "border-blue-500/20"
@@ -42,7 +42,7 @@ export const categoryList: Record<string, categoryDetails> = {
 }
 
 
-export default function Row({isSelected, name, login, category, status, updatedAt}: RowConfig) {
+export default function Row({isSelected, username, service, category, status, createdAt}: RowConfig) {
     const categoryDetails = categoryList[category];
     const statusDetails = statuses[status];
 
@@ -68,13 +68,13 @@ export default function Row({isSelected, name, login, category, status, updatedA
                 <div className="flex items-center gap-3">
                     {/*Здесь иконки*/}
                     <span className="font-medium text-white">
-                        {name}
+                        {service}
                     </span>
                 </div>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted) brightness-130">
                 <Link href={"/passwords/showPassword"} className="hover:text-(--accent-color) hover:underline transition-colors">
-                    {login}
+                    {username}
                 </Link>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50">
@@ -88,7 +88,7 @@ export default function Row({isSelected, name, login, category, status, updatedA
                     {status}
                 </span>
             </td>
-            <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted)">{updatedAt}</td>
+            <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted)">{createdAt}</td>
             <td className="py-3 px-4 text-right">
                 <Link href="/passwords/editPassword">
                     <button className="text-(--text-muted) hover:text-white opacity-0 group-hover:opacity-100 transition-all">
