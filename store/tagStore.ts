@@ -3,20 +3,19 @@ import {Tag, TagStore} from "@/types";
 import {DEFAULT_TAGS} from "@/config";
 import {createJSONStorage, persist} from "zustand/middleware";
 import {idbStorage} from "@/lib/storage";
-import {set} from "idb-keyval";
 
 const defaultData = DEFAULT_TAGS;
 
 const tagStore = create<TagStore>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             data: defaultData,
-            selectedTag: [],
-            addTag: (tag) => set((state) => ({
-                selectedTag: [...state.selectedTag, tag],
+            selectedTag: null,
+            addTag: (tag: Tag) => set(() => ({
+                selectedTag: tag,
             })),
-            removeTag: (tag) => set((state) => ({
-                selectedTag: state.selectedTag.filter((t) => t.id !== tag.id),
+            removeTag: () => set(() => ({
+                selectedTag: null,
             })),
             addTagToCatalog: (tag: Omit<Tag, 'id'>) => set((state) => ({
                 data: [...state.data, { ...tag, id: state.data.length }]
@@ -32,5 +31,5 @@ const tagStore = create<TagStore>()(
 export const useTagData = () => tagStore((state) => state.data)
 export const useSelectedTag = () => tagStore((state) => state.selectedTag)
 export const addTag = (tag: Tag) => tagStore.getState().addTag(tag)
-export const removeTag = (tag: Tag) => tagStore.getState().removeTag(tag)
+export const removeTag = () => tagStore.getState().removeTag()
 export const addTagToCatalog = (tag: Omit<Tag, 'id'>) => tagStore.getState().addTagToCatalog(tag)

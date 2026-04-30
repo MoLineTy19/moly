@@ -7,7 +7,7 @@ export interface Password {
     login: string;
     password: string;
     strengthScore: number;
-    tags: Array<Tag>;
+    tag: Tag;
     note: string;
     lastModified: number;
     createdAt: number;
@@ -22,9 +22,9 @@ export interface Tag {
 
 export interface TagStore {
     data: Array<Tag>;
-    selectedTag: Array<Tag>;
+    selectedTag: Tag | null;
     addTag: (tag: Tag) => void;
-    removeTag: (tag: Tag) => void;
+    removeTag: () => void;
     addTagToCatalog: (tag: Omit<Tag, 'id'>) => void;
 }
 
@@ -76,7 +76,7 @@ export interface RowConfig {
     title: string;
     login: string;
     password: string;
-    category: number;
+    tag: Tag;
     strengthScore: number;
     createdAt: number;
 }

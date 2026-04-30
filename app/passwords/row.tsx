@@ -25,9 +25,9 @@ export interface categoryDetails {
     borderColor: string,
 }
 
-export default function Row({isSelected, title, login, category, strengthScore, createdAt, password}: RowConfig) {
+export default function Row({isSelected, title, login, tag, strengthScore, createdAt, password}: RowConfig) {
     const [isShow, setShow] = useState(false);
-    const categoryDetails = DEFAULT_TAGS[category];
+    const categoryDetails = DEFAULT_TAGS.filter(value => value.id === tag.id)[0];
     const statusDetails = statuses[strengthScore];
 
     const [isChecked, setIsChecked] = useState(isSelected);

@@ -4,7 +4,7 @@ import React, {Fragment, useState} from "react";
 import {Tag} from "@/types";
 import {addTagToCatalog, useTagData} from "@/store/tagStore";
 
-export default function Tags({selectedTags, setTag, note, setNote} : {selectedTags: Array<Tag>, setTag: React.Dispatch<React.SetStateAction<Array<Tag>>>, note: string, setNote: React.Dispatch<React.SetStateAction<string>>}) {
+export default function Tags({selectedTag, setTag, note, setNote} : {selectedTag: Tag, setTag: React.Dispatch<React.SetStateAction<Tag>>, note: string, setNote: React.Dispatch<React.SetStateAction<string>>}) {
     const [input, setInput] = useState("");
     const allTags = useTagData()
 
@@ -24,18 +24,19 @@ export default function Tags({selectedTags, setTag, note, setNote} : {selectedTa
                     color: "#ffffff",
                     icon: "❤️"
                 }
-                setTag([...selectedTags, newTag])
+                addTagToCatalog(newTag);
+                setTag(newTag)
             }
             setInput('')
         }
     }
 
-    const removeTag = (tag: Tag) => {
-        setTag(selectedTags.filter(t => t.id !== tag.id))
+    const removeTag = () => {
+        setTag(allTags[0])
     }
 
     const addTag = (tag: Tag) => {
-        setTag([...selectedTags, tag])
+        setTag(tag)
     }
 
     const handleNoteChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -50,12 +51,12 @@ export default function Tags({selectedTags, setTag, note, setNote} : {selectedTa
                         <label className="block text-sm font-medium text-(--text-color)/80 mb-2">Теги</label>
                         <div className="flex flex-wrap gap-2 mb-3">
                             {
-                                selectedTags.map((tag, index) => (
-                                    <div className="px-2.5 py-1 rounded-md bg-dark-800 border border-(--accent-color) text-xs text-(--text-color)/80 flex items-center gap-1.5 cursor-pointer hover:bg-(--accent-color)/60 transition-colors" onClick={() => removeTag(tag)} key={index}>
-                                        {tag.title}
+                                selectedTag && (
+                                    <div className="px-2.5 py-1 rounded-md bg-dark-800 border border-(--accent-color) text-xs text-(--text-color)/80 flex items-center gap-1.5 cursor-pointer hover:bg-(--accent-color)/60 transition-colors" onClick={removeTag}>
+                                        {selectedTag.title}
                                         <FontAwesomeIcon icon={faX} size="xs"/>
                                     </div>
-                                ))
+                                )
                             }
                         </div>
                         <div className="relative">
@@ -66,7 +67,7 @@ export default function Tags({selectedTags, setTag, note, setNote} : {selectedTa
                         </div>
                         <div className="flex flex-wrap gap-2 mt-3">
                             {allTags
-                                .filter(tag => !selectedTags.some(selected => selected.id === tag.id))
+                                .filter(tag => !selectedTag || selectedTag.id !== tag.id)
                                 .map((tag) => (
                                 <Fragment key={tag.id}>
                                     <span className="px-2.5 py-1 rounded-md bg-white/5 border border-(--border-input-color) text-xs text-(--text-color)/80 flex items-center gap-1.5 cursor-pointer hover:bg-(--background-secondary) transition-colors" onClick={() => addTag(tag)}>

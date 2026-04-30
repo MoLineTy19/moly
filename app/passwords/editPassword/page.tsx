@@ -7,19 +7,26 @@ import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
 import Tags from "@/app/passwords/addPassword/tags";
 import React, {useState} from "react";
 import {STRENGTH_COLORS, STRENGTH_LEVELS} from "@/config";
+import {Tag} from "@/types";
+import {useTagData} from "@/store/tagStore";
+import {calculatePasswordStrength} from "@/utils/passwordStrength";
 
 export default function EditPassword() {
+    const allTag = useTagData();
+
     const [url, setUrl] = useState("");
     const [title, setTitle] = useState("");
     const [login, setLogin] = useState("");
     const [category, setCategory] = useState(1);
     const [password, setPassword] = useState("123123212121");
     const [reliability, setReliability] = useState(0);
-    const [selectedTags, setTag] = useState<Array<string>>([]);
+    const [selectedTags, setTag] = useState<Tag>(allTag[0]);
     const [note, setNote] = useState("");
 
     const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPassword(event.target.value);
+        const newPassword = event.target.value;
+        setPassword(newPassword)
+        setReliability(calculatePasswordStrength(newPassword))
     }
 
     return (
@@ -81,7 +88,7 @@ export default function EditPassword() {
                                 </div>
                             </div>
                         </div>
-                        <Tags selectedTags={selectedTags} setTag={setTag} note={note} setNote={setNote} />
+                        <Tags selectedTag={selectedTags} setTag={setTag} note={note} setNote={setNote} />
                         <div className="bg-(--background-secondary) border border-gray-800 rounded-xl shadow-soft overflow-hidden">
                             <div className="px-6 py-4 border-b border-gray-800 flex justify-between items-center">
                                 <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider">

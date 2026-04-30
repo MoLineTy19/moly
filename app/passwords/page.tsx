@@ -18,7 +18,6 @@ import {PasswordData, PasswordCount} from "@/store/passwordStore";
 
 export default function PasswordPage() {
     const [isChecked, setIsChecked] = useState(false);
-    const [pagePassword, setPagePassword] = useState();
     const passwordCount = PasswordCount();
 
     const allPasswords = PasswordData();
@@ -142,7 +141,7 @@ export default function PasswordPage() {
                     <tbody className="text-sm text-gray-300">
                     {
                         paginatedPasswords.map((item, index) => (
-                            <Row isSelected={item.isSelected} login={item.login} title={item.title} category={item.category} strengthScore={item.strengthScore} createdAt={item.createdAt} key={index} password={item.password}/>
+                            <Row isSelected={item.isSelected} login={item.login} title={item.title} tag={item.tag} strengthScore={item.strengthScore} createdAt={item.createdAt} key={index} password={item.password}/>
                         ))
                     }
                     </tbody>

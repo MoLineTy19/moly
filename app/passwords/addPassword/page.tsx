@@ -8,21 +8,21 @@ import Tags from "@/app/passwords/addPassword/tags";
 import {PasswordAdd} from "@/store/passwordStore";
 import Link from "next/link";
 import {Password, Tag} from "@/types";
-import {addTagToCatalog, useTagData} from "@/store/tagStore";
+import {useTagData} from "@/store/tagStore";
 
 
 
 export default function AddPage() {
+    const storageTags = useTagData()
+
     const [url, setUrl] = useState("");
     const [title, setTitle] = useState("");
     const [login, setLogin] = useState("");
     const [category, setCategory] = useState(1);
     const [password, setPassword] = useState("");
     const [reliability, setReliability] = useState(0);
-    const [selectedTags, setTag] = useState<Array<Tag>>([]);
+    const [selectedTag, setTag] = useState<Tag>(storageTags[0]);
     const [note, setNote] = useState("");
-
-    const storageTags = useTagData()
 
     const handleClickConfirmSave: MouseEventHandler = (e) => {
         e.preventDefault();
@@ -33,7 +33,7 @@ export default function AddPage() {
             password: password,
             strengthScore: reliability,
             url: url,
-            tags: selectedTags,
+            tag: selectedTag,
             note: note,
         }
 
@@ -48,13 +48,6 @@ export default function AddPage() {
         }
 
         PasswordAdd(data)
-        console.log(data.tags)
-        data.tags
-            .filter((tag) => !storageTags.some(storageTag => storageTag.id === tag.id))
-            .map((tag) => {
-                console.log(tag);
-                addTagToCatalog(tag);
-        })
         toast.success("Даннные добавлены")
     }
 
@@ -68,7 +61,7 @@ export default function AddPage() {
                 <form className="space-y-6">
                     <MetaData url={url} setUrl={setUrl} title={title} setTitle={setTitle} login={login} setLogin={setLogin} category={category} setCategory={setCategory}/>
                     <Generator password={password} setPassword={setPassword} reliability={reliability} setReliability={setReliability}/>
-                    <Tags selectedTags={selectedTags} setTag={setTag} note={note} setNote={setNote}/>
+                    <Tags selectedTag={selectedTag} setTag={setTag} note={note} setNote={setNote}/>
                     <div className="flex items-center justify-end gap-4 pt-4">
                         <Link href={'/passwords'}>
                             <button type="button" className="px-6 py-2.5 rounded-lg border border-(--text-muted)/20 text-(--text-color)/80 hover:text-(--text-color) hover:bg-dark-800 font-medium text-sm transition-colors cursor-pointer" >
