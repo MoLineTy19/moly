@@ -3,13 +3,13 @@ import {faAngleDown, faGlobe} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import {faUser} from "@fortawesome/free-regular-svg-icons";
 
-export default function MetaData({url, setUrl, name, setName, login, setLogin, category, setCategory} : {url: string, setUrl: React.Dispatch<React.SetStateAction<string>>, name: string, setName: React.Dispatch<React.SetStateAction<string>>, login: string, setLogin: React.Dispatch<React.SetStateAction<string>>, category: number, setCategory: React.Dispatch<React.SetStateAction<number>>}) {
+export default function MetaData({url, setUrl, title, setTitle, login, setLogin, category, setCategory} : {url: string, setUrl: React.Dispatch<React.SetStateAction<string>>, title: string, setTitle: React.Dispatch<React.SetStateAction<string>>, login: string, setLogin: React.Dispatch<React.SetStateAction<string>>, category: number, setCategory: React.Dispatch<React.SetStateAction<number>>}) {
     const handleChangeUrl = (e: React.ChangeEvent<HTMLInputElement>) => {
         setUrl(e.target.value)
     }
 
-    const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setName(e.target.value)
+    const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTitle(e.target.value)
     }
 
     const handleChangeLogin = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +40,7 @@ export default function MetaData({url, setUrl, name, setName, login, setLogin, c
                         <label className="block text-sm font-medium text-(--text-color)/80 mb-2">
                             Название записи*
                         </label>
-                        <input type="text" placeholder="Например: WoW 3" className={`w-full px-4 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none transition-colors placeholder-gray-600 ${name.length >= 2 ? 'focus:border-(--accent-color)' : 'focus:border-red-500'}`} value={name} onChange={handleChangeName}/>
+                        <input type="text" placeholder="Например: WoW 3" className={`w-full px-4 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none transition-colors placeholder-gray-600 ${title.length >= 2 ? 'focus:border-(--accent-color)' : 'focus:border-red-500'}`} value={title} onChange={handleChangeTitle}/>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>

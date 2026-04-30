@@ -1,11 +1,12 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faPlus, faTag, faX} from "@fortawesome/free-solid-svg-icons";
 import React, {Fragment, useState} from "react";
-import {TagStructure, useTagData} from "@/store/use-tag-store";
+import {Tag} from "@/types";
+import {addTagToCatalog, useTagData} from "@/store/tagStore";
 
-export default function Tags({selectedTags, setTag, note, setNote} : {selectedTags: Array<string>, setTag: React.Dispatch<React.SetStateAction<Array<string>>>, note: string, setNote: React.Dispatch<React.SetStateAction<string>>}) {
+export default function Tags({selectedTags, setTag, note, setNote} : {selectedTags: Array<Tag>, setTag: React.Dispatch<React.SetStateAction<Array<Tag>>>, note: string, setNote: React.Dispatch<React.SetStateAction<string>>}) {
     const [input, setInput] = useState("");
-    const tag = useTagData()
+    const allTags = useTagData()
 
     const handleInputTag = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInput(event.target.value)
@@ -13,19 +14,28 @@ export default function Tags({selectedTags, setTag, note, setNote} : {selectedTa
 
     const handleKeyDownInput = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === "Enter") {
-            if (!selectedTags.includes(input.trim())) {
-                setTag([...selectedTags, input])
+            const trimmed = input.trim();
+            const exists = allTags.some(tag => tag.title === trimmed)
+
+            if (!exists) {
+                const newTag: Tag = {
+                    id: allTags.length,
+                    title: trimmed,
+                    color: "#ffffff",
+                    icon: "❤️"
+                }
+                setTag([...selectedTags, newTag])
             }
             setInput('')
         }
     }
 
-    const removeTag = (tagTitle: string) => {
-        setTag(selectedTags.filter(val => val !== tagTitle))
+    const removeTag = (tag: Tag) => {
+        setTag(selectedTags.filter(t => t.id !== tag.id))
     }
 
-    const addTag = (tagTitle: TagStructure) => {
-        setTag([...selectedTags, tagTitle.title])
+    const addTag = (tag: Tag) => {
+        setTag([...selectedTags, tag])
     }
 
     const handleNoteChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -42,7 +52,7 @@ export default function Tags({selectedTags, setTag, note, setNote} : {selectedTa
                             {
                                 selectedTags.map((tag, index) => (
                                     <div className="px-2.5 py-1 rounded-md bg-dark-800 border border-(--accent-color) text-xs text-(--text-color)/80 flex items-center gap-1.5 cursor-pointer hover:bg-(--accent-color)/60 transition-colors" onClick={() => removeTag(tag)} key={index}>
-                                        {tag}
+                                        {tag.title}
                                         <FontAwesomeIcon icon={faX} size="xs"/>
                                     </div>
                                 ))
@@ -55,8 +65,10 @@ export default function Tags({selectedTags, setTag, note, setNote} : {selectedTa
                             <input type="text" placeholder="Введите тег и нажмите Enter" className="w-full pl-11 pr-4 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none focus:border-(--accent-color) transition-colors placeholder-gray-600" onChange={handleInputTag} onKeyDown={handleKeyDownInput} value={input}/>
                         </div>
                         <div className="flex flex-wrap gap-2 mt-3">
-                            {tag.filter(value => !selectedTags.includes(value.title)).map((tag, index) => (
-                                <Fragment key={index}>
+                            {allTags
+                                .filter(tag => !selectedTags.some(selected => selected.id === tag.id))
+                                .map((tag) => (
+                                <Fragment key={tag.id}>
                                     <span className="px-2.5 py-1 rounded-md bg-white/5 border border-(--border-input-color) text-xs text-(--text-color)/80 flex items-center gap-1.5 cursor-pointer hover:bg-(--background-secondary) transition-colors" onClick={() => addTag(tag)}>
                                         <FontAwesomeIcon icon={faPlus} className="text-(--text-muted) text-[10px]"/>
                                         {tag.title}

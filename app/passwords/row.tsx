@@ -7,11 +7,11 @@ import Link from "next/link";
 import {RowConfig, statusDetails} from "@/types";
 import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
 import toast from "react-hot-toast";
-import {STRENGTH_LEVELS} from "@/config";
+import {DEFAULT_TAGS, STRENGTH_LEVELS} from "@/config";
 
 
 export const statuses: Record<number, statusDetails> = {
-    3: {
+    4: {
         color: "(--accent-color)"
     },
     1: {
@@ -25,23 +25,9 @@ export interface categoryDetails {
     borderColor: string,
 }
 
-export const categoryList: Record<string, categoryDetails> = {
-    "Работа": {
-        background: "bg-blue-500/10",
-        textColor: "text-blue-400",
-        borderColor: "border-blue-500/20"
-    },
-    "personal": {
-        background: "bg-blue-500/10",
-        textColor: "text-blue-400",
-        borderColor: "border-blue-500/20"
-    }
-}
-
-
 export default function Row({isSelected, title, login, category, strengthScore, createdAt, password}: RowConfig) {
     const [isShow, setShow] = useState(false);
-    const categoryDetails = categoryList[category];
+    const categoryDetails = DEFAULT_TAGS[category];
     const statusDetails = statuses[strengthScore];
 
     const [isChecked, setIsChecked] = useState(isSelected);
@@ -66,7 +52,6 @@ export default function Row({isSelected, title, login, category, strengthScore, 
             toast.error("Произошла неизвестная ошибка")
             console.error(err)
         }
-
     }
 
     return (
@@ -112,8 +97,8 @@ export default function Row({isSelected, title, login, category, strengthScore, 
                 </div>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50">
-                <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs ${categoryDetails.textColor} ${categoryDetails.borderColor} ${categoryDetails.background}`}>
-                    {category}
+                <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs`} style={{color: categoryDetails.color, borderColor: categoryDetails.color}}>
+                    {categoryDetails.title}
                 </span>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50">

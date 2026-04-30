@@ -1,23 +1,11 @@
 import {createJSONStorage, persist} from "zustand/middleware";
 import {create} from "zustand";
 import {idbStorage} from "@/lib/storage";
-
-export interface PasswordEntry {
-    id?: string;
-    service: string;
-    username: string;
-    password: string;
-    category: number;
-    status: number;
-    url?: string;
-    tags?: string[];
-    notes?: string;
-    createdAt?: number;
-}
+import {Password} from "@/types";
 
 interface PasswordState {
-    entries: PasswordEntry[],
-    addEntry: (data: PasswordEntry) => void;
+    entries: Password[],
+    addEntry: (data: Omit<Password, 'id' | 'createdAt' | 'lastModified'>) => void;
     removeEntry: (id: string) => void;
 }
 
@@ -25,18 +13,12 @@ const usePasswordStore = create<PasswordState>()(
     persist(
         (set, get) => ({
             entries: [],
-            addEntry: (data: PasswordEntry) => {
-                const newEntry: PasswordEntry = {
+            addEntry: (data: Omit<Password, 'id' | 'createdAt' | 'lastModified'>) => {
+                const newEntry: Password = {
+                    ...data,
                     id: crypto.randomUUID(),
-                    service: data.service,
-                    username: data.username,
-                    password: data.password,
-                    category: data.category,
-                    url: data.url,
-                    status: data.status,
-                    tags: data.tags,
-                    notes: data.notes,
                     createdAt: Date.now(),
+                    lastModified: Date.now(),
                 };
                 set((state) => ({ entries: [newEntry, ...state.entries]}))
             },
@@ -45,7 +27,7 @@ const usePasswordStore = create<PasswordState>()(
             }
         }),
         {
-            name: 'test-password',
+            name: 'password-storage',
             storage: createJSONStorage(() => idbStorage)
         }
     )
@@ -53,5 +35,5 @@ const usePasswordStore = create<PasswordState>()(
 
 export const PasswordData = () => usePasswordStore((state) => state.entries);
 export const PasswordCount = () => usePasswordStore((state) => state.entries.length);
-export const PasswordAdd = (passwordData: PasswordEntry) => usePasswordStore.getState().addEntry(passwordData);
+export const PasswordAdd = (passwordData: Omit<Password, 'id' | 'createdAt' | 'lastModified'>) => usePasswordStore.getState().addEntry(passwordData);
 export const PasswordRemove = (passwordId: string) => usePasswordStore.getState().removeEntry(passwordId)

@@ -5,8 +5,23 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import MetaData from "@/app/passwords/addPassword/metaData";
 import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
 import Tags from "@/app/passwords/addPassword/tags";
+import React, {useState} from "react";
+import {STRENGTH_COLORS, STRENGTH_LEVELS} from "@/config";
 
 export default function EditPassword() {
+    const [url, setUrl] = useState("");
+    const [title, setTitle] = useState("");
+    const [login, setLogin] = useState("");
+    const [category, setCategory] = useState(1);
+    const [password, setPassword] = useState("123123212121");
+    const [reliability, setReliability] = useState(0);
+    const [selectedTags, setTag] = useState<Array<string>>([]);
+    const [note, setNote] = useState("");
+
+    const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword(event.target.value);
+    }
+
     return (
         <>
             <div className="grow overflow-y-auto p-8 relative flex justify-center">
@@ -28,7 +43,7 @@ export default function EditPassword() {
                         </div>
                     </div>
                     <form className="space-y-6">
-                        <MetaData />
+                        <MetaData url={url} setUrl={setUrl} title={title} setTitle={setTitle} login={login} setLogin={setLogin} category={category} setCategory={setCategory}/>
                         <div className="bg-(--background-secondary) border border-gray-800 rounded-xl shadow-soft overflow-hidden relative">
                             <div className="px-6 py-4 border-b border-gray-800 flex justify-between items-center bg-(--background-secondary)/30">
                                 <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider">
@@ -45,7 +60,7 @@ export default function EditPassword() {
                                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
                                             <FontAwesomeIcon icon={faKey} />
                                         </div>
-                                        <input className="w-full pl-11 pr-24 py-3 bg-(--background-color) border border-gray-700 rounded-lg text-sm text-(--text-color) font-mono focus:outline-none focus:border-(--accent-color) transition-colors placeholder-gray-600"/>
+                                        <input className="w-full pl-11 pr-24 py-3 bg-(--background-color) border border-gray-700 rounded-lg text-sm text-(--text-color) font-mono focus:outline-none focus:border-(--accent-color) transition-colors placeholder-gray-600" value={password} onChange={handleChangeInput}/>
                                         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                                             <button type="button" className="w-8 h-8 rounded-md text-gray-400 hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
                                                 <FontAwesomeIcon icon={faEye} />
@@ -60,15 +75,13 @@ export default function EditPassword() {
                                             <span className="text-xs font-medium text-gray-500">
                                                 Надежность пароля
                                             </span>
-                                            <span className="text-xs font-medium text-(--accent-color)">
-                                                Надежный
-                                            </span>
+                                            <span className={`text-xs font-medium`} style={{color: STRENGTH_COLORS[reliability]}}>{STRENGTH_LEVELS[reliability]}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <Tags />
+                        <Tags selectedTags={selectedTags} setTag={setTag} note={note} setNote={setNote} />
                         <div className="bg-(--background-secondary) border border-gray-800 rounded-xl shadow-soft overflow-hidden">
                             <div className="px-6 py-4 border-b border-gray-800 flex justify-between items-center">
                                 <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider">

@@ -5,33 +5,39 @@ import toast from "react-hot-toast";
 import Generator from "@/app/passwords/addPassword/generator";
 import MetaData from "@/app/passwords/addPassword/metaData";
 import Tags from "@/app/passwords/addPassword/tags";
-import {PasswordAdd, PasswordEntry} from "@/store/passwordStore";
+import {PasswordAdd} from "@/store/passwordStore";
 import Link from "next/link";
+import {Password, Tag} from "@/types";
+import {addTagToCatalog, useTagData} from "@/store/tagStore";
 
 
 
 export default function AddPage() {
     const [url, setUrl] = useState("");
-    const [name, setName] = useState("");
+    const [title, setTitle] = useState("");
     const [login, setLogin] = useState("");
     const [category, setCategory] = useState(1);
     const [password, setPassword] = useState("");
     const [reliability, setReliability] = useState(0);
-    const [selectedTags, setTag] = useState<Array<string>>([]);
+    const [selectedTags, setTag] = useState<Array<Tag>>([]);
     const [note, setNote] = useState("");
+
+    const storageTags = useTagData()
 
     const handleClickConfirmSave: MouseEventHandler = (e) => {
         e.preventDefault();
 
-        const data: PasswordEntry = {
-            service: name,
-            username: login,
+        const data: Omit<Password, 'id' | 'createdAt' | 'lastModified' > = {
+            title: title,
+            login: login,
             password: password,
-            category: category,
-            status: reliability,
+            strengthScore: reliability,
+            url: url,
+            tags: selectedTags,
+            note: note,
         }
 
-        if (!url || !name || !login) {
+        if (!url || !title || !login) {
             toast.error("Заполните поля помеченные *")
             return
         }
@@ -42,6 +48,13 @@ export default function AddPage() {
         }
 
         PasswordAdd(data)
+        console.log(data.tags)
+        data.tags
+            .filter((tag) => !storageTags.some(storageTag => storageTag.id === tag.id))
+            .map((tag) => {
+                console.log(tag);
+                addTagToCatalog(tag);
+        })
         toast.success("Даннные добавлены")
     }
 
@@ -53,7 +66,7 @@ export default function AddPage() {
                     <p className="text-(--text-muted) brightness-130 text-sm">Добавьте новые учетные данные в ваш безопасный сейф.</p>
                 </div>
                 <form className="space-y-6">
-                    <MetaData url={url} setUrl={setUrl} name={name} setName={setName} login={login} setLogin={setLogin} category={category} setCategory={setCategory}/>
+                    <MetaData url={url} setUrl={setUrl} title={title} setTitle={setTitle} login={login} setLogin={setLogin} category={category} setCategory={setCategory}/>
                     <Generator password={password} setPassword={setPassword} reliability={reliability} setReliability={setReliability}/>
                     <Tags selectedTags={selectedTags} setTag={setTag} note={note} setNote={setNote}/>
                     <div className="flex items-center justify-end gap-4 pt-4">

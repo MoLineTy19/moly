@@ -1,21 +1,31 @@
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 
-export interface Category {
+export interface Password {
+    id: string;
+    url: string;
+    title: string;
+    login: string;
+    password: string;
+    strengthScore: number;
+    tags: Array<Tag>;
+    note: string;
+    lastModified: number;
+    createdAt: number;
+}
+
+export interface Tag {
     id: number;
-    name: string;
+    title: string;
     icon: string;
     color: string;
 }
 
-export interface Password {
-    id: string;
-    title: string;
-    login: string;
-    password: string;
-    category: number;
-    strengthScore: number;
-    lastModified: number;
-    createdAt: number;
+export interface TagStore {
+    data: Array<Tag>;
+    selectedTag: Array<Tag>;
+    addTag: (tag: Tag) => void;
+    removeTag: (tag: Tag) => void;
+    addTagToCatalog: (tag: Omit<Tag, 'id'>) => void;
 }
 
 export interface PasswordStrengthConfig {
