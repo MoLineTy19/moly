@@ -142,7 +142,7 @@ export default function PasswordPage() {
                     <tbody className="text-sm text-gray-300">
                     {
                         paginatedPasswords.map((item, index) => (
-                            <Row isSelected={item.isSelected} login={item.login} title={item.title} category={item.category} strengthScore={item.strengthScore} createdAt={item.createdAt} key={index} password={item.password}/>
+                            <Row isSelected={item.isSelected} login={item.login} title={item.title} tag={item.tag} strengthScore={item.strengthScore} createdAt={item.createdAt} key={index} password={item.password}/>
                         ))
                     }
                     </tbody>
