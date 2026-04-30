@@ -5,11 +5,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {usePathname} from "next/navigation";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import {faFolder, faHouse, faStar} from "@fortawesome/free-regular-svg-icons";
-
-export interface RouteConfig {
-    title: string,
-    icon: IconDefinition
-}
+import {RouteConfig} from "@/types";
 
 export const routes: Record<string, RouteConfig> = {
     "/passwords": {

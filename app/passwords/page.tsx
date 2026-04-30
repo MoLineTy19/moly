@@ -113,13 +113,17 @@ export default function PasswordPage() {
                                 </div>
                             </label>
                         </th>
-                        <th className="py-4 px-4 font-medium">
+                        <th className="py-4 px-4 font-medium w-lg">
                             <FontAwesomeIcon icon={faGlobe} className="mr-2"/>
                             САЙТ / НАЗВАНИЕ
                         </th>
-                        <th className="py-4 px-4 font-medium border-l border-(--border-color)">
+                        <th className="py-4 px-4 font-medium w-1/5 border-l border-(--border-color)">
                             <FontAwesomeIcon icon={faUser} className="mr-2"/>
                             ЛОГИН
+                        </th>
+                        <th className="py-4 px-4 font-medium w-1/6 border-l border-(--border-color)">
+                            <FontAwesomeIcon icon={faUser} className="mr-2"/>
+                            Пароль
                         </th>
                         <th className="py-4 px-4 font-medium border-l border-(--border-color)">
                             <FontAwesomeIcon icon={faTag} className="mr-2"/>
@@ -138,7 +142,7 @@ export default function PasswordPage() {
                     <tbody className="text-sm text-gray-300">
                     {
                         paginatedPasswords.map((item, index) => (
-                            <Row isSelected={item.isSelected} username={item.service} service={item.username} category={item.category} status={item.status} createdAt={item.createdAt} key={index}/>
+                            <Row isSelected={item.isSelected} login={item.username} title={item.service} category={item.category} strengthScore={item.status} createdAt={item.createdAt} key={index} password={item.password}/>
                         ))
                     }
                     </tbody>

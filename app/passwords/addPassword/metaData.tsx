@@ -3,7 +3,7 @@ import {faAngleDown, faGlobe} from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import {faUser} from "@fortawesome/free-regular-svg-icons";
 
-export default function MetaData({url, setUrl, name, setName, login, setLogin, category, setCategory} : {url: string, setUrl: React.Dispatch<React.SetStateAction<string>>, name: string, setName: React.Dispatch<React.SetStateAction<string>>, login: string, setLogin: React.Dispatch<React.SetStateAction<string>>, category: string, setCategory: React.Dispatch<React.SetStateAction<string>>}) {
+export default function MetaData({url, setUrl, name, setName, login, setLogin, category, setCategory} : {url: string, setUrl: React.Dispatch<React.SetStateAction<string>>, name: string, setName: React.Dispatch<React.SetStateAction<string>>, login: string, setLogin: React.Dispatch<React.SetStateAction<string>>, category: number, setCategory: React.Dispatch<React.SetStateAction<number>>}) {
     const handleChangeUrl = (e: React.ChangeEvent<HTMLInputElement>) => {
         setUrl(e.target.value)
     }
@@ -17,7 +17,7 @@ export default function MetaData({url, setUrl, name, setName, login, setLogin, c
     }
 
     const handleChangeCategory = (e: React.ChangeEvent<HTMLSelectElement>)=> {
-        setCategory(e.target.value)
+        setCategory(parseInt(e.target.value))
     }
 
 

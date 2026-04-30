@@ -1,24 +1,15 @@
 "use client"
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEllipsis} from "@fortawesome/free-solid-svg-icons";
-import {useState} from "react";
+import {faEllipsis, faEyeLowVision} from "@fortawesome/free-solid-svg-icons";
+import React, {MouseEventHandler, useState} from "react";
 import Link from "next/link";
+import {RowConfig, statusDetails} from "@/types";
+import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
+import toast from "react-hot-toast";
 
-export interface RowConfig {
-    isSelected: boolean;
-    service: string;
-    username: string;
-    category: string;
-    status: number;
-    createdAt: number;
-}
 
-export interface statusDetails {
-    color: string
-}
-
-export const statuses: Record<string, statusDetails> = {
+export const statuses: Record<number, statusDetails> = {
     3: {
         color: "(--accent-color)"
     },
@@ -47,11 +38,35 @@ export const categoryList: Record<string, categoryDetails> = {
 }
 
 
-export default function Row({isSelected, username, service, category, status, createdAt}: RowConfig) {
+export default function Row({isSelected, title, login, category, strengthScore, createdAt, password}: RowConfig) {
+    const [isShow, setShow] = useState(false);
     const categoryDetails = categoryList[category];
-    const statusDetails = statuses[status];
+    const statusDetails = statuses[strengthScore];
 
     const [isChecked, setIsChecked] = useState(isSelected);
+
+    const handleClickShow: MouseEventHandler = (e) => {
+        e.preventDefault();
+        setShow(!isShow)
+    }
+
+    const handleCopy: MouseEventHandler = async (e) => {
+        e.preventDefault();
+
+        if (!password || !password.length) {
+            toast.error("Поле пароля пустое!")
+            return
+        }
+
+        try {
+            await navigator.clipboard.writeText(password)
+            toast.success("Скопировано")
+        } catch (err) {
+            toast.error("Произошла неизвестная ошибка")
+            console.error(err)
+        }
+
+    }
 
     return (
         <tr className="table-row-hover border-b border-(--text-muted)/20 transition-colors group cursor-pointer">
@@ -73,14 +88,27 @@ export default function Row({isSelected, username, service, category, status, cr
                 <div className="flex items-center gap-3">
                     {/*Здесь иконки*/}
                     <span className="font-medium text-white">
-                        {service}
+                        {title}
                     </span>
                 </div>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted) brightness-130">
                 <Link href={"/passwords/showPassword"} className="hover:text-(--accent-color) hover:underline transition-colors">
-                    {username}
+                    {login}
                 </Link>
+            </td>
+            <td className="py-3 pl-4 pr-1 border-l border-(--border-color)/50">
+                <div className="flex relative">
+                    <input type={isShow ? "text" : "password"} disabled={true} value={password} />
+                    <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center">
+                        <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={handleClickShow}>
+                            <FontAwesomeIcon icon={isShow ? faEye : faEyeLowVision } />
+                        </button>
+                        <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={handleCopy}>
+                            <FontAwesomeIcon icon={faCopy} />
+                        </button>
+                    </div>
+                </div>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50">
                 <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs ${categoryDetails.textColor} ${categoryDetails.borderColor} ${categoryDetails.background}`}>
@@ -90,7 +118,7 @@ export default function Row({isSelected, username, service, category, status, cr
             <td className="py-3 px-4 border-l border-(--border-color)/50">
                 <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-${statusDetails.color}/10 text-${statusDetails.color} border border-${statusDetails.color}/20 text-xs`}>
                     {/*<span className="w-1.5 h-1.5 rounded-full text-(--accent-color)"></span>*/}
-                    {status}
+                    {strengthScore}
                 </span>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted)">{createdAt}</td>

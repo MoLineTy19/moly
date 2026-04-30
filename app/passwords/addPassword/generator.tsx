@@ -109,10 +109,10 @@ export default function Generator({password, setPassword}: {password: string, se
                             <input type={isShow ? 'text': 'password'} placeholder="Введите пароль или сгенерируйте" className="w-full pl-11 pr-24 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color)
                                      font-mono focus:outline-none focus:border-(--accent-color) transition-colors placeholder-gray-600" value={password} onChange={handlePasswordChange}/>
                             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                                <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-dark-800 flex items-center justify-center transition-colors" onClick={handleClickShow}>
+                                <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={handleClickShow}>
                                     <FontAwesomeIcon icon={isShow ? faEye : faEyeLowVision } />
                                 </button>
-                                <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-dark-800 flex items-center justify-center transition-colors" onClick={handleCopy}>
+                                <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={handleCopy}>
                                     <FontAwesomeIcon icon={faCopy} />
                                 </button>
                             </div>

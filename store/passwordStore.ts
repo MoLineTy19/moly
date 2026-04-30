@@ -7,7 +7,7 @@ export interface PasswordEntry {
     service: string;
     username: string;
     password: string;
-    category: string;
+    category: number;
     status: number;
     url?: string;
     tags?: string[];

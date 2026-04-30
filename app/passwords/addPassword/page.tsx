@@ -14,7 +14,7 @@ export default function AddPage() {
     const [url, setUrl] = useState("");
     const [name, setName] = useState("");
     const [login, setLogin] = useState("");
-    const [category, setCategory] = useState("personal");
+    const [category, setCategory] = useState(1);
     const [password, setPassword] = useState("");
     const [reliability, setReliability] = useState(3);
     const [selectedTags, setTag] = useState<Array<string>>([]);
