@@ -28,6 +28,8 @@ export interface categoryDetails {
 export default function Row({isSelected, title, login, tag, strengthScore, createdAt, password}: RowConfig) {
     const [isShow, setShow] = useState(false);
     const categoryDetails = DEFAULT_TAGS.filter(value => value.id === tag.id)[0];
+    const createdDate = new Date(createdAt);
+
     const statusDetails = statuses[strengthScore];
 
     const [isChecked, setIsChecked] = useState(isSelected);
@@ -85,7 +87,9 @@ export default function Row({isSelected, title, login, tag, strengthScore, creat
             </td>
             <td className="py-3 pl-4 pr-1 border-l border-(--border-color)/50">
                 <div className="flex relative">
-                    <input type={isShow ? "text" : "password"} disabled={true} value={password} />
+                    <div className="bg-(--background-color) rounded pl-2 py-1">
+                        <input type={isShow ? "text" : "password"} disabled={true} value={password} />
+                    </div>
                     <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center">
                         <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={handleClickShow}>
                             <FontAwesomeIcon icon={isShow ? faEye : faEyeLowVision } />
@@ -106,7 +110,7 @@ export default function Row({isSelected, title, login, tag, strengthScore, creat
                     {STRENGTH_LEVELS[strengthScore]}
                 </span>
             </td>
-            <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted)">{createdAt}</td>
+            <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted)">{createdDate.toLocaleString('ru-RU')}</td>
             <td className="py-3 px-4 text-right">
                 <Link href="/passwords/editPassword">
                     <button className="text-(--text-muted) hover:text-white opacity-0 group-hover:opacity-100 transition-all">
