@@ -15,7 +15,7 @@ import {faFolder, faStar} from "@fortawesome/free-regular-svg-icons";
 import Link from "next/link";
 import SectionButton from "@/components/layout/sectionButton";
 import {PasswordCount} from "@/store/passwordStore";
-import {MouseEventHandler, useState} from "react";
+import {useState} from "react";
 
 export default function Sidebar() {
     const [isOpen, setIsOpen] = useState(true);
