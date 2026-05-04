@@ -75,7 +75,7 @@ export default function Row({isSelected, title, login, tag, strengthScore, creat
                 </div>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted) brightness-130">
-                <Link href={"/passwords/showPassword"} className="hover:text-(--accent-color) hover:underline transition-colors">
+                <Link href={`/passwords/showPassword/${11}`} className="hover:text-(--accent-color) hover:underline transition-colors">
                     {login}
                 </Link>
             </td>

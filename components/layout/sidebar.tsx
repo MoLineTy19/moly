@@ -1,7 +1,7 @@
 "use client"
 
 import {
-    faAngleDown,
+    faAngleDown, faAngleUp,
     faFile,
     faListUl,
     faMagnifyingGlass,
@@ -11,12 +11,15 @@ import {
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
-import SectionButton from "@/components/sectionButton";
 import {faFolder, faStar} from "@fortawesome/free-regular-svg-icons";
 import Link from "next/link";
+import SectionButton from "@/components/layout/sectionButton";
 import {PasswordCount} from "@/store/passwordStore";
+import {MouseEventHandler, useState} from "react";
 
 export default function Sidebar() {
+    const [isOpen, setIsOpen] = useState(true);
+
     return (
         <aside className="w-75 shrink-0 bg-(--background-secondary) border-r border-(--border-color) flex flex-col pt-6 pb-6 overflow-y-auto z-20">
             <div className="px-6 mb-8 flex items-center justify-between">
@@ -54,13 +57,18 @@ export default function Sidebar() {
                 </div>
                 <SectionButton title="Все пароли" icon={faListUl} href="/passwords" data={PasswordCount().toString()}/>
                 <SectionButton title="Избранное" icon={faStar} href="/favorites"/>
-                <div className="px-3 mt-8 mb-2 text-xs font-medium text-(--text-muted) uppercase tracking-wider flex items-center justify-between">
+                <div className="px-3 mt-8 mb-2 text-xs font-medium text-(--text-muted) uppercase tracking-wider flex items-center justify-between cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
                     Управление
-                    <FontAwesomeIcon icon={faAngleDown} />
+                    { isOpen ? <FontAwesomeIcon icon={faAngleDown} /> : <FontAwesomeIcon icon={faAngleUp} /> }
                 </div>
-                <SectionButton title="Управление категориями" icon={faFolder} href="/categories"/>
-                <SectionButton title="Поиск и фильтры" icon={faSliders} href="/search"/>
-                <SectionButton title="Настройки безопасности" icon={faShieldHalved} href="/security"/>
+                {
+                    isOpen &&
+                    <>
+                        <SectionButton title="Управление категориями" icon={faFolder} href="/categories"/>
+                        <SectionButton title="Поиск и фильтры" icon={faSliders} href="/search"/>
+                        <SectionButton title="Настройки безопасности" icon={faShieldHalved} href="/security"/>
+                    </>
+                }
             </nav>
         </aside>
     )

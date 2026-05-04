@@ -16,6 +16,9 @@
     * {
         @apply font-[Inter];
     }
+    button {
+    @apply cursor-pointer;
+    }
 }
 
 .custom-range::-webkit-slider-thumb {

@@ -93,7 +93,7 @@ export default function Generator({password, setPassword, reliability, setReliab
             <div className="bg-(--background-secondary) border border-(--text-muted)/20 rounded-xl shadow-soft overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-800 flex justify-between items-center bg-(--background-color)/20">
                     <h2 className="text-sm font-medium text-(--text-muted) brightness-130 uppercase tracking-wider">Пароль</h2>
-                    <button type="button" className="text-(--accent-color) hover:text-(--accent-color)/90 font-medium flex items-center gap-1.5 transition-colors cursor-pointer" onClick={toggleGenerator}>
+                    <button type="button" className="text-(--accent-color) hover:text-(--accent-color)/90 font-medium flex items-center gap-1.5 transition-colors" onClick={toggleGenerator}>
                         <FontAwesomeIcon icon={faWandMagicSparkles} />
                         Генератор
                     </button>
@@ -182,7 +182,7 @@ export default function Generator({password, setPassword, reliability, setReliab
                                     </div>
                                 </label>
                             </div>
-                            <button type="button" className="w-full py-3 bg-white/10 hover:bg-dark-700 border border-(--border-input-color) text-(--text-color) rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer" onClick={toggleGenerator}>
+                            <button type="button" className="w-full py-3 bg-white/10 hover:bg-dark-700 border border-(--border-input-color) text-(--text-color) rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2" onClick={toggleGenerator}>
                                 <FontAwesomeIcon icon={faArrowsRotate} />
                                 Сгенерировать новый пароль
                             </button>

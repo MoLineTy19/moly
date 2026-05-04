@@ -1,20 +1,36 @@
 "use client"
 
+
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
-    faAngleDown, faArrowRightToBracket,
+    faAngleDown, faArrowRightToBracket, faBorderAll, faCodeBranch,
     faDesktop,
     faExclamation,
     faFileExport,
-    faFileImport,
-    faKey,
-    faLock
+    faFileImport, faGears,
+    faKey, faListUl,
+    faLock, faTableList
 } from "@fortawesome/free-solid-svg-icons";
 import {faEye} from "@fortawesome/free-regular-svg-icons";
-import {useState} from "react";
+import React, {MouseEventHandler, useState} from "react";
 
 export default function Security() {
+    const [currentView, setCurrentView] = useState('table')
     const [enabled, setEnabled] = useState(false);
+
+    const handleCheckUpdate: MouseEventHandler = (e) => {
+        e.preventDefault()
+        console.log(123)
+    }
+
+    const handleResetRecoveryKey: MouseEventHandler = (e) => {
+        e.preventDefault()
+        console.log(123)
+    }
+
+    const switchDisplayView = (view: string, e: React.MouseEvent) => {
+        setCurrentView(view);
+    }
 
     return (
         <div className="grow overflow-y-auto p-4 md:p-8 relative w-full">
@@ -54,9 +70,58 @@ export default function Security() {
                             <div className="text-xs text-gray-400 mt-1">Рекомендуется менять каждые 90 дней</div>
                         </div>
                     </div>
+                    <div className="bg-(--background-secondary) border border-gray-800 rounded-xl p-5 shadow-soft flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-dark-800 border border-gray-700 flex items-center justify-center shrink-0 text-gray-300">
+                            <FontAwesomeIcon icon={faCodeBranch} style={{color: 'var(--accent-color)'}}/>
+                        </div>
+                        <div>
+                            <div className="text-xs text-gray-500 font-medium mb-1">
+                                Статус обновлений
+                            </div>
+                            <p className="text-sm text-gray-400 mb-2">
+                                Версия: 1.0
+                            </p>
+                            <button className={`px-4 py-2 hover:bg-(--accent-color) border text-(--text-color) rounded-lg text-sm font-medium transition-colors whitespace-nowrap items-center bg-(--accent-color)/90 border-(--accent-color)`} onClick={handleCheckUpdate}>
+                                <FontAwesomeIcon icon={faDesktop} style={{marginRight: 6}}/>
+                                Проверить версию
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     <div className="lg:col-span-7 flex flex-col gap-6">
+                        <section className="bg-(--background-secondary) border border-gray-800 rounded-xl shadow-soft overflow-hidden">
+                            <div className="px-6 py-4 border-b border-gray-800 bg-(--background-secondary)/50">
+                                <h2 className="text-lg font-medium text-(--text-color) flex items-center gap-2">
+                                    <FontAwesomeIcon icon={faGears} />
+                                    Общие настройки
+                                </h2>
+                            </div>
+                            <div className="p-6 flex flex-col gap-6">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-800">
+                                    <div>
+                                        <h3 className="text-sm font-medium text-(--text-color) mb-1">
+                                            Отображение по умолчанию
+                                        </h3>
+                                        <p className="text-xs text-gray-400 max-w-md">
+                                            Ваш основной ключ для доступа к сейфу. Убедитесь, что он надежный и уникальный.
+                                        </p>
+                                    </div>
+                                    <button className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-(--text-color) text-sm shadow-sm  hover:bg-white/5 ${currentView === 'table' ? 'border bg-white/5 border-(--border-input-color)' : ''}`} onClick={(e) => switchDisplayView('table', e)}>
+                                        <FontAwesomeIcon icon={faTableList}/>
+                                        Таблица
+                                    </button>
+                                    <button className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-(--text-color) text-sm shadow-sm hover:bg-white/5 ${currentView === 'board' ? 'border bg-white/5 border-(--border-input-color)' : ''}`} onClick={(e) => switchDisplayView('board', e)}>
+                                        <FontAwesomeIcon icon={faBorderAll}/>
+                                        Доска
+                                    </button>
+                                    <button className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-(--text-color) text-sm shadow-sm hover:bg-white/5 ${currentView === 'list' ? 'border bg-white/5 border-(--border-input-color)' : ''}`} onClick={(e) => switchDisplayView('list', e)}>
+                                        <FontAwesomeIcon icon={faListUl}/>
+                                        Список
+                                    </button>
+                                </div>
+                            </div>
+                        </section>
                         <section className="bg-(--background-secondary) border border-gray-800 rounded-xl shadow-soft overflow-hidden">
                             <div className="px-6 py-4 border-b border-gray-800 bg-(--background-secondary)/50">
                                 <h2 className="text-lg font-medium text-(--text-color) flex items-center gap-2">
@@ -74,7 +139,7 @@ export default function Security() {
                                             Ваш основной ключ для доступа к сейфу. Убедитесь, что он надежный и уникальный.
                                         </p>
                                     </div>
-                                    <button className='px-4 py-2 bg-dark-800 hover:bg-dark-700 border border-gray-700 text-(--text-color) rounded-lg text-sm font-medium transition-colors whitespace-nowrap'>
+                                    <button className='px-4 py-2 bg-white/5 hover:bg-dark-700 border border-gray-700 text-(--text-color) rounded-lg text-sm font-medium transition-colors whitespace-nowrap'>
                                         Сменить пароль
                                     </button>
                                 </div>
@@ -93,7 +158,7 @@ export default function Security() {
                                         <button className="px-3 py-2 bg-dark-800 hover:bg-dark-700 border border-gray-700 text-gray-300 rounded-lg text-xs font-medium transition-colors" title="Показать ключ">
                                             <FontAwesomeIcon icon={faEye} />
                                         </button>
-                                        <button className="px-4 py-2 bg-dark-800 hover:bg-dark-700 border border-gray-700 text-red-400 hover:text-red-300 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
+                                        <button className={`px-4 py-2 hover:bg-red-500 border text-(--text-color) rounded-lg text-sm font-medium transition-colors whitespace-nowrap items-center bg-red-500/90 border-(--border-color)`} onClick={handleResetRecoveryKey}>
                                             Перегенерировать
                                         </button>
                                     </div>
