@@ -64,11 +64,11 @@ export default function AddPage() {
                     <Tags selectedTag={selectedTag} setTag={setTag} note={note} setNote={setNote}/>
                     <div className="flex items-center justify-end gap-4 pt-4">
                         <Link href={'/passwords'}>
-                            <button type="button" className="px-6 py-2.5 rounded-lg border border-(--text-muted)/20 text-(--text-color)/80 hover:text-(--text-color) hover:bg-dark-800 font-medium text-sm transition-colors cursor-pointer" >
+                            <button type="button" className="px-6 py-2.5 rounded-lg border border-(--text-muted)/20 text-(--text-color)/80 hover:text-(--text-color) hover:bg-dark-800 font-medium text-sm transition-colors" >
                                 Отмена
                             </button>
                         </Link>
-                        <button type="submit" className="px-8 py-2.5 rounded-lg bg-(--accent-color)/90 hover:bg-(--accent-color) text-(--text-color) font-medium text-sm shadow-lg shadow-(--accent-color)/20 transition-all cursor-pointer" onClick={handleClickConfirmSave}>
+                        <button type="submit" className="px-8 py-2.5 rounded-lg bg-(--accent-color)/90 hover:bg-(--accent-color) text-(--text-color) font-medium text-sm shadow-lg shadow-(--accent-color)/20 transition-all" onClick={handleClickConfirmSave}>
                             Сохранить
                         </button>
                     </div>
