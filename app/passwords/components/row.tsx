@@ -4,10 +4,11 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEllipsis, faEyeLowVision} from "@fortawesome/free-solid-svg-icons";
 import React, {MouseEventHandler, useState} from "react";
 import Link from "next/link";
-import {RowConfig, statusDetails} from "@/types";
 import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
 import toast from "react-hot-toast";
-import {DEFAULT_TAGS, STRENGTH_LEVELS} from "@/config";
+import {STRENGTH_LEVELS} from "@/config";
+import {RowConfig, statusDetails} from "@/types";
+import {generateTagColor} from "@/utils/color";
 
 
 export const statuses: Record<number, statusDetails> = {
@@ -20,16 +21,16 @@ export const statuses: Record<number, statusDetails> = {
 }
 
 export default function Row({isSelected, title, login, tag, strengthScore, createdAt, password}: RowConfig) {
-    const [isShow, setShow] = useState(false);
-    const categoryDetails = DEFAULT_TAGS.filter(value => value.id === tag.id)[0];
     const createdDate = new Date(createdAt);
 
-    const statusDetails = statuses[strengthScore];
-
+    const [isShow, setShow] = useState(false);
     const [isChecked, setIsChecked] = useState(isSelected);
 
-    const handleClickShow: MouseEventHandler = (e) => {
-        e.preventDefault();
+    const statusDetails = statuses[strengthScore];
+    const baseColor = generateTagColor(tag.color)
+
+
+    const handleClickShow: MouseEventHandler = () => {
         setShow(!isShow)
     }
 
@@ -85,7 +86,7 @@ export default function Row({isSelected, title, login, tag, strengthScore, creat
                         <input type={isShow ? "text" : "password"} disabled={true} value={password} />
                     </div>
                     <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center">
-                        <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={handleClickShow}>
+                        <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={(handleClickShow)}>
                             <FontAwesomeIcon icon={isShow ? faEye : faEyeLowVision } />
                         </button>
                         <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={handleCopy}>
@@ -95,8 +96,8 @@ export default function Row({isSelected, title, login, tag, strengthScore, creat
                 </div>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50">
-                <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs`} style={{color: categoryDetails.color, borderColor: categoryDetails.color}}>
-                    {categoryDetails.title}
+                <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs`} style={{color: baseColor.color, borderColor: baseColor.color}}>
+                    {tag.title}
                 </span>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50">

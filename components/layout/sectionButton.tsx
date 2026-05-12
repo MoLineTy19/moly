@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import {usePathname} from "next/navigation";
-import {SectionButtonDetails} from "types";
+import {SectionButtonDetails} from "@/types";
 
 
-
+/**
+ * Компонент кнопки для боковой панели
+ */
 export default function SectionButton({href, icon, title, data}: SectionButtonDetails) {
     const path = usePathname()
 

@@ -14,18 +14,19 @@ import {
 import {faEye} from "@fortawesome/free-regular-svg-icons";
 import React, {MouseEventHandler, useState} from "react";
 
+/**
+ * Страница с настройками Moly
+ */
 export default function Security() {
     const [currentView, setCurrentView] = useState('table')
     const [enabled, setEnabled] = useState(false);
 
     const handleCheckUpdate: MouseEventHandler = (e) => {
         e.preventDefault()
-        console.log(123)
     }
 
     const handleResetRecoveryKey: MouseEventHandler = (e) => {
         e.preventDefault()
-        console.log(123)
     }
 
     const switchDisplayView = (view: string, e: React.MouseEvent) => {

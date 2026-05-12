@@ -1,34 +1,38 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPlus, faTag, faX} from "@fortawesome/free-solid-svg-icons";
+import {faHeart, faPlus, faTag, faX} from "@fortawesome/free-solid-svg-icons";
 import React, {Fragment, useState} from "react";
-import {Tag} from "@/types";
-import {addTagToCatalog, useTagData} from "@/store/tagStore";
+import {Tag} from "@/types/components";
+import {useTagStore} from "@/store/tagStore";
+
+//* ТРЕБУЕТСЯ ПЕРЕРАБОТКА
+//* TODO сделать фильтр, а не подбор с регистрацией тегов
 
 export default function Tags({selectedTag, setTag, note, setNote} : {selectedTag: Tag, setTag: React.Dispatch<React.SetStateAction<Tag>>, note: string, setNote: React.Dispatch<React.SetStateAction<string>>}) {
     const [input, setInput] = useState("");
-    const allTags = useTagData()
+    const allTags = useTagStore((state) => state.tags)
 
     const handleInputTag = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInput(event.target.value)
     }
 
     const handleKeyDownInput = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === "Enter") {
-            const trimmed = input.trim();
-            const exists = allTags.some(tag => tag.title === trimmed)
-
-            if (!exists) {
-                const newTag: Tag = {
-                    id: allTags.length,
-                    title: trimmed,
-                    color: "#ffffff",
-                    icon: "❤️"
-                }
-                addTagToCatalog(newTag);
-                setTag(newTag)
-            }
-            setInput('')
-        }
+        // if (event.key === "Enter") {
+        //     const trimmed = input.trim();
+        //     const exists = allTags.some(tag => tag.title === trimmed)
+        //
+        //     if (!exists) {
+        //         const newTag: Tag = {
+        //             id: allTags.length,
+        //             title: trimmed,
+        //             color: "#ffffff",
+        //             iconId: 1,
+        //             countUses: 0,
+        //         }
+        //         // addTagToCatalog(newTag);
+        //         setTag(newTag)
+        //     }
+        //     setInput('')
+        // }
     }
 
     const removeTag = () => {

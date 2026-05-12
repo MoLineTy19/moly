@@ -1,39 +1,44 @@
-import {createJSONStorage, persist} from "zustand/middleware";
+import {Password, PasswordStore} from "@/types";
 import {create} from "zustand";
-import {idbStorage} from "@/lib/storage";
-import {Password} from "@/types";
 
-interface PasswordState {
-    entries: Password[],
-    addEntry: (data: Omit<Password, 'id' | 'createdAt' | 'lastModified'>) => void;
-    removeEntry: (id: string) => void;
-}
+export const usePasswordStore = create<PasswordStore>((set) => ({
+    passwords: [],
+    passwordCount: 0,
+    isLoading: false,
+    error: null,
 
-const usePasswordStore = create<PasswordState>()(
-    persist(
-        (set, get) => ({
-            entries: [],
-            addEntry: (data: Omit<Password, 'id' | 'createdAt' | 'lastModified'>) => {
-                const newEntry: Password = {
-                    ...data,
-                    id: crypto.randomUUID(),
-                    createdAt: Date.now(),
-                    lastModified: Date.now(),
-                };
-                set((state) => ({ entries: [newEntry, ...state.entries]}))
-            },
-            removeEntry: (id: string) => {
-                set((state) => ({ entries: state.entries.filter(e => e.id !== id)}))
-            }
-        }),
-        {
-            name: 'password-storage',
-            storage: createJSONStorage(() => idbStorage)
+    fetchPasswords: async () => {
+        set(  {isLoading: true, error: null} );
+
+        try {
+            const res = await fetch('/api/passwords');
+            if (!res.ok) throw new Error('Failed to fetch');
+            const data = await res.json();
+            set({ passwords: data, passwordCount: data.length , isLoading: false })
+        } catch (err) {
+            set({ error: (err as Error).message, isLoading: false})
         }
-    )
-)
+    },
 
-export const PasswordData = () => usePasswordStore((state) => state.entries);
-export const PasswordCount = () => usePasswordStore((state) => state.entries.length);
-export const PasswordAdd = (passwordData: Omit<Password, 'id' | 'createdAt' | 'lastModified'>) => usePasswordStore.getState().addEntry(passwordData);
-export const PasswordRemove = (passwordId: string) => usePasswordStore.getState().removeEntry(passwordId)
+    addPassword: async (password: Omit<Password, 'id' | 'createdAt' | 'lastModified'>) => {
+        set( {error: null} );
+
+        try {
+            const res = await fetch('/api/passwords/add', {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({password}),
+            });
+            if (!res.ok) throw new Error('Failed to fetch');
+        } catch (err) {
+            set({ error: (err as Error).message})
+        }
+    },
+
+    deletePassword: async () => {
+        // TODO: реализовать позже
+    },
+}))
+
+
+export const addPassword = (password: Omit<Password, 'id' | 'createdAt' | 'lastModified'>) => usePasswordStore.getState().addPassword(password);

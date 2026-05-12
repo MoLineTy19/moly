@@ -7,12 +7,15 @@ import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
 import Tags from "@/app/passwords/addPassword/tags";
 import React, {useState} from "react";
 import {STRENGTH_COLORS, STRENGTH_LEVELS} from "@/config";
-import {Tag} from "@/types";
-import {useTagData} from "@/store/tagStore";
 import {calculatePasswordStrength} from "@/utils/passwordStrength";
+import {Tag} from "@/types/components";
+import {useTagStore} from "@/store/tagStore";
 
+/**
+ * Страница с изменением записей связанных с паролем
+ */
 export default function EditPassword() {
-    const allTag = useTagData();
+    const allTag = useTagStore((state) => state.tags);
 
     const [url, setUrl] = useState("");
     const [title, setTitle] = useState("");

@@ -12,22 +12,23 @@ import {
 import {faFolder} from "@fortawesome/free-regular-svg-icons";
 import React, {useState} from "react";
 import Link from "next/link";
-import {PasswordData, PasswordCount} from "@/store/passwordStore";
 import TableView from "@/app/passwords/components/tableView";
+import BoardView from "@/app/passwords/components/boardView";
+import {usePasswordStore} from "@/store/passwordStore";
 
-
+/**
+ * Страница с отображением паролей
+ */
 export default function PasswordPage() {
+    const passwords = usePasswordStore((state) => state.passwords);
+    const passwordCount = usePasswordStore((state) => state.passwordCount);
+
+
     const [isChecked, setIsChecked] = useState(false);
-    const passwordCount = PasswordCount();
-
     const [currentView, setCurrentView] = useState('table')
-
-    const allPasswords = PasswordData();
     const [currentPage, setCurrentPage] = useState(0);
     const itemPerPage = 10;
-
-    const totalPage = Math.ceil(allPasswords.length / itemPerPage);
-
+    const totalPage = Math.ceil(passwords.length / itemPerPage);
 
     const goToNextPage = () => {
         setCurrentPage(prev => Math.min(prev + 1, totalPage - 1));
@@ -93,21 +94,25 @@ export default function PasswordPage() {
                     </div>
                 </div>
             </div>
-            <div className="bg-(--background-secondary) border border-gray-800 rounded-xl overflow-hidden shadow-soft">
-                {/*тут сделать свап*/}
-                { currentView === 'table' ? <TableView passwords={allPasswords} currentPage={currentPage} itemPerPage={itemPerPage} isChecked={isChecked} setIsChecked={setIsChecked}/> : null}
-            </div>
-            <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
-                <div>Показано {currentPage * itemPerPage + 1} - {Math.min((currentPage + 1) * itemPerPage, passwordCount)} из {passwordCount} записей</div>
-                <div className="flex gap-2">
-                    <button className="px-3 py-1.5 rounded-md bg-(--background-secondary) border border-(--border-input-color) hover:text-(--text-color) hover:border-(--border-input-color)/90 transition-colors disabled:opacity-50" onClick={goToPreviousPage}>
-                        Предыдущая
-                    </button>
-                    <button className="px-3 py-1.5 rounded-md bg-(--background-secondary) border border-(--border-input-color) hover:text-(--text-color) hover:border-(--border-input-color)/90 transition-colors" onClick={goToNextPage}>
-                        Следующая
-                    </button>
-                </div>
-            </div>
+            { currentView === 'table' ?
+                <>
+                    <div className="bg-(--background-secondary) border border-gray-800 rounded-xl overflow-hidden shadow-soft">
+                        {/*тут сделать свап*/}
+                        <TableView passwords={passwords} currentPage={currentPage} itemPerPage={itemPerPage} isChecked={isChecked} setIsChecked={setIsChecked}/>
+                    </div>
+                    <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
+                        <div>Показано {currentPage * itemPerPage + 1} - {Math.min((currentPage + 1) * itemPerPage, passwordCount)} из {passwordCount} записей</div>
+                        <div className="flex gap-2">
+                            <button className="px-3 py-1.5 rounded-md bg-(--background-secondary) border border-(--border-input-color) hover:text-(--text-color) hover:border-(--border-input-color)/90 transition-colors disabled:opacity-50" onClick={goToPreviousPage}>
+                                Предыдущая
+                            </button>
+                            <button className="px-3 py-1.5 rounded-md bg-(--background-secondary) border border-(--border-input-color) hover:text-(--text-color) hover:border-(--border-input-color)/90 transition-colors" onClick={goToNextPage}>
+                                Следующая
+                            </button>
+                        </div>
+                    </div></>
+            : null}
+            { currentView === 'board' ? <BoardView/> : null}
         </div>
     )
 }

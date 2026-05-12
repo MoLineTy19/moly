@@ -9,6 +9,10 @@ import {faGithub} from "@fortawesome/free-brands-svg-icons";
 import {faCopy, faEye, faUser} from "@fortawesome/free-regular-svg-icons";
 import React from "react";
 
+
+/**
+ * Страница с деталями о пароле
+ */
 export default function ShowPage() {
     return (
         <div className="grow overflow-y-auto p-8 relative">

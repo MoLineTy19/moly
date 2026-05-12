@@ -5,15 +5,18 @@ import toast from "react-hot-toast";
 import Generator from "@/app/passwords/addPassword/generator";
 import MetaData from "@/app/passwords/addPassword/metaData";
 import Tags from "@/app/passwords/addPassword/tags";
-import {PasswordAdd} from "@/store/passwordStore";
 import Link from "next/link";
-import {Password, Tag} from "@/types";
-import {useTagData} from "@/store/tagStore";
+import {Password} from "@/types";
+import {Tag} from "@/types/components";
+import {addPassword} from "@/store/passwordStore";
+import {useTagStore} from "@/store/tagStore";
 
 
-
+/**
+ * Страница с добавлением пароля
+ */
 export default function AddPage() {
-    const storageTags = useTagData()
+    const tags = useTagStore((state) => state.tags);
 
     const [url, setUrl] = useState("");
     const [title, setTitle] = useState("");
@@ -21,13 +24,13 @@ export default function AddPage() {
     const [category, setCategory] = useState(1);
     const [password, setPassword] = useState("");
     const [reliability, setReliability] = useState(0);
-    const [selectedTag, setTag] = useState<Tag>(storageTags[0]);
+    const [selectedTag, setTag] = useState<Tag>(tags[0]);
     const [note, setNote] = useState("");
 
     const handleClickConfirmSave: MouseEventHandler = (e) => {
         e.preventDefault();
 
-        const data: Omit<Password, 'id' | 'createdAt' | 'lastModified' > = {
+        const data: Omit<Password, 'id' | 'createdAt' | 'lastModified'> = {
             title: title,
             login: login,
             password: password,
@@ -47,7 +50,7 @@ export default function AddPage() {
             return;
         }
 
-        PasswordAdd(data)
+        addPassword(data)
         toast.success("Даннные добавлены")
     }
 

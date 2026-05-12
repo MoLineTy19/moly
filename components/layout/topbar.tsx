@@ -14,6 +14,9 @@ const routeNames: Record<string, string> = {
     "security": "Настройки безопасности",
 };
 
+/**
+ * Компонент верхней панели
+ */
 export default function Topbar() {
     const path = usePathname().split("/").filter((value) => value.trim());
 

@@ -3,7 +3,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faGlobe, faKey, faShieldHalved, faTag} from "@fortawesome/free-solid-svg-icons";
 import {faCalendar, faUser} from "@fortawesome/free-regular-svg-icons";
 import {Password} from "@/types";
-import Row from "@/app/passwords/row";
+import Row from "./row";
 
 export default function TableView({passwords, currentPage, itemPerPage, isChecked, setIsChecked}: {passwords: Array<Password>, currentPage: number, itemPerPage: number, isChecked: boolean, setIsChecked: Dispatch<SetStateAction<boolean>>}) {
     const paginatedPasswords = passwords
@@ -59,8 +59,8 @@ export default function TableView({passwords, currentPage, itemPerPage, isChecke
             </thead>
             <tbody className="text-sm text-gray-300">
             {
-                paginatedPasswords.map((item, index) => (
-                    <Row isSelected={item.isSelected} login={item.login} title={item.title} tag={item.tag} strengthScore={item.strengthScore} createdAt={item.createdAt} key={index} password={item.password}/>
+                paginatedPasswords.map((item) => (
+                    <Row isSelected={item.isSelected} login={item.login} title={item.title} tag={item.tag} strengthScore={item.strengthScore} createdAt={item.createdAt} key={item.id} password={item.password}/>
                 ))
             }
             </tbody>

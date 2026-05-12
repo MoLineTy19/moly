@@ -1,35 +1,51 @@
 import {create} from "zustand";
-import {Tag, TagStore} from "@/types";
-import {DEFAULT_TAGS} from "@/config";
-import {createJSONStorage, persist} from "zustand/middleware";
-import {idbStorage} from "@/lib/storage";
+import {TagStore} from "@/types";
+import {Tag} from "@/types/components";
 
-const defaultData = DEFAULT_TAGS;
+export const useTagStore = create<TagStore>((set) => ({
+    tags: [],
+    isLoading: false,
+    error: null,
 
-const tagStore = create<TagStore>()(
-    persist(
-        (set) => ({
-            data: defaultData,
-            selectedTag: null,
-            addTag: (tag: Tag) => set(() => ({
-                selectedTag: tag,
-            })),
-            removeTag: () => set(() => ({
-                selectedTag: null,
-            })),
-            addTagToCatalog: (tag: Omit<Tag, 'id'>) => set((state) => ({
-                data: [...state.data, { ...tag, id: state.data.length }]
-            })),
-        }),
-        {
-            name: 'tag-storage',
-            storage: createJSONStorage(() => idbStorage),
+    fetchTags: async () => {
+        set( {isLoading: true, error: null});
+
+        try {
+            const res = await fetch('/api/tags');
+            if (!res.ok) throw new Error('Failed to fetch');
+            const data = await res.json();
+            set({ tags: data, isLoading: false });
+        } catch (err) {
+            set({ error: (err as Error).message, isLoading: false });
         }
-    )
-)
+    },
 
-export const useTagData = () => tagStore((state) => state.data)
-export const useSelectedTag = () => tagStore((state) => state.selectedTag)
-export const addTag = (tag: Tag) => tagStore.getState().addTag(tag)
-export const removeTag = () => tagStore.getState().removeTag()
-export const addTagToCatalog = (tag: Omit<Tag, 'id'>) => tagStore.getState().addTagToCatalog(tag)
+    addTag: async () => {
+        // TODO: реализовать позже
+    },
+
+    deleteTag: async () => {
+        // TODO: реализовать позже
+    },
+
+    editTag: async () => {
+        // TODO: реализовать позже
+    },
+
+    reorderTags: async (newOrder: Tag[]) => {
+        const ids = newOrder.map(tag => tag.id);
+        const res = await fetch('/api/tags/reorder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ids}),
+        });
+        if (!res.ok) throw new Error('Failed to fetch');
+        const updatedTags = await res.json();
+        set({ tags: updatedTags });
+    }
+}))
+
+export const editTag = (tag: Tag) => useTagStore.getState().editTag(tag)
+export const addTag = (tag: Tag) => useTagStore.getState().addTag(tag)
+export const deleteTag = (id: number) => useTagStore.getState().deleteTag(id)
+export const reorderTags = (newOrder: Tag[]) => useTagStore.getState().reorderTags(newOrder)
