@@ -1,8 +1,8 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faHeart, faPlus, faTag, faX} from "@fortawesome/free-solid-svg-icons";
 import React, {Fragment, useState} from "react";
-import {Tag} from "@/types/components";
 import {useTagStore} from "@/store/tagStore";
+import {Tag} from "@/types/components";
 
 //* ТРЕБУЕТСЯ ПЕРЕРАБОТКА
 //* TODO сделать фильтр, а не подбор с регистрацией тегов

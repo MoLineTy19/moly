@@ -1,5 +1,5 @@
 import React, {Dispatch, SetStateAction} from "react";
-import CheckBox from "@/app/passwords/addPassword/checkBox";
+import CheckBox from "@/app/passwords/addPassword/components/checkBox";
 
 
 export default function AdditionOption({name, isActive, setIsActive}: {name: string; isActive: boolean, setIsActive: Dispatch<SetStateAction<boolean>>}) {

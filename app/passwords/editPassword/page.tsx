@@ -2,9 +2,9 @@
 
 import {faKey, faTag, faTrashCan, faWandMagicSparkles} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import MetaData from "@/app/passwords/addPassword/metaData";
+import MetaData from "../addPassword/components/metaData";
 import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
-import Tags from "@/app/passwords/addPassword/tags";
+import Tags from "../addPassword/components/tags";
 import React, {useState} from "react";
 import {STRENGTH_COLORS, STRENGTH_LEVELS} from "@/config";
 import {calculatePasswordStrength} from "@/utils/passwordStrength";

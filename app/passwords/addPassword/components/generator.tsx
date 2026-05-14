@@ -3,8 +3,8 @@ import React, {MouseEventHandler, useState} from "react";
 import toast from "react-hot-toast";
 import {faArrowsRotate, faEyeLowVision, faKey, faWandMagicSparkles} from "@fortawesome/free-solid-svg-icons";
 import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
-import AdditionOption from "@/app/passwords/addPassword/additionalOptions";
-import CheckBox from "@/app/passwords/addPassword/checkBox";
+import AdditionOption from "./additionalOptions";
+import CheckBox from "./checkBox";
 import {calculatePasswordStrength} from "@/utils/passwordStrength";
 import {STRENGTH_COLORS, STRENGTH_LEVELS} from "@/config";
 

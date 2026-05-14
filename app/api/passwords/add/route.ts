@@ -4,10 +4,17 @@ import {PasswordTable} from "@/lib/schema";
 
 export async function POST(request: NextRequest) {
     const body = await request.json()
+    const { title, login, password, strengthScore, url, tag, note } = body.password;
+    console.log(tag)
+    const [newPassword] = await db.insert(PasswordTable).values({
+        url,
+        title,
+        login,
+        password,
+        strength_score: strengthScore,
+        tag_id: tag.id,
+        note: note,
+        }).returning()
 
-    await db.insert(PasswordTable).values(
-        body
-    )
-
-    return NextResponse.json({ success: true , status: 'success' })
+    return NextResponse.json({ success: true, data: newPassword })
 }

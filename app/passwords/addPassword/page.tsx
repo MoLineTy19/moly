@@ -2,9 +2,9 @@
 
 import React, { MouseEventHandler, useState} from "react";
 import toast from "react-hot-toast";
-import Generator from "@/app/passwords/addPassword/generator";
-import MetaData from "@/app/passwords/addPassword/metaData";
-import Tags from "@/app/passwords/addPassword/tags";
+import Generator from "./components/generator";
+import MetaData from "./components/metaData";
+import Tags from "./components/tags";
 import Link from "next/link";
 import {Password} from "@/types";
 import {Tag} from "@/types/components";
