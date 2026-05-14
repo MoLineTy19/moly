@@ -30,6 +30,13 @@ export const usePasswordStore = create<PasswordStore>((set) => ({
                 body: JSON.stringify({password}),
             });
             if (!res.ok) throw new Error('Failed to fetch');
+            const result = await res.json();
+            const newPassword = result.data;
+
+            set((state) => ({
+                passwords: [newPassword, ...state.passwords],
+                passwordCount: state.passwordCount + 1,
+            }));
         } catch (err) {
             set({ error: (err as Error).message})
         }
