@@ -78,7 +78,7 @@ export default function Row({ item }: { item: RowItem }) {
                 </div>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted) brightness-130">
-                <Link href={`/passwords/showPassword/${item.id}`} className="hover:text-(--accent-color) hover:underline transition-colors">
+                <Link href={`/passwords/${item.id}`} className="hover:text-(--accent-color) hover:underline transition-colors">
                     {item.login}
                 </Link>
             </td>
