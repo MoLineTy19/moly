@@ -60,7 +60,7 @@ export default function TableView({passwords, currentPage, itemPerPage, isChecke
             <tbody className="text-sm text-gray-300">
             {
                 paginatedPasswords.map((item) => (
-                    <Row isSelected={item.isSelected} login={item.login} title={item.title} tag={item.tag} strengthScore={item.strengthScore} createdAt={item.createdAt} key={item.id} password={item.password}/>
+                    <Row item={item} key={item.id}/>
                 ))
             }
             </tbody>

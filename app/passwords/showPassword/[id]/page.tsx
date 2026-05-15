@@ -9,14 +9,27 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {faGithub} from "@fortawesome/free-brands-svg-icons";
 import {faCopy, faEye, faUser} from "@fortawesome/free-regular-svg-icons";
-import React, {use} from "react";
+import React, {useEffect, useState} from "react";
+import {Password} from "@/types";
+import {useParams} from "next/navigation";
 
-interface PageProps {
-    params: Promise<{ id: string }>;
-}
+export default function ShowPage() {
+    const params = useParams();
+    const id = params.id;
 
-export default function ShowPage({ params }: PageProps) {
-    const { id } = use(params);
+    const [password, setPassword] = useState<Password | null>(null);
+
+    useEffect(() => {
+        if (id) {
+            fetch(`/api/passwords/${id}`)
+                .then(res => res.json())
+                .then(data => setPassword(data.data));
+        }
+    }, [id]);
+
+    if (!password) {
+        return <div className="grow p-8">Пароль не найден</div>;
+    }
 
     return (
         <div className="grow overflow-y-auto p-8 relative">
@@ -39,10 +52,10 @@ export default function ShowPage({ params }: PageProps) {
                     </div>
                     <div>
                         <h1 className="text-3xl font-bold text-(--text-color) mb-2">
-                            GitHub - Personal
+                            {password.title}
                         </h1>
                         <a href={"https://github.com"} target="_blank" className="text-green-500 hover:text-green-400 text-sm flex items-center gap-2 transition-colors">
-                            https://github.com
+                            {password.url}
                         </a>
                     </div>
                 </div>
@@ -73,7 +86,7 @@ export default function ShowPage({ params }: PageProps) {
                                     Имя пользователя / Email
                                 </label>
                                 <div className="flex relative">
-                                    <input type="text" value="molinety.dev@example.com" className="w-full px-4 py-3 bg-(--background-color) border border-gray-700 rounded-lg text-sm text-(--text-color) focus:outline-none pr-12"/>
+                                    <input type="text" value={password.login} className="w-full px-4 py-3 bg-(--background-color) border border-gray-700 rounded-lg text-sm text-(--text-color) focus:outline-none pr-12" readOnly={true}/>
                                     <button className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-md text-gray-400 hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
                                         <FontAwesomeIcon icon={faCopy} />
                                     </button>
@@ -87,7 +100,7 @@ export default function ShowPage({ params }: PageProps) {
                                     </span>
                                 </label>
                                 <div className="flex relative group">
-                                    <input type="password" value="12345" readOnly={true} className="w-full px-4 py-3 bg-(--background-color) border border-gray-700 rounded-lg text-sm text-(--text-color) font-mono focus:outline-none pr-20"/>
+                                    <input type="password" value={password.password} className="w-full px-4 py-3 bg-(--background-color) border border-gray-700 rounded-lg text-sm text-(--text-color) font-mono focus:outline-none pr-20" disabled={true}/>
                                     <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                                         <button className="w-8 h-8 rounded-md text-gray-400 hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
                                             <FontAwesomeIcon icon={faEye} />
@@ -113,7 +126,7 @@ export default function ShowPage({ params }: PageProps) {
                                     </div>
                                 </label>
                                 <div className="flex relative">
-                                    <input type="text" value="812 123" className="w-full px-4 py-3 bg-(--background-color) border border-gray-700 rounded-lg text-lg tracking-widest text-(--accent-color) font-mono font-semibold focus:outline-none pr-12"/>
+                                    <input type="text" defaultValue="812 123" className="w-full px-4 py-3 bg-(--background-color) border border-gray-700 rounded-lg text-lg tracking-widest text-(--accent-color) font-mono font-semibold focus:outline-none pr-12"/>
                                     <button className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-md text-gray-400 hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
                                         <FontAwesomeIcon icon={faCopy} />
                                     </button>
@@ -129,12 +142,7 @@ export default function ShowPage({ params }: PageProps) {
                         </div>
                         <div className="p-6">
                             <div className="p-4 bg-(--background-color) border border-gray-800 rounded-lg text-sm text-gray-300 leading-relaxed font-mono whitespace-pre-wrap">
-                                Recovery codes:
-                                1. 8f92-k3m4
-                                2. p9l2-0xnc
-                                3. m4b8-2qaz
-
-                                Used for personal projects and open source contributions.
+                                {password.note}
                             </div>
                         </div>
                     </div>

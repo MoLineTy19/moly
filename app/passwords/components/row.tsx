@@ -7,7 +7,7 @@ import Link from "next/link";
 import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
 import toast from "react-hot-toast";
 import {STRENGTH_LEVELS} from "@/config";
-import {RowConfig, statusDetails} from "@/types";
+import {Password, statusDetails} from "@/types";
 import {generateTagColor} from "@/utils/color";
 
 
@@ -20,14 +20,16 @@ export const statuses: Record<number, statusDetails> = {
     }
 }
 
-export default function Row({isSelected, title, login, tag, strengthScore, createdAt, password}: RowConfig) {
-    const createdDate = new Date(createdAt);
+type RowItem = Password & { isSelected?: boolean };
+
+export default function Row({ item }: { item: RowItem }) {
+    const createdDate = new Date(item.createdAt);
 
     const [isShow, setShow] = useState(false);
-    const [isChecked, setIsChecked] = useState(isSelected);
+    const [isChecked, setIsChecked] = useState(item.isSelected);
 
-    const statusDetails = statuses[strengthScore];
-    const baseColor = generateTagColor(tag.color)
+    const statusDetails = statuses[item.strengthScore];
+    const baseColor = generateTagColor(item.tag.color)
 
 
     const handleClickShow: MouseEventHandler = () => {
@@ -37,13 +39,13 @@ export default function Row({isSelected, title, login, tag, strengthScore, creat
     const handleCopy: MouseEventHandler = async (e) => {
         e.preventDefault();
 
-        if (!password || !password.length) {
+        if (!item.password || !item.password.length) {
             toast.error("Поле пароля пустое!")
             return
         }
 
         try {
-            await navigator.clipboard.writeText(password)
+            await navigator.clipboard.writeText(item.password)
             toast.success("Скопировано")
         } catch (err) {
             toast.error("Произошла неизвестная ошибка")
@@ -71,19 +73,19 @@ export default function Row({isSelected, title, login, tag, strengthScore, creat
                 <div className="flex items-center gap-3">
                     {/*Здесь иконки*/}
                     <span className="font-medium text-white">
-                        {title}
+                        {item.title}
                     </span>
                 </div>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted) brightness-130">
-                <Link href={`/passwords/showPassword/${11}`} className="hover:text-(--accent-color) hover:underline transition-colors">
-                    {login}
+                <Link href={`/passwords/showPassword/${item.id}`} className="hover:text-(--accent-color) hover:underline transition-colors">
+                    {item.login}
                 </Link>
             </td>
             <td className="py-3 pl-4 pr-1 border-l border-(--border-color)/50">
                 <div className="flex relative">
                     <div className="bg-(--background-color) rounded pl-2 py-1">
-                        <input type={isShow ? "text" : "password"} disabled={true} value={password} />
+                        <input type={isShow ? "text" : "password"} disabled={true} value={item.password} />
                     </div>
                     <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center">
                         <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={(handleClickShow)}>
@@ -97,12 +99,12 @@ export default function Row({isSelected, title, login, tag, strengthScore, creat
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50">
                 <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs`} style={{color: baseColor.color, borderColor: baseColor.color}}>
-                    {tag.title}
+                    {item.tag.title}
                 </span>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50">
                 <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-${statusDetails.color}/10 text-${statusDetails.color} border border-${statusDetails.color}/20 text-xs`}>
-                    {STRENGTH_LEVELS[strengthScore]}
+                    {STRENGTH_LEVELS[item.strengthScore]}
                 </span>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted)">{createdDate.toLocaleString('ru-RU')}</td>
