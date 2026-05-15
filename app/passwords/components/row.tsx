@@ -109,7 +109,7 @@ export default function Row({ item }: { item: RowItem }) {
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted)">{createdDate.toLocaleString('ru-RU')}</td>
             <td className="py-3 px-4 text-right">
-                <Link href="/passwords/editPassword">
+                <Link href={`/passwords/edit/${item.id}`}>
                     <button className="text-(--text-muted) hover:text-white opacity-0 group-hover:opacity-100 transition-all">
                         <FontAwesomeIcon icon={faEllipsis}/>
                     </button>

@@ -2,14 +2,18 @@
 
 import {faKey, faTag, faTrashCan, faWandMagicSparkles} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import MetaData from "../addPassword/components/metaData";
+import MetaData from "../../addPassword/components/metaData";
 import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
-import Tags from "../addPassword/components/tags";
-import React, {useState} from "react";
-import {STRENGTH_COLORS, STRENGTH_LEVELS} from "@/config";
-import {calculatePasswordStrength} from "@/utils/passwordStrength";
-import {Tag} from "@/types/components";
+import Tags from "../../addPassword/components/tags";
+import React, {useEffect, useState} from "react";
+import {useParams} from "next/navigation";
 import {useTagStore} from "@/store/tagStore";
+import {Password} from "@/types";
+import {Tag} from "@/types/components";
+import {calculatePasswordStrength} from "@/utils/passwordStrength";
+import {STRENGTH_COLORS, STRENGTH_LEVELS} from "@/config";
+import {editPassword} from "@/store/passwordStore";
+import toast from "react-hot-toast";
 
 /**
  * Страница с изменением записей связанных с паролем
@@ -17,19 +21,65 @@ import {useTagStore} from "@/store/tagStore";
 export default function EditPassword() {
     const allTag = useTagStore((state) => state.tags);
 
+    const params = useParams();
+    const id = params.id;
+
+    const [statePassword, setStatePassword] = useState<Password | null>(null);
     const [url, setUrl] = useState("");
     const [title, setTitle] = useState("");
     const [login, setLogin] = useState("");
+    const [password, setPassword] = useState<string>("");
     const [category, setCategory] = useState(1);
-    const [password, setPassword] = useState("123123212121");
     const [reliability, setReliability] = useState(0);
-    const [selectedTags, setTag] = useState<Tag>(allTag[0]);
+    const [selectedTag, setTag] = useState<Tag>(allTag[0]);
     const [note, setNote] = useState("");
+
+
+    useEffect(() => {
+        if (!id) return;
+
+        fetch(`/api/passwords/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                const pwd = data.data;
+                setStatePassword(pwd);
+
+                setPassword(pwd.password);
+                setTitle(pwd.title);
+                setLogin(pwd.login);
+                setUrl(pwd.url);
+                setNote(pwd.note);
+                setTag(pwd.tag);
+                setCategory(pwd.tag.id);
+            });
+    }, [id]);
 
     const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newPassword = event.target.value;
         setPassword(newPassword)
         setReliability(calculatePasswordStrength(newPassword))
+    }
+
+    if (!statePassword) {
+        return <>
+            Пароль не найден
+        </>
+    }
+
+    const handleClickSave = () => {
+        const updated = {
+            ...statePassword,
+            password,
+            title,
+            login,
+            note,
+            tag: selectedTag,
+            strengthScore: reliability,
+            url,
+        };
+
+        editPassword(updated)
+        toast.success("Изменено")
     }
 
     return (
@@ -91,7 +141,7 @@ export default function EditPassword() {
                                 </div>
                             </div>
                         </div>
-                        <Tags selectedTag={selectedTags} setTag={setTag} note={note} setNote={setNote} />
+                        <Tags selectedTag={selectedTag} setTag={setTag} note={note} setNote={setNote} />
                         <div className="bg-(--background-secondary) border border-gray-800 rounded-xl shadow-soft overflow-hidden">
                             <div className="px-6 py-4 border-b border-gray-800 flex justify-between items-center">
                                 <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider">
@@ -137,7 +187,7 @@ export default function EditPassword() {
                             <button type="button" className="px-6 py-2.5 rounded-lg border border-gray-700 text-gray-300 hover:text-(--text-color) hover:bg-(--background-color) font-medium text-sm transition-colors">
                                 Отмена
                             </button>
-                            <button type="button" className="px-8 py-2.5 rounded-lg bg-(--accent-color) hover:bg-(--accent-color)/70 text-(--text-color) font-medium text-sm shadow-lg shadow-(--accent-color)/20 transition-all">
+                            <button type="button" className="px-8 py-2.5 rounded-lg bg-(--accent-color) hover:bg-(--accent-color)/70 text-(--text-color) font-medium text-sm shadow-lg shadow-(--accent-color)/20 transition-all" onClick={() => handleClickSave()}>
                                 Сохранить изменения
                             </button>
                         </div>

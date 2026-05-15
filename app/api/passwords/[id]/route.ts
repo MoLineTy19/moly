@@ -3,14 +3,15 @@ import {PasswordTable, TagTable} from "@/lib/schema";
 import {NextRequest, NextResponse} from "next/server";
 import {eq} from "drizzle-orm";
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string}}) {
-    const id = Number(params.id);
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }>}) {
+    const { id: idStr } = await params;
+    const id = Number(idStr);
     if (isNaN(id)) {
         return NextResponse.json({ error: "Invalid id", status: 400 });
     }
 
     const body = await request.json();
-    const { title, login, password, strengthScore, url, tag_id, note } = body.passwords;
+    const { title, login, password, strengthScore, url, tag_id, note } = body;
 
     const updateData: any = {};
     if (title !== undefined) updateData.title = title;
@@ -22,15 +23,12 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     if (note !== undefined) updateData.note = note;
     updateData.updatedAt = new Date().toISOString();
 
-    const [updated] = await db
+    await db
         .update(PasswordTable)
         .set(updateData)
         .where(eq(PasswordTable.id, id))
-        .returning()
 
-    if (!updated) return NextResponse.json({ error: "Password not found", status: 404 });
-
-    return NextResponse.json({ success: true, data: updated });
+    return NextResponse.json({ success: true });
 }
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
