@@ -17,7 +17,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (title !== undefined) updateData.title = title;
     if (login !== undefined) updateData.login = login;
     if (password !== undefined) updateData.password = password;
-    if (strengthScore !== undefined) updateData.strengthScore = strengthScore;
+    if (strengthScore !== undefined) updateData.strength_score = strengthScore;
     if (url !== undefined) updateData.url = url;
     if (tag_id !== undefined) updateData.tag_id = tag_id;
     if (note !== undefined) updateData.note = note;

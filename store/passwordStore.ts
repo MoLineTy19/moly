@@ -2,6 +2,8 @@ import {Password, PasswordStore} from "@/types";
 import {create} from "zustand";
 
 export const usePasswordStore = create<PasswordStore>((set) => ({
+    masterKey: null,
+    masterKeyCreatedAt: null,
     passwords: [],
     passwordCount: 0,
     isLoading: false,
@@ -56,10 +58,10 @@ export const usePasswordStore = create<PasswordStore>((set) => ({
                 body: JSON.stringify((editedPassword)),
             });
             if (!res.ok) throw new Error('Failed to fetch');
-            const updated = await res.json();
+            const updatedPassword = await res.json();
             set((state) => ({
                 passwords: state.passwords.map((p) =>
-                    p.id === updated.data.id ? updated.data : p
+                    p.id === updatedPassword.data.id ? updatedPassword.data : p
                 ),
                 error: null
             }));

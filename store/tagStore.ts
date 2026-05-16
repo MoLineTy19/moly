@@ -28,8 +28,18 @@ export const useTagStore = create<TagStore>((set) => ({
         // TODO: реализовать позже
     },
 
-    editTag: async () => {
-        // TODO: реализовать позже
+    editTag: async (tag: Tag) => {
+        const id = tag.id;
+        const res = await fetch(`/api/tags/${id}`, {
+            method: "PATCH",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({tag}),
+        });
+        if (!res.ok) throw new Error('Failed to fetch');
+        set((state) => ({
+            tags: state.tags.map((value) => value.id === tag.id ? tag : value),
+            error: null,
+    }))
     },
 
     reorderTags: async (newOrder: Tag[]) => {
