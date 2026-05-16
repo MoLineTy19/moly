@@ -124,21 +124,21 @@ export default function ShowPage() {
                                     <div className="w-1/4 bg-gray-500"></div>
                                 </div>
                             </div>
-                            <div>
-                                <label className="text-xs font-medium text-gray-500 mb-2 flex justify-between items-center">
-                                    Двухфакторная аутентификация (TOTP)
-                                    <div className="flex items-center gap-2 text-xs text-(--accent-color)">
-                                        <FontAwesomeIcon icon={faCircleNotch} />
-                                        14 сек
-                                    </div>
-                                </label>
-                                <div className="flex relative">
-                                    <input type="text" defaultValue="812 123" className="w-full px-4 py-3 bg-(--background-color) border border-gray-700 rounded-lg text-lg tracking-widest text-(--accent-color) font-mono font-semibold focus:outline-none pr-12"/>
-                                    <button className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-md text-gray-400 hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
-                                        <FontAwesomeIcon icon={faCopy} />
-                                    </button>
-                                </div>
-                            </div>
+                            {/*<div>*/}
+                            {/*    <label className="text-xs font-medium text-gray-500 mb-2 flex justify-between items-center">*/}
+                            {/*        Двухфакторная аутентификация (TOTP)*/}
+                            {/*        <div className="flex items-center gap-2 text-xs text-(--accent-color)">*/}
+                            {/*            <FontAwesomeIcon icon={faCircleNotch} />*/}
+                            {/*            14 сек*/}
+                            {/*        </div>*/}
+                            {/*    </label>*/}
+                            {/*    <div className="flex relative">*/}
+                            {/*        <input type="text" defaultValue="812 123" className="w-full px-4 py-3 bg-(--background-color) border border-gray-700 rounded-lg text-lg tracking-widest text-(--accent-color) font-mono font-semibold focus:outline-none pr-12"/>*/}
+                            {/*        <button className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-md text-gray-400 hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">*/}
+                            {/*            <FontAwesomeIcon icon={faCopy} />*/}
+                            {/*        </button>*/}
+                            {/*    </div>*/}
+                            {/*</div>*/}
                         </div>
                     </div>
                     <div className='bg-(--background-secondary) border border-gray-800 rounded-xl overflow-hidden shadow-soft'>
@@ -181,7 +181,7 @@ export default function ShowPage() {
                                     Теги
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
-                                    <span className="px-2.5 py-1 rounded-md bg-(--background-secondary) border border-gray-700 text-xs text-gray-300 flex items-center gap-1.5">
+                                    <span className="px-2.5 py-1 rounded-md bg-white/5 border border-gray-700 text-xs text-gray-300 flex items-center gap-1.5">
                                         <FontAwesomeIcon icon={faTag} />
                                         dev
                                     </span>

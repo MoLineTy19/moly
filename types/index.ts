@@ -42,6 +42,8 @@ export interface SensitiveData {
 
 
 export interface PasswordStore {
+    masterKey: string | null;
+    masterKeyCreatedAt: number | null;
     passwords: Password[];
     passwordCount: number;
     fetchPasswords: () => Promise<void>;
@@ -61,17 +63,18 @@ export interface SectionButtonDetails {
 }
 
 
-export interface RowConfig {
-    isSelected: boolean;
-    title: string;
-    login: string;
-    password: string;
-    tag: Tag;
-    strengthScore: number;
-    createdAt: number;
-}
-
-
 export interface statusDetails {
     color: string
+}
+
+export interface ConfigStore {
+    currentView: string;
+    autoLockTimeOut: number;
+    clipboardClearTimeout: number;
+    lockOnTabSwitch: boolean;
+    setCurrentView: (view: string) => void;
+    setAutoLockTimeOut: (timeout: number) => void;
+    setClipboardClearTimeout: (timeout: number) => void;
+    setOnTabSwitch: (enabled: boolean) => void;
+    resetConfig: () => void;
 }

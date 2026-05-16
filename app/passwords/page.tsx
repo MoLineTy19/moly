@@ -16,6 +16,7 @@ import Link from "next/link";
 import TableView from "@/app/passwords/components/tableView";
 import BoardView from "@/app/passwords/components/boardView";
 import {usePasswordStore} from "@/store/passwordStore";
+import {useConfigStore} from "@/store/configStore";
 
 /**
  * Страница с отображением паролей
@@ -26,7 +27,7 @@ export default function PasswordPage() {
 
 
     const [isChecked, setIsChecked] = useState(false);
-    const [currentView, setCurrentView] = useState('table')
+    const {currentView, setCurrentView} = useConfigStore();
     const [currentPage, setCurrentPage] = useState(0);
     const itemPerPage = 10;
     const totalPage = Math.ceil(passwords.length / itemPerPage);
@@ -39,7 +40,7 @@ export default function PasswordPage() {
         setCurrentPage(prev => Math.max(prev - 1, 0))
     }
 
-    const switchDisplayView = (view: string, e: React.MouseEvent) => {
+    const switchDisplayView = (view: string) => {
         setCurrentView(view);
     }
 
@@ -62,15 +63,15 @@ export default function PasswordPage() {
             </div>
             <div className="flex items-center justify-between mb-6">
                 <div className="flex bg-(--background-secondary) rounded-lg p-1 border border-gray-800">
-                    <button className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-(--text-color) text-sm shadow-sm  hover:bg-white/5 ${currentView === 'table' ? 'border bg-white/5 border-(--border-input-color)' : ''}`} onClick={(e) => switchDisplayView('table', e)}>
+                    <button className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-(--text-color) text-sm shadow-sm  hover:bg-white/5 ${currentView === 'table' ? 'border bg-white/5 border-(--border-input-color)' : ''}`} onClick={() => switchDisplayView('table')}>
                         <FontAwesomeIcon icon={faTableList}/>
                         Таблица
                     </button>
-                    <button className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-(--text-color) text-sm shadow-sm hover:bg-white/5 ${currentView === 'board' ? 'border bg-white/5 border-(--border-input-color)' : ''}`} onClick={(e) => switchDisplayView('board', e)}>
+                    <button className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-(--text-color) text-sm shadow-sm hover:bg-white/5 ${currentView === 'board' ? 'border bg-white/5 border-(--border-input-color)' : ''}`} onClick={() => switchDisplayView('board')}>
                         <FontAwesomeIcon icon={faBorderAll}/>
                         Доска
                     </button>
-                    <button className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-(--text-color) text-sm shadow-sm hover:bg-white/5 ${currentView === 'list' ? 'border bg-white/5 border-(--border-input-color)' : ''}`} onClick={(e) => switchDisplayView('list', e)}>
+                    <button className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-(--text-color) text-sm shadow-sm hover:bg-white/5 ${currentView === 'list' ? 'border bg-white/5 border-(--border-input-color)' : ''}`} onClick={() => switchDisplayView('list')}>
                         <FontAwesomeIcon icon={faListUl}/>
                         Список
                     </button>

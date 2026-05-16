@@ -12,16 +12,22 @@ import {
     faLock, faTableList
 } from "@fortawesome/free-solid-svg-icons";
 import {faEye} from "@fortawesome/free-regular-svg-icons";
-import React, {MouseEventHandler, useState} from "react";
+import React, {MouseEventHandler} from "react";
+import {useConfigStore} from "@/store/configStore";
 
 /**
  * Страница с настройками Moly
  */
 export default function Security() {
-    const [currentView, setCurrentView] = useState('table')
-    const [enabled, setEnabled] = useState(false);
+    const { currentView, setCurrentView, autoLockTimeOut, setAutoLockTimeOut, clipboardClearTimeout, setClipboardClearTimeout,
+        lockOnTabSwitch, setOnTabSwitch
+    } = useConfigStore();
 
     const handleCheckUpdate: MouseEventHandler = (e) => {
+        e.preventDefault()
+    }
+
+    const handleChangeMasterKey: MouseEventHandler = (e) => {
         e.preventDefault()
     }
 
@@ -140,7 +146,7 @@ export default function Security() {
                                             Ваш основной ключ для доступа к сейфу. Убедитесь, что он надежный и уникальный.
                                         </p>
                                     </div>
-                                    <button className='px-4 py-2 bg-white/5 hover:bg-dark-700 border border-gray-700 text-(--text-color) rounded-lg text-sm font-medium transition-colors whitespace-nowrap'>
+                                    <button className='px-4 py-2 bg-white/5 hover:bg-dark-700 border border-gray-700 text-(--text-color) rounded-lg text-sm font-medium transition-colors whitespace-nowrap' onClick={handleChangeMasterKey}>
                                         Сменить пароль
                                     </button>
                                 </div>
@@ -150,7 +156,6 @@ export default function Security() {
                                             Ключ восстановления
                                             <FontAwesomeIcon icon={faExclamation} className="text-yellow-500 text-[10px]" />
                                         </h3>
-
                                         <p className="text-xs text-gray-400 max-w-md">
                                             Единственный способ восстановить доступ, если вы забудете мастер-пароль.
                                         </p>
@@ -184,13 +189,13 @@ export default function Security() {
                                         Время неактивности до запроса мастер-пароля.
                                     </p>
                                     <div className="relative">
-                                        <select className="w-full px-3 py-2.5 bg-(--background-color) border border-gray-700 rounded-lg text-sm text-(--text-color) focus:outline-none focus:border-(--accent-color) transition-colors appearance-none cursor-pointer">
+                                        <select className="w-full px-3 py-2.5 bg-(--background-color) border border-gray-700 rounded-lg text-sm text-(--text-color) focus:outline-none focus:border-(--accent-color) transition-colors appearance-none cursor-pointer" value={autoLockTimeOut} onChange={(e) => setAutoLockTimeOut(Number(e.target.value))}>
                                             <option value={1}>1 минута</option>
-                                            <option value={5} selected={true}>5 минута</option>
+                                            <option value={5}>5 минут</option>
                                             <option value={15}>15 минут</option>
                                             <option value={30}>30 минут</option>
                                             <option value={1}>1 час</option>
-                                            <option value={'never'}>Никогда (не рекомендуется)</option>
+                                            <option value={0}>Никогда (не рекомендуется)</option>
                                         </select>
                                         <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
                                             <FontAwesomeIcon icon={faAngleDown} />
@@ -206,11 +211,11 @@ export default function Security() {
                                         Автоматическое удаление скопированных паролей.
                                     </p>
                                     <div className="relative">
-                                        <select className='w-full px-3 py-2.5 bg-(--background-color) border border-gray-700 rounded-lg text-sm text-(--text-color) focus:outline-none focus:border-(--accent-color) transition-colors appearance-none cursor-pointer'>
-                                            <option value="10">10 секунд</option>
-                                            <option value="30">30 секунд</option>
-                                            <option value="60">60 секунд</option>
-                                            <option value="never">Никогда</option>
+                                        <select className='w-full px-3 py-2.5 bg-(--background-color) border border-gray-700 rounded-lg text-sm text-(--text-color) focus:outline-none focus:border-(--accent-color) transition-colors appearance-none cursor-pointer' value={clipboardClearTimeout} onChange={(e) => setClipboardClearTimeout(Number(e.target.value))}>
+                                            <option value={10}>10 секунд</option>
+                                            <option value={30}>30 секунд</option>
+                                            <option value={60}>60 секунд</option>
+                                            <option value={0}>Никогда</option>
                                         </select>
                                         <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
                                             <FontAwesomeIcon icon={faAngleDown} />
@@ -228,11 +233,9 @@ export default function Security() {
                                         </p>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
-                                        <input type={'checkbox'} className="sr-only peer" checked={enabled} onChange={() => setEnabled(!enabled)}/>
+                                        <input type={'checkbox'} className="sr-only peer" checked={lockOnTabSwitch} onChange={() => setOnTabSwitch(!lockOnTabSwitch)}/>
                                         <div className="w-10 h-5 bg-gray-200 rounded-full peer-checked:bg-(--accent-color) peer-focus:ring-2 peer-focus:ring-(--accent-color)/30 transition-colors duration-200">
-                                            <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${enabled ? 'translate-x-5' : 'translate-x-0.5'}`}>
-
-                                            </div>
+                                            <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 ${lockOnTabSwitch ? 'translate-x-5' : 'translate-x-0.5'}`}></div>
                                         </div>
                                     </label>
                                 </div>

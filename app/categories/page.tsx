@@ -21,6 +21,7 @@ import {
 import {arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {editTag, reorderTags, useTagStore} from "@/store/tagStore";
+import {generateTagColor} from "@/utils/color";
 
 /**
  * Страница с тегами
@@ -71,11 +72,18 @@ export default function Categories() {
         if (!icon) return toast.error("Выбери иконку!");
         if (!title) return toast.error("Укажи название!");
 
-        editTag(editingTag)
-        setEditingTag(null)
-        setColor('')
-        setIcon(undefined)
-        setTitle('')
+        const baseColor = generateTagColor(color)
+
+        const editedTag: Tag = {
+            ...editingTag,
+            title,
+            iconId: icon,
+            color: baseColor.color,
+            backgroundColor: baseColor.backgroundColor,
+            borderColor: baseColor.borderColor,
+        }
+
+        editTag(editedTag)
         toast.success('Тег обновлен!')
     }
 
