@@ -39,7 +39,7 @@ export default function TableView({passwords, currentPage, itemPerPage, isChecke
                     <FontAwesomeIcon icon={faUser} className="mr-2"/>
                     ЛОГИН
                 </th>
-                <th className="py-4 px-4 font-medium w-1/6 border-l border-(--border-color)">
+                <th className="py-4 px-4 font-medium w-1/7 border-l border-(--border-color)">
                     <FontAwesomeIcon icon={faKey} className="mr-2"/>
                     Пароль
                 </th>
@@ -47,11 +47,11 @@ export default function TableView({passwords, currentPage, itemPerPage, isChecke
                     <FontAwesomeIcon icon={faTag} className="mr-2"/>
                     КАТЕГОРИЯ
                 </th>
-                <th className="py-4 px-4 font-medium border-l border-(--border-color)">
+                <th className="py-4 px-4 font-medium  w-1/8 border-l border-(--border-color)">
                     <FontAwesomeIcon icon={faShieldHalved} className="mr-2"/>
                     СТАТУС
                 </th>
-                <th className="py-4 px-4 font-medium border-l border-(--border-color)">
+                <th className="py-4 px-4 font-medium  w-1/10 border-l border-(--border-color)">
                     <FontAwesomeIcon icon={faCalendar} className="mr-2"/>
                     ОБНОВЛЕНО
                 </th>

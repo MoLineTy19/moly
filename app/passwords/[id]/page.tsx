@@ -5,7 +5,7 @@ import {
     faCircleNotch,
     faPen, faTag,
     faTrashCan,
-    faTriangleExclamation
+    faTriangleExclamation, faUpRightFromSquare
 } from "@fortawesome/free-solid-svg-icons";
 import {faGithub} from "@fortawesome/free-brands-svg-icons";
 import {faCopy, faEye, faUser} from "@fortawesome/free-regular-svg-icons";
@@ -16,6 +16,8 @@ import {Password} from "@/types";
 export default function ShowPage() {
     const params = useParams();
     const id = params.id;
+
+    const isDetectedLeak = false;
 
     const [password, setPassword] = useState<Password | null>(null);
 
@@ -33,18 +35,22 @@ export default function ShowPage() {
 
     return (
         <div className="grow overflow-y-auto p-8 relative">
-            <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-500 shrink-0 mt-0.5">
-                    <FontAwesomeIcon icon={faTriangleExclamation} />
-                </div>
-                <div className="grow">
-                    <h3 className="text-red-400 font-semibold text-sm mb-1">Скомпрометированный пароль</h3>
-                    <p className="text-gray-300 text-sm">Этот пароль был обнаружен в недавней утечке данных. Рекомендуется немедленно изменить его для обеспечения безопасности вашего аккаунта.</p>
-                </div>
-                <div className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/30 whitespace-nowrap">
-                    Изменить пароль
-                </div>
-            </div>
+            {
+                isDetectedLeak ?
+                    <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-500 shrink-0 mt-0.5">
+                            <FontAwesomeIcon icon={faTriangleExclamation} />
+                        </div>
+                        <div className="grow">
+                            <h3 className="text-red-400 font-semibold text-sm mb-1">Скомпрометированный пароль</h3>
+                            <p className="text-gray-300 text-sm">Этот пароль был обнаружен в недавней утечке данных. Рекомендуется немедленно изменить его для обеспечения безопасности вашего аккаунта.</p>
+                        </div>
+                        <div className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/30 whitespace-nowrap">
+                            Изменить пароль
+                        </div>
+                    </div>
+                    : null
+            }
             <div className="mb-8 flex items-start justify-between">
                 <div className="flex items-center gap-5">
                     <div className="w-16 h-16 rounded-2xl bg-(--background-secondary) border border-gray-700 flex items-center justify-center text-3xl text-(--text-color) shadow-soft">
@@ -56,6 +62,7 @@ export default function ShowPage() {
                         </h1>
                         <a href={"https://github.com"} target="_blank" className="text-green-500 hover:text-green-400 text-sm flex items-center gap-2 transition-colors">
                             {password.url}
+                            <FontAwesomeIcon icon={faUpRightFromSquare} />
                         </a>
                     </div>
                 </div>

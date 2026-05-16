@@ -2,6 +2,7 @@
 
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
+    faAngleDown,
     faBorderAll,
     faListUl,
     faMagnifyingGlass,
@@ -48,7 +49,7 @@ export default function PasswordPage() {
                 <div>
                     <h1 className="text-3xl font-bold text-(--text-color) flex items-center gap-3 mb-2">
                         Все пароли
-                        <span className="text-sm font-normal bg-dark-800 text-(--text-muted) brightness-130 py-0.5 px-2.5 rounded-md border border-(--border-input-color)"> {passwordCount} </span>
+                        <span className="text-sm font-normal bg-(--background-secondary) text-(--text-muted) brightness-130 py-0.5 px-2.5 rounded-md border border-(--border-input-color)"> {passwordCount} </span>
                     </h1>
                     <h4 className="mt-3">Управляйте вашими сохраненными учетными записями и безопасными заметками.</h4>
                 </div>
@@ -78,10 +79,12 @@ export default function PasswordPage() {
                     <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-(--background-secondary) border border-(--border-input-color) text-gray-300 hover:text-(--text-color) text-sm transition-colors">
                         <FontAwesomeIcon icon={faFolder}/>
                         Категория
+                        <FontAwesomeIcon icon={faAngleDown} />
                     </button>
                     <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-(--background-secondary) border border-(--border-input-color) text-gray-300 hover:text-(--text-color) text-sm transition-colors">
                         <FontAwesomeIcon icon={faShieldHalved}/>
                         Надежность
+                        <FontAwesomeIcon icon={faAngleDown} />
                     </button>
                     <button className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-400 hover:text-(--text-color) text-sm transition-colors border border-transparent border-dashed hover:border-(--border-input-color)">
                         <FontAwesomeIcon icon={faPlus}/>
@@ -103,10 +106,10 @@ export default function PasswordPage() {
                     <div className="mt-4 flex items-center justify-between text-sm text-gray-500">
                         <div>Показано {currentPage * itemPerPage + 1} - {Math.min((currentPage + 1) * itemPerPage, passwordCount)} из {passwordCount} записей</div>
                         <div className="flex gap-2">
-                            <button className="px-3 py-1.5 rounded-md bg-(--background-secondary) border border-(--border-input-color) hover:text-(--text-color) hover:border-(--border-input-color)/90 transition-colors disabled:opacity-50" onClick={goToPreviousPage}>
+                            <button className="px-3 py-1.5 rounded-md bg-(--background-secondary) border border-(--border-input-color) hover:text-(--text-color) hover:border-(--border-input-color)/90 transition-colors disabled:opacity-50" onClick={goToPreviousPage} disabled={currentPage != 1}>
                                 Предыдущая
                             </button>
-                            <button className="px-3 py-1.5 rounded-md bg-(--background-secondary) border border-(--border-input-color) hover:text-(--text-color) hover:border-(--border-input-color)/90 transition-colors" onClick={goToNextPage}>
+                            <button className="px-3 py-1.5 rounded-md bg-(--background-secondary) border border-(--border-input-color) hover:text-(--text-color) hover:border-(--border-input-color)/90 transition-colors disabled:opacity-50" onClick={goToNextPage} disabled={currentPage == totalPage - 1}>
                                 Следующая
                             </button>
                         </div>

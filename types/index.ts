@@ -53,12 +53,6 @@ export interface PasswordStore {
 }
 
 
-export interface RouteConfig {
-    title: string,
-    icon: IconDefinition
-}
-
-
 export interface SectionButtonDetails {
     title: string;
     href: string;

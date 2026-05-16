@@ -1,9 +1,9 @@
 'use client'
 
-import {faBell} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {usePathname} from "next/navigation";
 import {Fragment} from "react";
+import {faBell} from "@fortawesome/free-regular-svg-icons";
 
 const routeNames: Record<string, string> = {
     "passwords": "Все пароли",
@@ -33,8 +33,9 @@ export default function Topbar() {
                 ))}
             </div>
             <div className="flex items-center gap-4">
-                <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-dark-800 transition-colors relative">
-                    <FontAwesomeIcon icon={faBell} style={{color: "var(--accent-color)"}} />
+                <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-(--background-secondary) transition-colors relative">
+                    <FontAwesomeIcon icon={faBell} />
+                    <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-(--accent-color) border border-(--background-secondary)"></span>
                 </button>
             </div>
         </header>

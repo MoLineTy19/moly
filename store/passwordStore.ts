@@ -8,7 +8,7 @@ export const usePasswordStore = create<PasswordStore>((set) => ({
     error: null,
 
     fetchPasswords: async () => {
-        set(  {isLoading: true, error: null} );
+        set( {isLoading: true, error: null} );
 
         try {
             const res = await fetch('/api/passwords');

@@ -54,7 +54,7 @@ export default function Row({ item }: { item: RowItem }) {
     }
 
     return (
-        <tr className="table-row-hover border-b border-(--text-muted)/20 transition-colors group cursor-pointer">
+        <tr className="table-row-hover border-b border-(--text-muted)/20 transition-colors group cursor-pointer" style={{backgroundColor: item.strengthScore <= 2 ? 'rgba(255, 0, 0, 0.02)' : ''}}>
             <td className="py-3 px-4 text-center">
                 <label className="relative flex  items-center justify-center cursor-pointer">
                     <input
@@ -70,22 +70,26 @@ export default function Row({ item }: { item: RowItem }) {
                 </label>
             </td>
             <td className="py-3 px-4">
-                <div className="flex items-center gap-3">
-                    {/*Здесь иконки*/}
-                    <span className="font-medium text-white">
+                <Link href={`/passwords/${item.id}`}>
+                    <div className="flex items-center gap-3">
+                        {/*Здесь иконки*/}
+                        <span className="font-medium text-white">
                         {item.title}
                     </span>
-                </div>
+                    </div>
+                </Link>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted) brightness-130">
-                <Link href={`/passwords/${item.id}`} className="hover:text-(--accent-color) hover:underline transition-colors">
-                    {item.login}
+                <Link href={`/passwords/${item.id}`}>
+                    <span className="hover:text-(--accent-color) hover:underline transition-colors">
+                        {item.login}
+                    </span>
                 </Link>
             </td>
             <td className="py-3 pl-4 pr-1 border-l border-(--border-color)/50">
                 <div className="flex relative">
                     <div className="bg-(--background-color) rounded pl-2 py-1">
-                        <input type={isShow ? "text" : "password"} disabled={true} value={item.password} />
+                        <input type={isShow ? "text" : "password"} disabled={true} value={isShow ? item.password : "*".repeat(16)} />
                     </div>
                     <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center">
                         <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={(handleClickShow)}>
