@@ -10,6 +10,13 @@
     --accent-color: #00c950;
     --border-color: #1e2939;
     --border-input-color: #364153;
+
+    --color-dark-700: #1f2937;
+    --color-dark-800: #111827;
+    --color-dark-950: #030712;
+    --color-brand-400: #34d970;
+    --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.35);
+    --shadow-glow: 0 0 20px rgba(0, 201, 80, 0.30);
 }
 
 @layer base {

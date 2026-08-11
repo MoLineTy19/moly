@@ -8,8 +8,8 @@ import Tags from "./components/tags";
 import Link from "next/link";
 import {Password} from "@/types";
 import {Tag} from "@/types/components";
-import {addPassword} from "@/store/passwordStore";
 import {useTagStore} from "@/store/tagStore";
+import {addPassword} from "@/store/passwordStore";
 
 
 /**
@@ -21,10 +21,9 @@ export default function AddPage() {
     const [url, setUrl] = useState("");
     const [title, setTitle] = useState("");
     const [login, setLogin] = useState("");
-    const [category, setCategory] = useState(1);
     const [password, setPassword] = useState("");
     const [reliability, setReliability] = useState(0);
-    const [selectedTag, setTag] = useState<Tag>(tags[0]);
+    const [selectedTag, setTag] = useState<Tag | null>(null);
     const [note, setNote] = useState("");
 
     const handleClickConfirmSave: MouseEventHandler = (e) => {
@@ -62,7 +61,7 @@ export default function AddPage() {
                     <p className="text-(--text-muted) brightness-130 text-sm">Добавьте новые учетные данные в ваш безопасный сейф.</p>
                 </div>
                 <form className="space-y-6">
-                    <MetaData url={url} setUrl={setUrl} title={title} setTitle={setTitle} login={login} setLogin={setLogin} category={category} setCategory={setCategory}/>
+                    <MetaData url={url} setUrl={setUrl} title={title} setTitle={setTitle} login={login} setLogin={setLogin}/>
                     <Generator password={password} setPassword={setPassword} reliability={reliability} setReliability={setReliability}/>
                     <Tags selectedTag={selectedTag} setTag={setTag} note={note} setNote={setNote}/>
                     <div className="flex items-center justify-end gap-4 pt-4">

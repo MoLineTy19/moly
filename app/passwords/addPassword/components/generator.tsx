@@ -6,7 +6,9 @@ import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
 import AdditionOption from "./additionalOptions";
 import CheckBox from "./checkBox";
 import {calculatePasswordStrength} from "@/utils/passwordStrength";
-import {STRENGTH_COLORS, STRENGTH_LEVELS} from "@/config";
+import {STRENGTH_DETAILS} from "@/config";
+import {copyWithAutoClear} from "@/utils/clipboard";
+import {useConfigStore} from "@/store/configStore";
 
 export default function Generator({password, setPassword, reliability, setReliability}: {password: string, setPassword:  React.Dispatch<React.SetStateAction<string>>, reliability: number, setReliability: React.Dispatch<React.SetStateAction<number>>}) {
     const [isShow, setShow] = useState(false);
@@ -17,13 +19,26 @@ export default function Generator({password, setPassword, reliability, setReliab
     const [isSpecialSymbol, setSpecialSymbol] = useState(true);
     const [isUnique, setUnique] = useState(false);
     const [isSimilar, setSimilar] = useState(false);
+    const clipboardClearTimeout = useConfigStore((s) => s.clipboardClearTimeout);
 
-    function generatePassword(length: number) {
+
+    function secureRandomInt(max: number): number {
+        const range = 2 ** 32;
+        const limit = range - (range % max);
+        const buf = new Uint32Array(1);
+        let x: number;
+        do {
+            crypto.getRandomValues(buf);
+            x = buf[0];
+        } while (x >= limit);
+        return x % max;
+    }
+
+    function generatePassword(length: number): string {
         const charsetL = "abcdefghijklmnopqrstuvwxyz";
         const charsetU = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        const numbers = "0123456789"
-        const specSymbol = "!@#$%^&*()_~"
-
+        const numbers = "0123456789";
+        const specSymbol = "!@#$%^&*()_~";
         const ambiguousChars = "0OilI";
 
         let charset = "";
@@ -36,16 +51,16 @@ export default function Generator({password, setPassword, reliability, setReliab
             charset = charset.split('').filter(ch => !ambiguousChars.includes(ch)).join('');
         }
 
-        let res = '';
-        for (let i = 0, n = charset.length; i < length; ++i) {
-            const randomChar = charset.charAt(Math.floor(Math.random() * n));
-            if (isUnique) {
-                if (!res.includes(randomChar)) res += randomChar
-            } else {
-                res += randomChar
-            }
+        if (charset.length === 0) return "";
+
+        const result: string[] = [];
+        while (result.length < length) {
+            const idx = secureRandomInt(charset.length);
+            const ch = charset.charAt(idx);
+            if (isUnique && result.includes(ch)) continue;
+            result.push(ch);
         }
-        return res;
+        return result.join('');
     }
 
     const toggleGenerator: MouseEventHandler = (e) => {
@@ -68,21 +83,21 @@ export default function Generator({password, setPassword, reliability, setReliab
 
     const handleCopy: MouseEventHandler = async (e) => {
         e.preventDefault();
-
         if (!password || !password.length) {
-            toast.error("Поле пароля пустое!")
-            return
+            toast.error("Поле пароля пустое!");
+            return;
         }
-
         try {
-            await navigator.clipboard.writeText(password)
-            toast.success("Скопировано")
+            await copyWithAutoClear(password, clipboardClearTimeout);
+            toast.success(clipboardClearTimeout > 0
+                ? `Скопировано, очистится через ${clipboardClearTimeout}с`
+                : "Скопировано");
         } catch (err) {
-            toast.error("Произошла неизвестная ошибка")
-            console.error(err)
+            toast.error("Произошла неизвестная ошибка");
+            console.error(err);
         }
+    };
 
-    }
 
     const handleInputLengthPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPasswordLength(parseInt(e.target.value))
@@ -118,7 +133,7 @@ export default function Generator({password, setPassword, reliability, setReliab
                         <div className="mt-3">
                             <div className="flex justify-between items-center mb-1.5">
                                 <span className="text-xs font-medium text-(--text-muted)">Надежность пароли</span>
-                                <span className={`text-xs font-medium`} style={{color: STRENGTH_COLORS[reliability]}}>{STRENGTH_LEVELS[reliability]}</span>
+                                <span className={`text-xs font-medium`} style={{color: STRENGTH_DETAILS[reliability].color}}>{STRENGTH_DETAILS[reliability].title}</span>
                             </div>
                             <div className="flex gap-1 h-1.5 rounded-full overflow-hidden bg-dark-800">
                                 {

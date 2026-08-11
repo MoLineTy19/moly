@@ -11,9 +11,10 @@ import {useTagStore} from "@/store/tagStore";
 import {Password} from "@/types";
 import {Tag} from "@/types/components";
 import {calculatePasswordStrength} from "@/utils/passwordStrength";
-import {STRENGTH_COLORS, STRENGTH_LEVELS} from "@/config";
-import {editPassword} from "@/store/passwordStore";
+import {editPassword, deletePassword} from "@/store/passwordStore";
 import toast from "react-hot-toast";
+import {STRENGTH_DETAILS} from "@/config";
+import {useRouter} from "next/navigation";
 
 /**
  * Страница с изменением записей связанных с паролем
@@ -23,15 +24,15 @@ export default function EditPassword() {
 
     const params = useParams();
     const id = params.id;
+    const router = useRouter();
 
     const [statePassword, setStatePassword] = useState<Password | null>(null);
     const [url, setUrl] = useState("");
     const [title, setTitle] = useState("");
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState<string>("");
-    const [category, setCategory] = useState(1);
     const [reliability, setReliability] = useState(0);
-    const [selectedTag, setTag] = useState<Tag>(allTag[0]);
+    const [selectedTag, setTag] = useState<Tag | null>(null);
     const [note, setNote] = useState("");
 
 
@@ -48,9 +49,12 @@ export default function EditPassword() {
                 setTitle(pwd.title);
                 setLogin(pwd.login);
                 setUrl(pwd.url);
-                setNote(pwd.note);
+                setNote(pwd.note ?? "");
                 setTag(pwd.tag);
-                setCategory(pwd.tag.id);
+            })
+            .catch(err => {
+                console.error("Failed to load password", err);
+                toast.error("Не удалось загрузить запись");
             });
     }, [id]);
 
@@ -96,14 +100,21 @@ export default function EditPassword() {
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <button type="button" className="px-4 py-2 rounded-lg border border-gray-700 text-gray-300 hover:text-(--text-color) hover:bg-(--background-secondary) font-medium text-sm transition-colors flex items-center gap-2">
+                            <button type="button"
+                                    onClick={() => {
+                                        if (!confirm("Удалить запись безвозвратно?")) return;
+                                        deletePassword(statePassword.id);
+                                        toast.success("Удалено");
+                                        router.push("/passwords");
+                                    }}
+                                    className="px-4 py-2 rounded-lg border border-gray-700 text-gray-300 hover:text-red-400 hover:border-red-500/50 font-medium text-sm transition-colors flex items-center gap-2">
                                 <FontAwesomeIcon icon={faTrashCan} />
                                 Удалить
                             </button>
                         </div>
                     </div>
                     <form className="space-y-6">
-                        <MetaData url={url} setUrl={setUrl} title={title} setTitle={setTitle} login={login} setLogin={setLogin} category={category} setCategory={setCategory}/>
+                        <MetaData url={url} setUrl={setUrl} title={title} setTitle={setTitle} login={login} setLogin={setLogin}/>
                         <div className="bg-(--background-secondary) border border-gray-800 rounded-xl shadow-soft overflow-hidden relative">
                             <div className="px-6 py-4 border-b border-gray-800 flex justify-between items-center bg-(--background-secondary)/30">
                                 <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider">
@@ -135,7 +146,7 @@ export default function EditPassword() {
                                             <span className="text-xs font-medium text-gray-500">
                                                 Надежность пароля
                                             </span>
-                                            <span className={`text-xs font-medium`} style={{color: STRENGTH_COLORS[reliability]}}>{STRENGTH_LEVELS[reliability]}</span>
+                                            <span className={`text-xs font-medium`} style={{color: STRENGTH_DETAILS[reliability].color}}>{STRENGTH_DETAILS[reliability].title}</span>
                                         </div>
                                     </div>
                                 </div>

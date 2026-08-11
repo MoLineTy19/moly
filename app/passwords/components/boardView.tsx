@@ -1,9 +1,11 @@
+import {Password} from "@/types";
 import BoardCard from "@/app/passwords/components/boardCard";
 
-export default function BoardView() {
+export default function BoardView({passwords}: { passwords: Password[] }) {
+    if (!passwords?.length) return null;
     return (
-        <div className="grid grid-cols-7 gap-4">
-            <BoardCard/>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {passwords.map(p => <BoardCard key={p.id} item={p}/>)}
         </div>
-    )
+    );
 }

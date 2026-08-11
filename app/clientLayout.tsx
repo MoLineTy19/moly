@@ -6,19 +6,28 @@ import Sidebar from "@/components/layout/sidebar";
 import Topbar from "@/components/layout/topbar";
 import {usePasswordStore} from "@/store/passwordStore";
 import {useTagStore} from "@/store/tagStore";
+import UnlockScreen from "@/app/unlock/page";
+import {useAutoLock} from "@/app/hooks/useAutoLock";
 
 /**
  * Клиентское исполнение лайаута
  */
 export default function ClientLayout({ children }: { children: ReactNode }) {
     const fetchPasswords = usePasswordStore((state) => state.fetchPasswords)
+    const rehydrate = usePasswordStore((state) => state.rehydrate);
     const fetchTags = useTagStore((state) => state.fetchTags)
+    const {isLocked, isSetup} = usePasswordStore();
 
     useEffect(() => {
+        rehydrate();
+        if (isLocked) return;
         fetchPasswords()
         fetchTags()
-    }, [fetchPasswords, fetchTags])
+    }, [fetchPasswords, fetchTags, isLocked])
 
+    useAutoLock();
+
+    if (isLocked) return <UnlockScreen />;
 
     return (
         <>

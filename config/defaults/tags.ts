@@ -1,16 +1,35 @@
-import {TagColorScheme} from "@/types/components";
-import {faHome, faPen} from "@fortawesome/free-solid-svg-icons";
+import {
+    faBasketShopping,
+    faBriefcase,
+    faCamera,
+    faCloud, faCoins,
+    faHeart,
+    faHome,
+    faPen
+} from "@fortawesome/free-solid-svg-icons";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import {faUser} from "@fortawesome/free-regular-svg-icons";
+import {faBluesky} from "@fortawesome/free-brands-svg-icons";
 
-export const DEFAULT_TAG_COLORS: TagColorScheme[] = [
-    { color: '#3b82f6', backgroundColor: '#0d3577', borderColor: '#92b9ff' },   // синий
-    { color: '#10b981', backgroundColor: '#096a4a', borderColor: '#9df6d8' },   // зелёный
-    { color: '#f59e0b', backgroundColor: '#5c3a0a', borderColor: '#ffd966' },   // оранжевый
-    { color: '#ef4444', backgroundColor: '#7f1a1a', borderColor: '#fca5a5' },   // красный
-    { color: '#8b5cf6', backgroundColor: '#3b1e6b', borderColor: '#c4b5fd' },   // фиолетовый
-]
+export const DEFAULT_TAG_COLORS = [
+    'hsl(0, 70%, 55%)',      // красный
+    'hsl(22.5, 70%, 55%)',   // оранжево-красный
+    'hsl(45, 70%, 55%)',     // оранжевый
+    'hsl(67.5, 70%, 55%)',   // золотистый
+    'hsl(90, 70%, 55%)',     // салатовый
+    'hsl(112.5, 70%, 55%)',  // жёлто-зелёный
+    'hsl(135, 70%, 55%)',    // зелёный
+    'hsl(157.5, 70%, 55%)',  // мятно-зелёный
+    'hsl(180, 70%, 55%)',    // циан
+    'hsl(202.5, 70%, 55%)',  // небесно-голубой
+    'hsl(225, 70%, 55%)',    // синий
+    'hsl(247.5, 70%, 55%)',  // сине-фиолетовый
+    'hsl(270, 70%, 55%)',    // фиолетовый
+    'hsl(292.5, 70%, 55%)',  // пурпурный
+    'hsl(315, 70%, 55%)',    // розовый
+    'hsl(337.5, 70%, 55%)',  // малиновый
+];
 
 export const DEFAULT_TAG_ICON: Array<IconDefinition> = [
-    faUser, faHome, faPen
+    faUser, faHome, faPen, faCamera, faBasketShopping, faBluesky, faBriefcase, faCloud, faHeart, faCoins
 ]

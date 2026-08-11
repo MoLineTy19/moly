@@ -1,58 +1,90 @@
 import {TagColorScheme} from "@/types/components";
 
-/**
- * Преобразует hex цвет в формат rgba
- * @param hex - цвет в формате #RRGGBB или #RGB
- * @param alpha - прозрачность (0..1)
- */
-function hexToRGB(hex: string, alpha: number): string {
-    hex = hex.replace("#", "");
+type RGB = { r: number; g: number; b: number };
 
-    if (hex.length === 3) {
-        hex = hex.split('').map(c => c + c).join('');
+/** h, s, l — все в диапазоне 0..1 */
+function hslToRgb(h: number, s: number, l: number): RGB {
+    let r: number, g: number, b: number;
+
+    if (s === 0) {
+        r = g = b = l; // ахроматический (серый)
+    } else {
+        const hue2rgb = (p: number, q: number, t: number) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
+        };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1 / 3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1 / 3);
     }
 
-    const r = parseInt(hex.slice(0, 2), 16);
-    const g = parseInt(hex.slice(2, 4), 16);
-    const b = parseInt(hex.slice(4, 6), 16);
+    return {r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255)};
+}
+
+/**
+ * Разбирает любой CSS-цвет (#hex / rgb / rgba / hsl / hsla) в RGB.
+ * Возвращает null, если цвет распознать не удалось.
+ */
+function parseColor(color: string): RGB | null {
+    const c = (color ?? "").trim().toLowerCase();
+    if (!c) return null;
+
+    // #RGB или #RRGGBB
+    if (c.startsWith("#")) {
+        let h = c.slice(1);
+        if (h.length === 3) h = h.split("").map((ch) => ch + ch).join("");
+        if (h.length !== 6 || !/^[0-9a-f]{6}$/.test(h)) return null;
+        return {
+            r: parseInt(h.slice(0, 2), 16),
+            g: parseInt(h.slice(2, 4), 16),
+            b: parseInt(h.slice(4, 6), 16),
+        };
+    }
+
+    // hsl(h, s%, l%) / hsla(...) — основная палитра DEFAULT_TAG_COLORS
+    const hsl = c.match(/^hsla?\(\s*([0-9.]+)(?:deg)?\s*[ ,]\s*([0-9.]+)%\s*[ ,]\s*([0-9.]+)%/);
+    if (hsl) {
+        return hslToRgb(
+            parseFloat(hsl[1]) / 360,
+            parseFloat(hsl[2]) / 100,
+            parseFloat(hsl[3]) / 100,
+        );
+    }
+
+    // rgb(r, g, b) / rgba(...)
+    const rgb = c.match(/^rgba?\(\s*([0-9.]+)\s*[ ,]\s*([0-9.]+)\s*[ ,]\s*([0-9.]+)/);
+    if (rgb) {
+        return {r: parseFloat(rgb[1]), g: parseFloat(rgb[2]), b: parseFloat(rgb[3])};
+    }
+
+    return null;
+}
+
+// Серый #6a7282 - фолбэк, если цвет не удалось распознать
+const FALLBACK_RGB: RGB = {r: 106, g: 114, b: 130};
+
+/** Преобразует любой CSS-цвет в rgba(...) с заданной прозрачностью */
+function toRgba(color: string, alpha: number): string {
+    const {r, g, b} = parseColor(color) ?? FALLBACK_RGB;
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-
 /**
- * Осветляет или затемняет hex цвет (опционально для рамки)
- * @param hex - исходный цвет
- * @param percent - процент изменения (-1..1, отрицательное → темнее)
- */
-function adjustBrightness(hex: string, percent: number): string {
-    hex = hex.replace("#", '')
-
-    if (hex.length === 3) {
-        hex = hex.split('').map(c => c + c).join('');
-    }
-
-    let r = parseInt(hex.slice(0, 2), 16);
-    let g = parseInt(hex.slice(2, 4), 16);
-    let b = parseInt(hex.slice(4, 6), 16);
-    r = Math.min(255, Math.max(0, r + r * percent));
-    g = Math.min(255, Math.max(0, g + g * percent));
-    b = Math.min(255, Math.max(0, b + b * percent));
-    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`
-}
-
-
-/**
- * Генерирует цветовую схему на основе основного цвета
- * @param baseColor - основной цвет в hex (например, '#3b82f6')
+ * Генерирует цветовую схему на основе основного цвета.
+ * Принимает hex / rgb / rgba / hsl / hsla (соответствует DEFAULT_TAG_COLORS).
+ * @param baseColor - основной цвет
  * @returns объект с color, backgroundColor, borderColor
  */
 export function generateTagColor(baseColor: string): TagColorScheme {
-    const backgroundColor = hexToRGB(baseColor, 0.1);
-    const borderColor = hexToRGB(baseColor, 0.3);
-
     return {
         color: baseColor,
-        backgroundColor,
-        borderColor,
-    }
+        backgroundColor: toRgba(baseColor, 0.1),
+        borderColor: toRgba(baseColor, 0.3),
+    };
 }

@@ -6,35 +6,35 @@ import React, {MouseEventHandler, useState} from "react";
 import Link from "next/link";
 import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
 import toast from "react-hot-toast";
-import {STRENGTH_LEVELS} from "@/config";
-import {Password, statusDetails} from "@/types";
+import {Password} from "@/types";
 import {generateTagColor} from "@/utils/color";
-
-
-export const statuses: Record<number, statusDetails> = {
-    4: {
-        color: "(--accent-color)"
-    },
-    1: {
-        color: "red-500"
-    }
-}
+import {STRENGTH_DETAILS} from "@/config";
+import {useConfigStore} from "@/store/configStore";
+import {copyWithAutoClear} from "@/utils/clipboard";
 
 type RowItem = Password & { isSelected?: boolean };
 
-export default function Row({ item }: { item: RowItem }) {
+export default function Row({item}: { item: RowItem }) {
     const createdDate = new Date(item.createdAt);
 
     const [isShow, setShow] = useState(false);
     const [isChecked, setIsChecked] = useState(item.isSelected);
 
-    const statusDetails = statuses[item.strengthScore];
-    const baseColor = generateTagColor(item.tag.color)
+    const FALLBACK_TAG_COLOR = '#6a7282';
+    const baseColor = generateTagColor(item.tag?.color ?? FALLBACK_TAG_COLOR);
+    const passwordStatusDetails = STRENGTH_DETAILS[item.strengthScore] ?? STRENGTH_DETAILS[0];
 
+    const formattedDate = createdDate.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+    });
 
     const handleClickShow: MouseEventHandler = () => {
         setShow(!isShow)
     }
+
+    const clipboardClearTimeout = useConfigStore((s) => s.clipboardClearTimeout);
 
     const handleCopy: MouseEventHandler = async (e) => {
         e.preventDefault();
@@ -45,16 +45,20 @@ export default function Row({ item }: { item: RowItem }) {
         }
 
         try {
-            await navigator.clipboard.writeText(item.password)
-            toast.success("Скопировано")
+            await copyWithAutoClear(item.password, clipboardClearTimeout)
+            toast.success(clipboardClearTimeout > 0
+                ? `Скопировано, очистится через ${clipboardClearTimeout}с`
+                : "Скопировано")
         } catch (err) {
             toast.error("Произошла неизвестная ошибка")
             console.error(err)
         }
     }
 
+
     return (
-        <tr className="table-row-hover border-b border-(--text-muted)/20 transition-colors group cursor-pointer" style={{backgroundColor: item.strengthScore <= 2 ? 'rgba(255, 0, 0, 0.02)' : ''}}>
+        <tr className="table-row-hover border-b border-(--text-muted)/20 transition-colors group cursor-pointer"
+            style={{backgroundColor: item.strengthScore <= 2 ? 'rgba(255, 0, 0, 0.02)' : ''}}>
             <td className="py-3 px-4 text-center">
                 <label className="relative flex  items-center justify-center cursor-pointer">
                     <input
@@ -89,32 +93,48 @@ export default function Row({ item }: { item: RowItem }) {
             <td className="py-3 pl-4 pr-1 border-l border-(--border-color)/50">
                 <div className="flex relative">
                     <div className="bg-(--background-color) rounded pl-2 py-1">
-                        <input type={isShow ? "text" : "password"} disabled={true} value={isShow ? item.password : "*".repeat(16)} />
+                        <input type={isShow ? "text" : "password"} disabled={true}
+                               value={isShow ? item.password : "*".repeat(16)}/>
                     </div>
                     <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center">
-                        <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={(handleClickShow)}>
-                            <FontAwesomeIcon icon={isShow ? faEye : faEyeLowVision } />
+                        <button type="button"
+                                className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors"
+                                onClick={(handleClickShow)}>
+                            <FontAwesomeIcon icon={isShow ? faEye : faEyeLowVision}/>
                         </button>
-                        <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={handleCopy}>
-                            <FontAwesomeIcon icon={faCopy} />
+                        <button type="button"
+                                className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors"
+                                onClick={handleCopy}>
+                            <FontAwesomeIcon icon={faCopy}/>
                         </button>
                     </div>
                 </div>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50">
-                <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs`} style={{color: baseColor.color, borderColor: baseColor.color}}>
-                    {item.tag.title}
+                <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs"
+                      style={{
+                          color: baseColor.color,
+                          backgroundColor: baseColor.backgroundColor,
+                          borderColor: baseColor.borderColor,
+                      }}>
+                    {item.tag?.title ?? 'Без тега'}
                 </span>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50">
-                <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-${statusDetails.color}/10 text-${statusDetails.color} border border-${statusDetails.color}/20 text-xs`}>
-                    {STRENGTH_LEVELS[item.strengthScore]}
+                <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs"
+                      style={{
+                          color: passwordStatusDetails.color,
+                          backgroundColor: passwordStatusDetails.backgroundColor,
+                          borderColor: passwordStatusDetails.borderColor,
+                      }}>
+                    {passwordStatusDetails.title}
                 </span>
             </td>
-            <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted)">{createdDate.toLocaleString('ru-RU')}</td>
+            <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted)">{formattedDate}</td>
             <td className="py-3 px-4 text-right">
                 <Link href={`/passwords/edit/${item.id}`}>
-                    <button className="text-(--text-muted) hover:text-white opacity-0 group-hover:opacity-100 transition-all">
+                    <button
+                        className="text-(--text-muted) hover:text-white opacity-0 group-hover:opacity-100 transition-all">
                         <FontAwesomeIcon icon={faEllipsis}/>
                     </button>
                 </Link>

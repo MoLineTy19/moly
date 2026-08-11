@@ -29,4 +29,11 @@ export const PasswordTable = sqliteTable('passwords', {
     })
 )
 
+export const ActivityLogTable = sqliteTable('activity_log', {
+    id: integer().primaryKey({autoIncrement: true}),
+    event_type: text().notNull(),     // unlock | manual_lock | auto_lock | tab_switch_lock | change_master_password | export | import
+    message: text(),
+    created_at: text().notNull().default(sql`(current_timestamp)`),
+})
+
 

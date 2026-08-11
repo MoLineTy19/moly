@@ -2,13 +2,13 @@ import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import {Tag} from "@/types/components";
 
 export interface Password {
-    id: string;
+    id: number;
     url: string;
     title: string;
     login: string;
     password: string;
     strengthScore: number;
-    tag: Tag;
+    tag: Tag | null;
     note: string;
     lastModified: number;
     createdAt: number;
@@ -18,7 +18,7 @@ export interface Password {
 export interface TagStore {
     tags: Array<Tag>;
     fetchTags: () => Promise<void>;
-    addTag: (tag: Omit<Tag, 'id'>) => Promise<void>;
+    addTag: (tag: Omit<Tag, 'id' | 'countUses' | 'position'>) => Promise<void>;
     editTag: (tag: Tag) => Promise<void>;
     deleteTag: (id: number) => Promise<void>;
     reorderTags: (tags: Tag[]) => Promise<void>;
@@ -42,10 +42,19 @@ export interface SensitiveData {
 
 
 export interface PasswordStore {
-    masterKey: string | null;
+    masterKey: CryptoKey | null;
+    isLocked: boolean;
     masterKeyCreatedAt: number | null;
     passwords: Password[];
     passwordCount: number;
+    isSetup: boolean;
+
+    unlock: (masterPassword: string) => Promise<boolean>;
+    setup: (masterPassword: string) => Promise<void>;
+    lock: (reason?: LockReason) => void;
+    rehydrate: () => void;
+    changeMasterPassword: (current: string, next: string) => Promise<{ ok: boolean; error?: string }>;
+
     fetchPasswords: () => Promise<void>;
     addPassword: (entry: Omit<Password, 'id' | 'createdAt' | 'lastModified'>) => Promise<void>;
     editPassword: (entry: Password) => Promise<void>;
@@ -53,6 +62,7 @@ export interface PasswordStore {
     isLoading: boolean;
     error: string | null;
 }
+
 
 
 export interface SectionButtonDetails {
@@ -63,8 +73,11 @@ export interface SectionButtonDetails {
 }
 
 
-export interface statusDetails {
-    color: string
+export interface StatusDetails {
+    color: string;
+    backgroundColor: string;
+    borderColor: string;
+    title: string;
 }
 
 export interface ConfigStore {
@@ -78,3 +91,21 @@ export interface ConfigStore {
     setOnTabSwitch: (enabled: boolean) => void;
     resetConfig: () => void;
 }
+
+export type ActivityEventType =
+    | 'unlock'
+    | 'manual_lock'
+    | 'auto_lock'
+    | 'tab_switch_lock'
+    | 'change_master_password'
+    | 'export'
+    | 'import';
+
+export interface ActivityEntry {
+    id: number;
+    type: ActivityEventType;
+    message: string | null;
+    createdAt: string;
+}
+
+export type LockReason = 'manual' | 'auto' | 'tab_switch';

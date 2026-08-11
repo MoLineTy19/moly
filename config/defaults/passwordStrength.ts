@@ -1,3 +1,5 @@
+import {StatusDetails} from "@/types";
+
 export const STRENGTH_WEIGHTS = {
     length: {
         min: 0,
@@ -20,21 +22,36 @@ export const STRENGTH_WEIGHTS = {
     },
 };
 
-export const STRENGTH_LEVELS: Record<number, string> = {
-    0: 'Очень слабый',
-    1: 'Слабый',
-    2: 'средний',
-    3: 'Надежный',
-    4: 'Очень надежный'
-} as const;
-
-
-export const STRENGTH_COLORS: Record<number, string> = {
-    0: '#ef4444',
-    1: '#f97316',
-    2: '#eab308',
-    3: '#22c55e',
-    4: '#10b981',
-} as const;
-// text-(--accent-color)
+export const STRENGTH_DETAILS: StatusDetails[] = [
+    {
+        color: "#6b7280",
+        backgroundColor: "rgba(107, 114, 128, 0.1)",
+        borderColor: "rgba(107, 114, 128, 0.2)",
+        title: "Очень слабый"
+    },
+    {
+        color: "#ef4444",
+        backgroundColor: "rgba(239, 68, 68, 0.1)",
+        borderColor: "rgba(239, 68, 68, 0.2)",
+        title: "Слабый"
+    },
+    {
+        color: "#f97316",
+        backgroundColor: "rgba(249, 115, 22, 0.1)",
+        borderColor: "rgba(249, 115, 22, 0.2)",
+        title: "Средний"
+    },
+    {
+        color: "#3b82f6",
+        backgroundColor: "rgba(59, 130, 246, 0.1)",
+        borderColor: "rgba(59, 130, 246, 0.2)",
+        title: "Надежный"
+    },
+    {
+        color: "#22c55e",
+        backgroundColor: "rgba(34, 197, 94, 0.1)",
+        borderColor: "rgba(34, 197, 94, 0.2)",
+        title: "Очень надежный"
+    },
+]
 

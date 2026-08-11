@@ -9,7 +9,7 @@ const routeNames: Record<string, string> = {
     "passwords": "Все пароли",
     "addPassword": "Добавить пароль",
     "favorites": "Избранное",
-    "categories": "Управление категориями",
+    "categories": "Управление тегами",
     "search": "Поиск и фильтры",
     "security": "Настройки безопасности",
 };

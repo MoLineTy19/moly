@@ -1,43 +1,104 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faGithub} from "@fortawesome/free-brands-svg-icons";
-import {STRENGTH_LEVELS} from "@/config";
-import React from "react";
-import {faCopy} from "@fortawesome/free-regular-svg-icons";
+import React, {useState} from "react";
+import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
+import {STRENGTH_DETAILS} from "@/config";
+import { useConfigStore } from "@/store/configStore";
+import {generateTagColor} from "@/utils/color";
+import {Password} from "@/types";
+import toast from "react-hot-toast";
+import {copyWithAutoClear} from "@/utils/clipboard";
+import {faEyeLowVision} from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
 
-export default function BoardCard() {
-
-    const statusDetails = {
-        color: 'green'
+function getDomain(url: string): string | null {
+    try {
+        if (!url) return null;
+        const u = new URL(url.startsWith('http') ? url : `https://${url}`);
+        return u.hostname;
+    } catch {
+        return null;
     }
+}
 
-    const strengthScore = 3;
+
+export default function BoardCard({item}: { item: Password }) {
+    const [show, setShow] = useState(false);
+    const [imgFailed, setImgFailed] = useState(false);
+    const clipboardClearTimeout = useConfigStore((s) => s.clipboardClearTimeout);
+
+    const domain = getDomain(item.url);
+    const tagColor = generateTagColor(item.tag?.color ?? '#6a7280');
+    const strength = STRENGTH_DETAILS[item.strengthScore] ?? STRENGTH_DETAILS[0];
+
+    const handleCopy = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!item.password) {
+            toast.error("Поле пароля пустое!");
+            return;
+        }
+        try {
+            await copyWithAutoClear(item.password, clipboardClearTimeout);
+            toast.success(clipboardClearTimeout > 0 ? `Скопировано, очистится через ${clipboardClearTimeout}с` : "Скопировано");
+        } catch {
+            toast.error("Произошла неизвестная ошибка");
+        }
+    };
+
+    const toggleShow = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setShow(v => !v);
+    };
+
+    const dots = Math.max(8, Math.min(item.password?.length ?? 8, 14));
+
 
     return (
-        <div className="relative min-h-[30vh] border border-(--border-color) rounded-lg overflow-hidden flex flex-col">
-            <div className="absolute text-[500px] text-red/20 z-0 left-1/2 -translate-x-1/2 top-1/6">
-                <FontAwesomeIcon icon={faGithub}/>
+        <Link href={`/passwords/${item.id}`}
+              className="group relative border border-(--border-color) rounded-xl overflow-hidden flex flex-col bg-(--background-secondary) hover:border-(--border-input-color) transition-colors p-5">
+            <div className="flex items-start gap-3 mb-4">
+                <div className="w-11 h-11 rounded-lg bg-(--background-color) border border-(--border-color) flex items-center justify-center overflow-hidden shrink-0">
+                    {domain && !imgFailed ? (
+                        <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`} alt="" aria-hidden
+                             onError={() => setImgFailed(true)} className="w-6 h-6"/>
+                    ) : (
+                        <span className="text-lg font-bold text-(--text-color)">
+                            {(item.title?.[0] ?? '?').toUpperCase()}
+                        </span>
+                    )}
+                </div>
+                <div className="grow min-w-0">
+                    <h3 className="text-base font-semibold text-(--text-color) truncate">{item.title}</h3>
+                    <div className="text-(--text-muted) text-xs truncate">{item.login || 'нет логина'}</div>
+                </div>
             </div>
-            <div className="absolute inset-0 bg-linear-to-b from-transparent to-black z-5"></div>
-            <div className="relative z-10 p-6 flex flex-col grow">
-                <h1 className="text-center text-2xl font-extrabold">
-                    GitHub
-                </h1>
-                <div className="text-center mt-10 text-xl">
-                    alisa.merken123@gmail.com
-                </div>
-                <div className="items-center flex justify-between mt-15">
-                    <div>
-                        Личное
-                    </div>
-                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-${statusDetails.color}/10 text-${statusDetails.color} border border-${statusDetails.color}/20 text-xs`}>
-                        {STRENGTH_LEVELS[strengthScore]}
-                    </span>
-                </div>
-                <div className="mt-auto flex justify-center">
-                    <input value="superhard password" disabled={true} type="password"/>
+
+            <div className="flex items-center justify-between gap-2 mb-3">
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-xs"
+                      style={{color: tagColor.color, backgroundColor: tagColor.backgroundColor, borderColor: tagColor.borderColor}}>
+                    {item.tag?.title ?? 'Без тега'}
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded border"
+                      style={{color: strength.color, backgroundColor: strength.backgroundColor, borderColor: strength.borderColor}}>
+                    {strength.title}
+                </span>
+            </div>
+
+            <div className="mt-auto flex items-center gap-1 bg-(--background-color) border border-(--border-color) rounded-lg pl-3 py-1.5 pr-1">
+                <code className="grow text-sm font-mono text-(--text-color) truncate">
+                    {show ? (item.password || '—') : '•'.repeat(dots)}
+                </code>
+                <button onClick={toggleShow} title={show ? "Скрыть" : "Показать"}
+                        className="w-8 h-8 rounded-md text-(--text-muted) hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
+                    <FontAwesomeIcon icon={show ? faEyeLowVision : faEye}/>
+                </button>
+                <button onClick={handleCopy} title="Скопировать пароль"
+                        className="w-8 h-8 rounded-md text-(--text-muted) hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
                     <FontAwesomeIcon icon={faCopy}/>
-                </div>
+                </button>
             </div>
-        </div>
-    )
+        </Link>
+    );
 }

@@ -1,0 +1,1 @@
+ALTER TABLE `passwords` ADD `updated_at` text DEFAULT (current_timestamp) NOT NULL;

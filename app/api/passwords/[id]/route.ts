@@ -2,6 +2,17 @@ import {db} from "@/lib/db";
 import {PasswordTable, TagTable} from "@/lib/schema";
 import {NextRequest, NextResponse} from "next/server";
 import {eq} from "drizzle-orm";
+import {z} from "zod";
+
+const PatchSchema = z.object({
+    title: z.string().min(1).max(200).optional(),
+    login: z.string().min(1).max(500).optional(),
+    url: z.string().max(2000).optional(),
+    password: z.string().min(1).optional(),       // шифртекст
+    strength_score: z.number().int().min(0).max(4).optional(),
+    note: z.string().nullable().optional(),
+    tag_id: z.number().int().nullable().optional(),
+});
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }>}) {
     const { id: idStr } = await params;
@@ -10,25 +21,25 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         return NextResponse.json({ error: "Invalid id", status: 400 });
     }
 
-    const body = await request.json();
-    const { title, login, password, strengthScore, url, tag_id, note } = body;
+    const parsed = PatchSchema.safeParse(await request.json());
+    if (!parsed.success) {
+        return NextResponse.json({error: parsed.error.flatten()}, {status: 400});
+    }
 
-    const updateData: any = {};
-    if (title !== undefined) updateData.title = title;
-    if (login !== undefined) updateData.login = login;
-    if (password !== undefined) updateData.password = password;
-    if (strengthScore !== undefined) updateData.strength_score = strengthScore;
-    if (url !== undefined) updateData.url = url;
-    if (tag_id !== undefined) updateData.tag_id = tag_id;
-    if (note !== undefined) updateData.note = note;
-    updateData.updatedAt = new Date().toISOString();
+    const updateData: Partial<typeof PasswordTable.$inferInsert> = {};
+    const v = parsed.data;
+    if (v.title !== undefined)         updateData.title = v.title;
+    if (v.login !== undefined)         updateData.login = v.login;
+    if (v.url !== undefined)           updateData.url = v.url;
+    if (v.password !== undefined)      updateData.password = v.password;
+    if (v.strength_score !== undefined) updateData.strength_score = v.strength_score;
+    if (v.note !== undefined)          updateData.note = v.note;
+    if (v.tag_id !== undefined)        updateData.tag_id = v.tag_id;
+    updateData.updated_at = new Date().toISOString();   // ← ИСПРАВЛЕНО: было updatedAt
 
-    await db
-        .update(PasswordTable)
-        .set(updateData)
-        .where(eq(PasswordTable.id, id))
+    await db.update(PasswordTable).set(updateData).where(eq(PasswordTable.id, id));
+    return NextResponse.json({success: true});
 
-    return NextResponse.json({ success: true });
 }
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -47,6 +58,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         strengthScore: PasswordTable.strength_score,
         note: PasswordTable.note,
         createdAt: PasswordTable.created_at,
+        updatedAt: PasswordTable.updated_at,
         tag: TagTable,
     })
     .from(PasswordTable)
@@ -58,3 +70,21 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ success: true, data: password })
 }
 
+export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const { id: idStr } = await params;
+    const id = Number(idStr);
+    if (isNaN(id)) {
+        return NextResponse.json({error: "Invalid id"}, {status: 400});
+    }
+
+    const deleted = await db
+        .delete(PasswordTable)
+        .where(eq(PasswordTable.id, id))
+        .returning({ id: PasswordTable.id });
+
+    if (deleted.length === 0) {
+        return NextResponse.json({error: "Password not found"}, {status: 404});
+    }
+
+    return NextResponse.json({success: true, id});
+}

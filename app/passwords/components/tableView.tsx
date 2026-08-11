@@ -16,7 +16,7 @@ export default function TableView({passwords, currentPage, itemPerPage, isChecke
     return (
         <table className="w-full text-left border-collapse">
             <thead>
-            <tr className="border-b border-(--border-color) text-xs font-medium text-gray-400 uppercase tracking-wider bg-(--background-secondary)">
+            <tr className="border-b border-(--border-color) text-xs font-medium text-(--text-muted) uppercase tracking-wider bg-(--background-secondary)">
                 <th className="py-4 px-4 w-12 text-center">
                     <label className="relative flex items-center justify-center cursor-pointer">
                         <input
@@ -45,7 +45,7 @@ export default function TableView({passwords, currentPage, itemPerPage, isChecke
                 </th>
                 <th className="py-4 px-4 font-medium border-l border-(--border-color)">
                     <FontAwesomeIcon icon={faTag} className="mr-2"/>
-                    КАТЕГОРИЯ
+                    ТЕГ
                 </th>
                 <th className="py-4 px-4 font-medium  w-1/8 border-l border-(--border-color)">
                     <FontAwesomeIcon icon={faShieldHalved} className="mr-2"/>
@@ -57,7 +57,7 @@ export default function TableView({passwords, currentPage, itemPerPage, isChecke
                 </th>
             </tr>
             </thead>
-            <tbody className="text-sm text-gray-300">
+            <tbody className="text-sm text-(--text-color)/80">
             {
                 paginatedPasswords.map((item) => (
                     <Row item={item} key={item.id}/>

@@ -68,7 +68,7 @@ export default function Sidebar() {
                 {
                     isOpen &&
                     <>
-                        <SectionButton title="Управление категориями" icon={faFolder} href="/categories"/>
+                        <SectionButton title="Управление тегами" icon={faFolder} href="/categories"/>
                         <SectionButton title="Поиск и фильтры" icon={faSliders} href="/search"/>
                         <SectionButton title="Настройки безопасности" icon={faShieldHalved} href="/security"/>
                     </>
