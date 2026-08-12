@@ -18,7 +18,8 @@
 /out/
 
 # production
-/build
+# build/ не игнорируем: там ресурсы для electron-builder (icon.svg, icon.ico).
+/release
 
 # misc
 .DS_Store
