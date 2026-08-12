@@ -111,6 +111,7 @@ export default function Categories() {
 
     const handleDragEnd = async (event: DragEndEvent) => {
         const {active, over} = event;
+        // arrayMove формирует новый порядок; проверка отсекает дроп элемента на самого себя.
         if (active.id !== over?.id) {
             const oldIndex = tags.findIndex((t) => t.id === active.id);
             const newIndex = tags.findIndex((t) => t.id === over?.id);
@@ -139,7 +140,7 @@ export default function Categories() {
                         </span>
                     </h1>
                     <p className="text-sm text-(--text-muted)">
-                        Создавайте, редактируйте и сортируйте теги для организации ваших паролей.
+                        Создавайте, редактируйте и сортируйте теги, чтобы группировать пароли.
                     </p>
                 </div>
                 <button onClick={openCreate}

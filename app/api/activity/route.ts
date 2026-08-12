@@ -4,6 +4,7 @@ import {NextRequest, NextResponse} from "next/server";
 import {desc} from "drizzle-orm";
 
 export async function GET(request: NextRequest) {
+    // limit ограничен диапазоном 1..500; некорректное или отсутствующее значение → 50.
     const raw = Number(request.nextUrl.searchParams.get('limit') ?? 50);
     const limit = Math.min(Math.max(Number.isFinite(raw) ? raw : 50, 1), 500);
 

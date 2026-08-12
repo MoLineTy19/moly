@@ -3,10 +3,13 @@
 import {usePasswordStore} from "@/store/passwordStore";
 import {useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faLock, faShieldHalved} from "@fortawesome/free-solid-svg-icons";
+import {faLock, faRotateLeft, faShieldHalved} from "@fortawesome/free-solid-svg-icons";
+import {saveSalt, saveVerifier} from "@/lib/encryption";
+import {parseRecovery} from "@/lib/vault-io";
+import toast from "react-hot-toast";
 
 export default function UnlockScreen() {
-    const {isSetup, setup, unlock} = usePasswordStore();
+    const {isSetup, setup, unlock, rehydrate} = usePasswordStore();
     const [pwd, setPwd] = useState("");
     const [show, setShow] = useState(false);
     const [err, setErr] = useState("");
@@ -32,6 +35,29 @@ export default function UnlockScreen() {
         }
     };
 
+    // Восстановление доступа к существующему сейфу из резервной копии
+    // (когда localStorage потерян, а database.db цела). Поднимает salt+verifier,
+    // после чего isSetup становится true и экран переключается на ввод пароля.
+    const handleRecoveryFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            const recovery = parseRecovery(String(reader.result));
+            if (!recovery) {
+                toast.error("В файле нет ключей восстановления");
+                return;
+            }
+            const salt = Uint8Array.from(atob(recovery.salt), (c) => c.charCodeAt(0));
+            saveSalt(salt);
+            saveVerifier(recovery.verifier);
+            rehydrate();
+            toast.success("Ключи восстановлены. Введите мастер-пароль.");
+        };
+        reader.readAsText(file);
+        e.target.value = "";
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-(--background-color) p-4">
             <div className="w-full max-w-md">
@@ -49,7 +75,7 @@ export default function UnlockScreen() {
                     <p className="text-sm text-(--text-secondary) text-center max-w-xs">
                         {isSetup
                             ? "Введите мастер-пароль для доступа к паролям."
-                            : "Создайте мастер-пароль. Он единственный ключ к вашему сейфу - восстановить его будет невозможно."}
+                            : "Создайте мастер-пароль. Восстановить его будет невозможно."}
                     </p>
                 </div>
 
@@ -113,9 +139,16 @@ export default function UnlockScreen() {
                 </form>
 
                 {!isSetup && (
-                    <p className="text-xs text-(--text-muted) text-center mt-4 max-w-xs mx-auto">
-                        Внимание: мастер-пароль нельзя восстановить. Храните его надёжно.
-                    </p>
+                    <div className="mt-4 max-w-xs mx-auto text-center">
+                        <p className="text-xs text-(--text-muted)">
+                            Внимание: мастер-пароль нельзя восстановить. Храните его надёжно.
+                        </p>
+                        <label className="inline-flex items-center gap-1.5 mt-3 text-xs text-(--accent-color) hover:text-(--accent-color)/70 cursor-pointer transition-colors">
+                            <FontAwesomeIcon icon={faRotateLeft}/>
+                            Восстановить из резервной копии
+                            <input type="file" accept=".json,application/json" className="hidden" onChange={handleRecoveryFile}/>
+                        </label>
+                    </div>
                 )}
             </div>
         </div>

@@ -15,7 +15,7 @@ export async function deriveKey(masterPassword: string, salt: Uint8Array): Promi
         {
             name: 'PBKDF2',
             salt: safeSalt,
-            iterations: 600000,
+            iterations: 600000, // ~0.4 c на вывод ключа; цена brute-force мастер-пароля
             hash: 'SHA-256',
         },
         keyMaterial,
@@ -30,6 +30,7 @@ export async function deriveKey(masterPassword: string, salt: Uint8Array): Promi
 
 export async function encrypt(text: string, key: CryptoKey): Promise<string> {
     const encoder = new TextEncoder();
+    // 12 байт = 96 бит, стандартная длина nonce для AES-GCM.
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const encodedData = encoder.encode(text);
 
@@ -77,6 +78,12 @@ export function loadSalt(): Uint8Array | null {
     return Uint8Array.from(atob(saltBase64), c => c.charCodeAt(0));
 }
 
+/** Соль устройства в исходном base64 (для recovery-экспорта). */
+export function loadSaltBase64(): string | null {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem('moly_salt');
+}
+
 
 
 const VERIFIER_PLAINTEXT = "moly-verifier-v1";
@@ -105,6 +112,26 @@ export function loadVerifier(): string | null {
     return localStorage.getItem('moly_verifier');
 }
 
+/**
+ * Временная страховка предыдущего verifier'а на время смены мастер-пароля.
+ * Если перешифровка БД прошла, а сохранить новый verifier не успели (падение
+ * вкладки), старый остаётся доступным для диагностики/отката вручную.
+ */
+export function saveVerifierPrev(verifier: string) {
+    if (typeof window === "undefined") return;
+    localStorage.setItem('moly_verifier_prev', verifier);
+}
+
+export function loadVerifierPrev(): string | null {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem('moly_verifier_prev');
+}
+
+export function clearVerifierPrev() {
+    if (typeof window === "undefined") return;
+    localStorage.removeItem('moly_verifier_prev');
+}
+
 export function hasSetup(): boolean {
     if (typeof window === "undefined") return false;
     return !!localStorage.getItem('moly_verifier') && !!localStorage.getItem('moly_salt');
@@ -114,6 +141,7 @@ export function hasSetup(): boolean {
 export function getOrCreateSalt(): Uint8Array {
     const existing = loadSalt();
     if (existing) return existing;
+    // 16 байт = 128 бит. Соль привязывает вывод ключа к устройству.
     const salt = crypto.getRandomValues(new Uint8Array(16));
     saveSalt(salt);
     return salt;

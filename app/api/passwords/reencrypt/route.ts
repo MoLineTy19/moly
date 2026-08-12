@@ -22,6 +22,8 @@ export async function POST(request: NextRequest) {
 
     const now = new Date().toISOString();
 
+    // Атомарно: при смене мастер-пароля все записи перешифровываются целиком,
+    // частичный результат недопустим. now считаем один раз на всю партию.
     db.transaction(() => {
         for (const item of parsed.data.items) {
             db.update(PasswordTable)

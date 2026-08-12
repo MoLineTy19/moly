@@ -11,7 +11,7 @@ import {useTagStore} from "@/store/tagStore";
 import {Password} from "@/types";
 import {Tag} from "@/types/components";
 import {calculatePasswordStrength} from "@/utils/passwordStrength";
-import {editPassword, deletePassword} from "@/store/passwordStore";
+import {editPassword, deletePassword, usePasswordStore} from "@/store/passwordStore";
 import toast from "react-hot-toast";
 import {STRENGTH_DETAILS} from "@/config";
 import {useRouter} from "next/navigation";
@@ -26,54 +26,51 @@ export default function EditPassword() {
     const id = params.id;
     const router = useRouter();
 
-    const [statePassword, setStatePassword] = useState<Password | null>(null);
+    // Запись уже расшифрована в сторе. Прямой fetch к API отдал бы шифртекст,
+    // а editPassword шифрует повторно, поэтому получилось бы двойное шифрование.
+    const password = usePasswordStore((s) => s.passwords.find((p) => p.id === Number(id)));
+    const isLoading = usePasswordStore((s) => s.isLoading);
+
     const [url, setUrl] = useState("");
     const [title, setTitle] = useState("");
     const [login, setLogin] = useState("");
-    const [password, setPassword] = useState<string>("");
+    const [pwdValue, setPwdValue] = useState<string>("");
     const [reliability, setReliability] = useState(0);
     const [selectedTag, setTag] = useState<Tag | null>(null);
     const [note, setNote] = useState("");
+    const [initialized, setInitialized] = useState(false);
 
-
+    // Заполняем форму расшифрованными данными один раз, когда запись появилась.
     useEffect(() => {
-        if (!id) return;
-
-        fetch(`/api/passwords/${id}`)
-            .then(res => res.json())
-            .then(data => {
-                const pwd = data.data;
-                setStatePassword(pwd);
-
-                setPassword(pwd.password);
-                setTitle(pwd.title);
-                setLogin(pwd.login);
-                setUrl(pwd.url);
-                setNote(pwd.note ?? "");
-                setTag(pwd.tag);
-            })
-            .catch(err => {
-                console.error("Failed to load password", err);
-                toast.error("Не удалось загрузить запись");
-            });
-    }, [id]);
+        if (password && !initialized) {
+            setPwdValue(password.password);
+            setTitle(password.title);
+            setLogin(password.login);
+            setUrl(password.url);
+            setNote(password.note ?? "");
+            setTag(password.tag);
+            setReliability(password.strengthScore);
+            setInitialized(true);
+        }
+    }, [password, initialized]);
 
     const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newPassword = event.target.value;
-        setPassword(newPassword)
+        setPwdValue(newPassword)
         setReliability(calculatePasswordStrength(newPassword))
     }
 
-    if (!statePassword) {
-        return <>
-            Пароль не найден
-        </>
+    if (isLoading && !password) {
+        return <div className="grow p-8 text-(--text-muted)">Загрузка…</div>;
+    }
+    if (!password) {
+        return <div className="grow p-8 text-(--text-muted)">Пароль не найден</div>;
     }
 
-    const handleClickSave = () => {
-        const updated = {
-            ...statePassword,
-            password,
+    const handleClickSave = async () => {
+        const updated: Password = {
+            ...password,
+            password: pwdValue,
             title,
             login,
             note,
@@ -82,8 +79,12 @@ export default function EditPassword() {
             url,
         };
 
-        editPassword(updated)
-        toast.success("Изменено")
+        try {
+            await editPassword(updated);
+            toast.success("Изменено");
+        } catch {
+            toast.error("Не удалось сохранить изменения");
+        }
     }
 
     return (
@@ -96,16 +97,20 @@ export default function EditPassword() {
                                 Редактирование записи
                             </h1>
                             <p className="text-(--text-secondary) text-sm">
-                                Обновите учетные данные для Google Личный.
+                                Обновите данные записи «{password.title}».
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
                             <button type="button"
-                                    onClick={() => {
+                                    onClick={async () => {
                                         if (!confirm("Удалить запись безвозвратно?")) return;
-                                        deletePassword(statePassword.id);
-                                        toast.success("Удалено");
-                                        router.push("/passwords");
+                                        try {
+                                            await deletePassword(password.id);
+                                            toast.success("Удалено");
+                                            router.push("/passwords");
+                                        } catch {
+                                            toast.error("Не удалось удалить запись");
+                                        }
                                     }}
                                     className="px-4 py-2 rounded-lg border border-(--border-input-color) text-(--text-secondary) hover:text-red-400 hover:border-red-500/50 font-medium text-sm transition-colors flex items-center gap-2">
                                 <FontAwesomeIcon icon={faTrashCan} />
@@ -131,7 +136,7 @@ export default function EditPassword() {
                                         <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--text-muted)">
                                             <FontAwesomeIcon icon={faKey} />
                                         </div>
-                                        <input className="w-full pl-11 pr-24 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) font-mono focus:outline-none focus:border-(--accent-color) transition-colors placeholder-(--text-muted)" value={password} onChange={handleChangeInput}/>
+                                        <input className="w-full pl-11 pr-24 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) font-mono focus:outline-none focus:border-(--accent-color) transition-colors placeholder-(--text-muted)" value={pwdValue} onChange={handleChangeInput}/>
                                         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                                             <button type="button" className="w-8 h-8 rounded-md text-(--text-secondary) hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
                                                 <FontAwesomeIcon icon={faEye} />

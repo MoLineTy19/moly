@@ -1,4 +1,5 @@
 import {Password} from "@/types";
+import {loadSaltBase64, loadVerifier} from "@/lib/encryption";
 
 const EXPORT_VERSION = 1;
 
@@ -12,11 +13,23 @@ export interface VaultExportItem {
     strengthScore: number;
 }
 
+/**
+ * Ключи восстановления: соль + verifier. Позволяют восстановить доступ к
+ * существующему сейфу (тем же id записей) после потери localStorage, пока
+ * database.db цела. Сам по себе блок не раскрывает пароли: для расшифровки
+ * нужен мастер-пароль.
+ */
+export interface VaultRecovery {
+    salt: string;
+    verifier: string;
+}
+
 export interface VaultExport {
     app: 'moly';
     version: number;
     exportedAt: string;
     items: VaultExportItem[];
+    recovery?: VaultRecovery;
 }
 
 export interface ParsedEntry {
@@ -30,6 +43,8 @@ export interface ParsedEntry {
 /* ---------------------- Экспорт ---------------------- */
 
 export function buildExport(passwords: Password[]): VaultExport {
+    const salt = loadSaltBase64();
+    const verifier = loadVerifier();
     return {
         app: 'moly',
         version: EXPORT_VERSION,
@@ -43,6 +58,8 @@ export function buildExport(passwords: Password[]): VaultExport {
             tag: p.tag?.title ?? null,
             strengthScore: p.strengthScore,
         })),
+        // Ключи восстановления: для доступа к сейфу при потере localStorage.
+        recovery: salt && verifier ? {salt, verifier} : undefined,
     };
 }
 
@@ -109,11 +126,31 @@ export function parseImport(text: string): ParsedEntry[] {
     return parseCSV(trimmed).map(normalizeEntry).filter((e): e is ParsedEntry => e !== null);
 }
 
+/**
+ * Извлечь блок recovery (salt+verifier) из JSON-выгрузки Moly.
+ * Используется на экране первичной настройки для восстановления доступа
+ * к существующему сейфу после потери localStorage (БД при этом цела).
+ * Возвращает null, если файл не JSON или блока recovery в нём нет.
+ */
+export function parseRecovery(text: string): VaultRecovery | null {
+    const trimmed = text.trim();
+    if (!trimmed.startsWith('{')) return null;
+    let data: any;
+    try {
+        data = JSON.parse(trimmed);
+    } catch {
+        return null;
+    }
+    const r = data?.recovery;
+    if (!r || typeof r.salt !== 'string' || typeof r.verifier !== 'string') return null;
+    return {salt: r.salt, verifier: r.verifier};
+}
+
 function normalizeEntry(raw: any): ParsedEntry | null {
     if (!raw || typeof raw !== 'object') return null;
     const title = String(raw.title ?? raw.name ?? '').trim();
     const password = String(raw.password ?? raw.secret ?? '').trim();
-    if (!title && !password) return null;     // минимум — заголовок или пароль
+    if (!title && !password) return null;     // минимум: заголовок или пароль
     return {
         title: title || 'Без названия',
         login: String(raw.login ?? raw.username ?? raw.user ?? '').trim(),

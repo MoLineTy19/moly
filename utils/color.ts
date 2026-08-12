@@ -2,7 +2,7 @@ import {TagColorScheme} from "@/types/components";
 
 type RGB = { r: number; g: number; b: number };
 
-/** h, s, l — все в диапазоне 0..1 */
+/** h, s, l: все в диапазоне 0..1 */
 function hslToRgb(h: number, s: number, l: number): RGB {
     let r: number, g: number, b: number;
 
@@ -47,7 +47,7 @@ function parseColor(color: string): RGB | null {
         };
     }
 
-    // hsl(h, s%, l%) / hsla(...) — основная палитра DEFAULT_TAG_COLORS
+    // hsl(h, s%, l%) / hsla(...): основная палитра DEFAULT_TAG_COLORS
     const hsl = c.match(/^hsla?\(\s*([0-9.]+)(?:deg)?\s*[ ,]\s*([0-9.]+)%\s*[ ,]\s*([0-9.]+)%/);
     if (hsl) {
         return hslToRgb(
@@ -66,7 +66,7 @@ function parseColor(color: string): RGB | null {
     return null;
 }
 
-// Серый #6a7282 — фолбэк, если цвет не удалось распознать.
+// Серый #6a7282: фолбэк, если цвет не удалось распознать.
 // Совпадает с токеном --text-muted; единый источник для всех потребителей.
 export const FALLBACK_TAG_COLOR = '#6a7282';
 const FALLBACK_RGB: RGB = {r: 106, g: 114, b: 130};

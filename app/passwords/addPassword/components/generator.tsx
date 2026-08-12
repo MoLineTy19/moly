@@ -22,6 +22,8 @@ export default function Generator({password, setPassword, reliability, setReliab
     const clipboardClearTimeout = useConfigStore((s) => s.clipboardClearTimeout);
 
 
+    // Равномерное случайное целое 0..max-1 без modulo-bias: значения из «хвоста»
+    // диапазона uint32, которые при % max дали бы перекос, отбрасываются.
     function secureRandomInt(max: number): number {
         const range = 2 ** 32;
         const limit = range - (range % max);
@@ -132,7 +134,7 @@ export default function Generator({password, setPassword, reliability, setReliab
                         </div>
                         <div className="mt-3">
                             <div className="flex justify-between items-center mb-1.5">
-                                <span className="text-xs font-medium text-(--text-muted)">Надежность пароли</span>
+                                <span className="text-xs font-medium text-(--text-muted)">Надежность пароля</span>
                                 <span className={`text-xs font-medium`} style={{color: STRENGTH_DETAILS[reliability].color}}>{STRENGTH_DETAILS[reliability].title}</span>
                             </div>
                             <div className="flex gap-1 h-1.5 rounded-full overflow-hidden bg-dark-800">

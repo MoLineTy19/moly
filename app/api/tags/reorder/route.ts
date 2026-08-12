@@ -6,6 +6,7 @@ import {asc, eq, sql} from "drizzle-orm";
 export async function POST(request: NextRequest) {
     const { ids }: { ids: number[] } = await request.json();
 
+    // position тега = его индекс в массиве ids; обновляем по одной строке.
     for (let i = 0; i < ids.length; i++) {
         await db.update(TagTable).set({position: i}).where(eq(TagTable.id, ids[i]));
     }

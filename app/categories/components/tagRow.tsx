@@ -10,6 +10,7 @@ interface TagRowProps extends Tag {
     onDelete: (tag: Tag) => void;
 }
 
+// Русская плюрализация по числу использований тега (запись / записи / записей).
 function pluralRecords(n: number): string {
     const mod10 = n % 10, mod100 = n % 100;
     if (mod10 === 1 && mod100 !== 11) return 'запись';

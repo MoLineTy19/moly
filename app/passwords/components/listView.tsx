@@ -16,6 +16,7 @@ import {copyWithAutoClear} from "@/utils/clipboard";
 function getDomain(url: string): string | null {
     try {
         if (!url) return null;
+        // Дописываем https://: без протокола new URL выбросит ошибку.
         const u = new URL(url.startsWith('http') ? url : `https://${url}`);
         return u.hostname;
     } catch {
@@ -33,6 +34,7 @@ function ListRow({item}: { item: Password }) {
     const tagColor = generateTagColor(item.tag?.color ?? FALLBACK_TAG_COLOR);
     const strength = STRENGTH_DETAILS[item.strengthScore] ?? STRENGTH_DETAILS[0];
 
+    // Блокируем всплытие клика по кнопкам действий, иначе сработает переход по ссылке Link.
     const stop = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();

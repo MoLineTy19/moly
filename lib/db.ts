@@ -6,6 +6,8 @@ import * as schema from "./schema";
 const dbPath = path.join(process.cwd(), 'database.db')
 const sqlite = new Database(dbPath);
 
+// В SQLite проверки внешних ключей по умолчанию выключены; включаем явно,
+// иначе orphan-записи (например, пароли с удалённым tag_id) не отбрасываются.
 sqlite.pragma('foreign_key = ON')
 
 export const db = drizzle(sqlite, { schema })

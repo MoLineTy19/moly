@@ -15,13 +15,14 @@ export function useAutoLock() {
 
     // Автоблокировка по неактивности
     useEffect(() => {
+        // autoLockTimeOut <= 0: функция выключена; isLocked: хранилище уже заблокировано
         if (autoLockTimeOut <= 0 || isLocked) return;
 
         const schedule = () => {
             if (timerRef.current) clearTimeout(timerRef.current);
             timerRef.current = setTimeout(() => {
                 lock('auto');
-            }, autoLockTimeOut * 60 * 1000);
+            }, autoLockTimeOut * 60 * 1000); // таймаут задаётся в минутах
         };
 
         schedule();

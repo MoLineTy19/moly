@@ -3,6 +3,7 @@ import {create} from "zustand";
 import {
     createVerifier, deriveMasterKey, encrypt, decrypt,
     hasSetup, loadVerifier, verifyMasterKey, saveVerifier, deriveKey, loadSalt,
+    saveVerifierPrev, clearVerifierPrev,
 } from "@/lib/encryption";
 import {logActivity} from "@/lib/activity";
 
@@ -45,7 +46,7 @@ export const usePasswordStore = create<PasswordStore>((set, get) => ({
         return true;
     },
 
-    /** Заблокировать сейф — выкинуть ключ из памяти. */
+    /** Заблокировать сейф: выкинуть ключ из памяти. */
     lock: (reason: LockReason = 'manual') => {
         if (get().isLocked) return;
         set({masterKey: null, isLocked: true, passwords: [],
@@ -75,6 +76,10 @@ export const usePasswordStore = create<PasswordStore>((set, get) => ({
         if (!valid) return {ok: false, error: 'Неверный текущий пароль'};
 
         const newKey = await deriveKey(next, salt);
+        // Вычисляем новый verifier заранее: после подтверждения серверной
+        // перешифровки останется лишь синхронно сохранить его, без await между
+        // шагами (иначе окно рассинхрона БД↔localStorage при падении вкладки).
+        const newVerifier = await createVerifier(newKey);
 
         const currentPasswords = get().passwords;
         const items = await Promise.all(currentPasswords.map(async (p) => ({
@@ -83,15 +88,24 @@ export const usePasswordStore = create<PasswordStore>((set, get) => ({
             note: p.note && p.note.length ? await encrypt(p.note, newKey) : null,
         })));
 
+        // Страховка: предыдущий verifier остаётся доступным, если перешифровка
+        // подтвердится, а новый verifier не успеем сохранить.
+        saveVerifierPrev(verifier);
+
         const res = await fetch('/api/passwords/reencrypt', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({items}),
         });
-        if (!res.ok) return {ok: false, error: 'Не удалось сохранить данные'};
+        if (!res.ok) {
+            clearVerifierPrev();
+            return {ok: false, error: 'Не удалось сохранить данные'};
+        }
 
-        const newVerifier = await createVerifier(newKey);
+        // Серверная перешифровка атомарна (транзакция) и уже подтверждена.
+        // Синхронно заменяем verifier: между этим и успехом выше нет await.
         saveVerifier(newVerifier);
+        clearVerifierPrev();
         set({masterKey: newKey, masterKeyCreatedAt: Date.now()});
         logActivity('change_master_password');
         return {ok: true};
@@ -107,15 +121,27 @@ export const usePasswordStore = create<PasswordStore>((set, get) => ({
             if (!res.ok) throw new Error('Failed to fetch');
             const data = await res.json();
 
-            // Дешифруем password и note
-            const decrypted = await Promise.all(data.map(async (p: any) => ({
+            // Дешифруем password и note построчно. Используем allSettled, а не
+            // Promise.all: одна нечитаемая запись (например, зашифрованная старым
+            // мастер-паролем до пересоздания сейфа) не должна обнулять весь
+            // список после перезагрузки. Такие записи просто пропускаем.
+            const results = await Promise.allSettled(data.map(async (p: any) => ({
                 ...p,
                 password: await decrypt(p.password, key),
                 note: p.note ? await decrypt(p.note, key) : "",
             })));
 
+            const decrypted = results
+                .filter((r): r is PromiseFulfilledResult<any> => r.status === 'fulfilled')
+                .map((r) => r.value);
+            const failed = results.length - decrypted.length;
+
             set({passwords: decrypted, passwordCount: decrypted.length,
                 isLoading: false});
+
+            if (failed > 0) {
+                console.warn(`[passwordStore] пропущено ${failed} нерасшифрованных записей`);
+            }
         } catch (err) {
             set({error: (err as Error).message, isLoading: false});
         }
@@ -155,6 +181,7 @@ export const usePasswordStore = create<PasswordStore>((set, get) => ({
             }));
         } catch (err) {
             set({error: (err as Error).message});
+            throw err;
         }
     },
 
@@ -174,6 +201,7 @@ export const usePasswordStore = create<PasswordStore>((set, get) => ({
             }));
         } catch (err) {
             set({error: (err as Error).message});
+            throw err;
         }
     },
 
@@ -198,6 +226,7 @@ export const usePasswordStore = create<PasswordStore>((set, get) => ({
                     note: encNote,
                     strength_score: editedPassword.strengthScore,
                     tag_id: editedPassword.tag?.id ?? null,
+                    favorite: editedPassword.favorite,
                 }),
             });
             if (!res.ok) throw new Error('Failed to fetch');
@@ -210,6 +239,70 @@ export const usePasswordStore = create<PasswordStore>((set, get) => ({
             }));
         } catch (err) {
             set({error: (err as Error).message});
+            throw err;
+        }
+    },
+
+    toggleFavorite: async (id: number) => {
+        const current = get().passwords.find((p) => p.id === id);
+        if (!current) return;
+        const next = !current.favorite;
+
+        // Оптимистично обновляем UI, затем шлём PATCH только поля favorite.
+        set((state) => ({
+            passwords: state.passwords.map((p) =>
+                p.id === id ? {...p, favorite: next} : p
+            ),
+            error: null,
+        }));
+
+        try {
+            const res = await fetch(`/api/passwords/${id}`, {
+                method: "PATCH",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({favorite: next}),
+            });
+            if (!res.ok) throw new Error('Failed to toggle favorite');
+        } catch (err) {
+            // Откатываем изменение при ошибке.
+            set((state) => ({
+                passwords: state.passwords.map((p) =>
+                    p.id === id ? {...p, favorite: !next} : p
+                ),
+                error: (err as Error).message,
+            }));
+            throw err;
+        }
+    },
+
+    setFavorite: async (ids: number[], favorite: boolean) => {
+        if (!ids.length) return;
+        const idSet = new Set(ids);
+
+        // Оптимистично обновляем все отмеченные записи.
+        set((state) => ({
+            passwords: state.passwords.map((p) =>
+                idSet.has(p.id) ? {...p, favorite} : p
+            ),
+            error: null,
+        }));
+
+        // Шлём PATCH по каждой записи; allSettled, чтобы одна ошибка не валила остальные.
+        const results = await Promise.allSettled(
+            ids.map((id) =>
+                fetch(`/api/passwords/${id}`, {
+                    method: "PATCH",
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({favorite}),
+                }).then((res) => {
+                    if (!res.ok) throw new Error('Failed to set favorite');
+                })
+            )
+        );
+        const failed = results.filter((r) => r.status === 'rejected').length;
+        if (failed > 0) {
+            set({error: `${failed} of ${ids.length} favorite updates failed`});
+            throw new Error(`${failed} of ${ids.length} favorite updates failed`);
         }
     },
 }));
@@ -219,5 +312,9 @@ export const addPassword = (password: Parameters<PasswordStore['addPassword']>[0
     usePasswordStore.getState().addPassword(password);
 export const editPassword = (password: Password) =>
     usePasswordStore.getState().editPassword(password);
+export const togglePasswordFavorite = (id: number) =>
+    usePasswordStore.getState().toggleFavorite(id);
+export const setPasswordsFavorite = (ids: number[], favorite: boolean) =>
+    usePasswordStore.getState().setFavorite(ids, favorite);
 export const deletePassword = (id: number) =>
     usePasswordStore.getState().deletePassword(id);

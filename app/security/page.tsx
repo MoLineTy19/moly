@@ -79,6 +79,8 @@ export default function Security() {
         ? Math.floor((Date.now() - masterKeyCreatedAt) / 86400000) : null;
     const avgStrength = passwords.length
         ? passwords.reduce((s, p) => s + (p.strengthScore || 0), 0) / passwords.length : 0;
+    // Оценка защиты из 5 факторов: автоблокировка, очистка буфера, блокировка при
+    // переключении вкладки, возраст мастер-пароля младше 90 дней, средняя сила паролей >= 3.
     const score = ([
         autoLockTimeOut > 0,
         clipboardClearTimeout > 0,
@@ -200,6 +202,8 @@ export default function Security() {
     const doImport = async () => {
         if (!parsed || parsed.length === 0) return;
         setImporting(true);
+        // Считаем фактически добавленные записи по разнице счётчика в сторе,
+        // а не по parsed.length: отдельные addPassword могут завершиться с ошибкой.
         const before = usePasswordStore.getState().passwordCount;
         for (const entry of parsed) {
             await addPassword({
@@ -210,6 +214,7 @@ export default function Security() {
                 strengthScore: strengthOf(entry.password),
                 tag: null,
                 note: entry.note,
+                favorite: false,
             });
         }
         const imported = Math.max(0, usePasswordStore.getState().passwordCount - before);
@@ -231,7 +236,7 @@ export default function Security() {
                 <div>
                     <h1 className="text-3xl font-bold text-(--text-color) mb-2">Центр безопасности</h1>
                     <p className="text-sm text-(--text-muted)">
-                        Управляйте настройками доступа, сессиями и параметрами защиты вашего сейфа.
+                        Управление доступом, блокировками и защитой сейфа.
                     </p>
                 </div>
 
@@ -258,7 +263,7 @@ export default function Security() {
                         <div>
                             <div className="text-xs text-(--text-muted) font-medium mb-1">Мастер-пароль</div>
                             <div className="text-lg font-semibold text-(--text-color)">
-                                {ageDays === null ? "—" : `${ageDays} дн. назад`}
+                                {ageDays === null ? "нет данных" : `${ageDays} дн. назад`}
                             </div>
                             <div className={`text-xs mt-1 ${ageDays !== null && ageDays >= 90 ? "text-yellow-400" : "text-(--text-muted)"}`}>
                                 {ageDays !== null && ageDays >= 90 ? "Пора сменить" : "Рекомендация: раз в 90 дней"}
@@ -393,7 +398,7 @@ export default function Security() {
                                     <div className="max-w-md">
                                         <h3 className="text-sm font-medium text-(--text-color) mb-1">Мастер-пароль</h3>
                                         <p className="text-xs text-(--text-muted)">
-                                            Ваш основной ключ к сейфу. Все записи будут перешифрованы новым ключом.
+                                            Мастер-пароль от сейфа. Все записи будут перешифрованы новым ключом.
                                         </p>
                                     </div>
                                     <button
@@ -508,6 +513,9 @@ export default function Security() {
                                     </span>
                                     <button onClick={() => setImportOpen(true)} className="px-3 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 border border-(--border-input-color) text-(--text-secondary) text-xs font-medium transition-colors">Выбрать файл</button>
                                 </div>
+                                <p className="text-[11px] text-(--text-muted) leading-relaxed pt-1">
+                                    JSON-экспорт содержит пароли в открытом виде и ключи восстановления. Храните файл надёжно: ключи позволяют восстановить доступ к сейфу при потере данных браузера.
+                                </p>
                             </div>
                         </section>
 
@@ -546,7 +554,7 @@ export default function Security() {
                 <Modal open={changeOpen} onClose={() => setChangeOpen(false)} title="Смена мастер-пароля" maxWidth="max-w-md">
                     <form onSubmit={onSubmitChange} className="flex flex-col gap-4">
                         <p className="text-xs text-(--text-muted)">
-                            Все записи будут перешифрованы новым ключом. Новый пароль восстановить невозможно — запомните его.
+                            Все записи будут перешифрованы новым ключом. Новый пароль восстановить невозможно, поэтому запомните его.
                         </p>
                         {([
                             {key: "cur", label: "Текущий пароль", val: cur, set: setCur},

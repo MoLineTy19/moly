@@ -20,13 +20,14 @@ export default function Modal({open, onClose, title, children, maxWidth = 'max-w
             if (e.key === 'Escape') onClose();
         };
         document.addEventListener('keydown', onKey);
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden'; // фиксируем прокрутку фона под модалкой
         return () => {
             document.removeEventListener('keydown', onKey);
             document.body.style.overflow = '';
         };
     }, [open, onClose]);
 
+    // createPortal требует DOM; при SSR window недоступен, рендерим null
     if (!open || typeof window === 'undefined') return null;
 
     return createPortal(

@@ -12,6 +12,8 @@ function hexToRgba(hex: string, alpha: number): string {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+// Веса и пороги для оценки силы пароля: длины 8/12/16, по баллу за класс
+// символов, бонусы за уникальность и отсутствие повторов/последовательностей.
 export const STRENGTH_WEIGHTS = {
     length: {
         min: 0,

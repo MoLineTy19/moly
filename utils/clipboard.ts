@@ -12,13 +12,13 @@ export async function copyWithAutoClear(text: string, timeoutSeconds: number): P
 
     activeTimer = setTimeout(async () => {
         try {
-            // Читаем текущее содержимое; если оно всё ещё наше — чистим
+            // Читаем текущее содержимое; если оно всё ещё наше, чистим
             const current = await navigator.clipboard.readText();
             if (current === text) {
                 await navigator.clipboard.writeText("");
             }
         } catch {
-            // readText может бросить (например, в не-Secure контексте) — просто пишем пустоту
+            // readText может бросить (например, в не-Secure контексте): просто пишем пустоту
             try { await navigator.clipboard.writeText(""); } catch {}
         }
         activeTimer = null;

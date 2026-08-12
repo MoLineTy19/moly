@@ -15,10 +15,11 @@ export function calculatePasswordStrength(password: string): number {
     if (/[^a-zA-Z0-9]/.test(password)) score++;
 
 
-    // Бонус за длину + разнообразие
+    // Бонус за длину + разнообразие: требуется доля уникальных символов > 70%.
     const uniqueChars = new Set(password).size;
     if (uniqueChars > password.length * 0.7) score++;
 
+    // Сжатие сырого счёта (0..8) в шкалу 1..4 для бейджа силы.
     if (score < 4) return 1;
     if (score < 6) return 2;
     if (score < 8) return 3;

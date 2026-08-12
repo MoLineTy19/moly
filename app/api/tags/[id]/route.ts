@@ -21,7 +21,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (backgroundColor !== undefined) updateData.background_color = backgroundColor;
     if (borderColor !== undefined) updateData.border_color = borderColor;
     if (countUses !== undefined) updateData.count_uses = countUses;
-    if (position !== undefined) updateData.position = position;   // ← ИСПРАВЛЕНО: было updateData.note = position
+    if (position !== undefined) updateData.position = position;   // ручной порядок тега в списке
 
     await db.update(TagTable).set(updateData).where(eq(TagTable.id, id));
     return NextResponse.json({ success: true });
@@ -34,6 +34,7 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
         return NextResponse.json({ error: "Invalid id" }, { status: 400 });
     }
 
+    // Сначала отвязываем пароли от тега (tag_id = null), затем удаляем сам тег.
     await db.update(PasswordTable).set({ tag_id: null }).where(eq(PasswordTable.tag_id, id));
     await db.delete(TagTable).where(eq(TagTable.id, id));
 

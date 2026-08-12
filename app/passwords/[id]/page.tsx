@@ -3,20 +3,19 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
     faEyeLowVision,
-    faPen, faTag,
+    faPen, faStar as faStarSolid, faTag,
     faTrashCan,
     faTriangleExclamation, faUpRightFromSquare
 } from "@fortawesome/free-solid-svg-icons";
 import {faGithub} from "@fortawesome/free-brands-svg-icons";
-import {faCopy, faEye, faUser} from "@fortawesome/free-regular-svg-icons";
-import React, {useEffect, useMemo, useState} from "react";
+import {faCopy, faEye, faStar as faStarOutline, faUser} from "@fortawesome/free-regular-svg-icons";
+import React, {useMemo, useState} from "react";
 import {useParams, useRouter} from "next/navigation";
-import {Password} from "@/types";
 import {STRENGTH_DETAILS} from "@/config";
 import {generateTagColor, FALLBACK_TAG_COLOR} from "@/utils/color";
 import toast from "react-hot-toast";
 import {useConfigStore} from "@/store/configStore";
-import {addPassword, deletePassword} from "@/store/passwordStore";
+import {addPassword, deletePassword, togglePasswordFavorite, usePasswordStore} from "@/store/passwordStore";
 import {copyWithAutoClear} from "@/utils/clipboard";
 import Link from "next/link";
 
@@ -58,23 +57,17 @@ export default function ShowPage() {
 
     const isDetectedLeak = false;
 
-    const [password, setPassword] = useState<Password | null>(null);
+    // Запись уже расшифрована в сторе (fetchPasswords). Прямой fetch к API
+    // отдал бы шифртекст: вся криптография клиентская, сервер не расшифровывает.
+    const password = usePasswordStore((s) => s.passwords.find((p) => p.id === Number(id)));
+    const isLoading = usePasswordStore((s) => s.isLoading);
     const [isShow, setShow] = useState(false);
 
     const clipboardClearTimeout = useConfigStore((s) => s.clipboardClearTimeout);
 
-    useEffect(() => {
-        if (id) {
-            fetch(`/api/passwords/${id}`)
-                .then(res => res.json())
-                .then(data => setPassword(data.data))
-                .catch(err => {
-                    console.error("Failed to load password", err);
-                    toast.error("Не удалось загрузить запись");
-                });
-        }
-    }, [id]);
-
+    if (isLoading && !password) {
+        return <div className="grow p-8 text-(--text-muted)">Загрузка…</div>;
+    }
     if (!password) {
         return <div className="grow p-8 text-(--text-muted)">Пароль не найден</div>;
     }
@@ -108,17 +101,32 @@ export default function ShowPage() {
         }
     };
 
-    const handleDelete = () => {
+    const handleDelete = async () => {
         if (!confirm("Удалить запись безвозвратно?")) return;
-        deletePassword(password.id);
-        toast.success("Удалено");
-        router.push("/passwords");
+        try {
+            await deletePassword(password.id);
+            toast.success("Удалено");
+            router.push("/passwords");
+        } catch {
+            toast.error("Не удалось удалить запись");
+        }
     };
 
     const handleDuplicate = async () => {
+        // Отбрасываем id/createdAt/lastModified: addPassword назначает их заново,
+        // иначе дубликат унаследовал бы идентичность и даты оригинала.
         const {id: _id, createdAt: _c, lastModified: _m, ...rest} = password;
-        await addPassword(rest);
-        toast.success("Дубликат создан");
+        try {
+            await addPassword(rest);
+            toast.success("Дубликат создан");
+        } catch {
+            toast.error("Не удалось создать дубликат");
+        }
+    };
+
+    const handleToggleFavorite = () => {
+        // Стор сам оптимистично обновит запись и синхронизирует с БД.
+        togglePasswordFavorite(password.id);
     };
 
 
@@ -132,8 +140,7 @@ export default function ShowPage() {
                     <div className="grow">
                         <h3 className="text-red-400 font-semibold text-sm mb-1">Скомпрометированный пароль</h3>
                         <p className="text-(--text-secondary) text-sm">
-                            Этот пароль был обнаружен в недавней утечке данных. Рекомендуется немедленно
-                            изменить его для обеспечения безопасности вашего аккаунта.
+                            Этот пароль найден в утечке данных. Рекомендуется как можно скорее сменить его.
                         </p>
                     </div>
                     <div
@@ -167,6 +174,17 @@ export default function ShowPage() {
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
+                    <button onClick={handleToggleFavorite}
+                            title={password.favorite ? "Убрать из избранного" : "Добавить в избранное"}
+                            aria-label={password.favorite ? "Убрать из избранного" : "Добавить в избранное"}
+                            aria-pressed={password.favorite}
+                            className={`w-10 h-10 rounded-lg border flex items-center justify-center transition-colors ${
+                                password.favorite
+                                    ? "bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20 hover:border-amber-500/40"
+                                    : "bg-(--background-secondary) border-(--border-color) text-(--text-muted) hover:text-(--text-color) hover:bg-(--background-secondary)/80"
+                            }`}>
+                        <FontAwesomeIcon icon={password.favorite ? faStarSolid : faStarOutline}/>
+                    </button>
                     <button onClick={handleDuplicate} title="Дублировать"
                             className="w-10 h-10 rounded-lg bg-(--background-secondary) border border-(--border-color) text-(--text-muted) hover:text-(--text-color) hover:bg-(--background-secondary)/80 flex items-center justify-center transition-colors">
                         <FontAwesomeIcon icon={faCopy}/>
@@ -339,7 +357,7 @@ export default function ShowPage() {
 
                             <hr className="border-(--border-color)"/>
 
-                            {/* История изменений (оставлено как есть) */}
+                            {/* История изменений */}
                             <div>
                                 <h3 className="text-xs font-medium text-(--text-muted) mb-4">История изменений</h3>
                                 <div
