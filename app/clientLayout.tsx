@@ -25,9 +25,9 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
         fetchTags()
     }, [fetchPasswords, fetchTags, isLocked])
 
-    useAutoLock();
+    // useAutoLock();
 
-    if (isLocked) return <UnlockScreen />;
+    // if (isLocked) return <UnlockScreen />;
 
     return (
         <>

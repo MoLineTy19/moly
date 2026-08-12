@@ -4,14 +4,14 @@ import {useEffect, useState} from "react";
 import type {ChangeEvent, FormEvent, MouseEventHandler} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
-    faAngleDown, faArrowRightToBracket, faBorderAll, faCodeBranch,
+    faAngleDown, faArrowRightToBracket, faArrowUp, faBorderAll, faCircleInfo, faCodeBranch,
     faDesktop, faFileExport, faFileImport, faGears, faKey, faListUl,
     faLock, faShieldHalved, faTableList, faClock, faWindowMinimize,
 } from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
 import {useConfigStore} from "@/store/configStore";
 import {addPassword, usePasswordStore} from "@/store/passwordStore";
-import {APP_VERSION} from "@/config/app";
+import {APP_VERSION, GITHUB_REPO} from "@/config/app";
 import Modal from "@/components/ui/modal";
 import Toggle from "@/components/ui/toggle";
 import {
@@ -58,6 +58,7 @@ export default function Security() {
     const [showPw, setShowPw] = useState(false);
     const [saving, setSaving] = useState(false);
     const [changeErr, setChangeErr] = useState("");
+    const [checking, setChecking] = useState(false);
 
     // Импорт
     const [importOpen, setImportOpen] = useState(false);
@@ -116,9 +117,32 @@ export default function Security() {
     };
 
     /* --------- Обработчики --------- */
-    const handleCheckUpdate: MouseEventHandler = (e) => {
+    const handleCheckUpdate: MouseEventHandler = async (e) => {
         e.preventDefault();
-        toast.success(`Moly v${APP_VERSION} — локальная сборка. Обновления проверяются вручную.`);
+        if (checking) return;
+        setChecking(true);
+        try {
+            const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`);
+            if (res.status === 404) {
+                toast("Релизов на GitHub пока нет", {icon: <FontAwesomeIcon icon={faCircleInfo} className="text-sky-400"/>});
+                return;
+            }
+            if (!res.ok) throw new Error("GitHub API");
+            const data = await res.json();
+            const remote = String(data.tag_name ?? "").replace(/^v/, "");
+            const local = APP_VERSION.replace(/^v/, "");
+            if (!remote) {
+                toast("Не удалось определить версию релиза", {icon: <FontAwesomeIcon icon={faCircleInfo} className="text-sky-400"/>});
+            } else if (remote === local) {
+                toast.success(`У вас последняя версия: v${local}`);
+            } else {
+                toast(`Доступна новая версия: v${remote} (у вас v${local})`, {icon: <FontAwesomeIcon icon={faArrowUp} className="text-(--accent-color)"/>});
+            }
+        } catch {
+            toast.error("Не удалось проверить обновления");
+        } finally {
+            setChecking(false);
+        }
     };
 
     const onSubmitChange = async (e: FormEvent) => {
@@ -249,11 +273,12 @@ export default function Security() {
                             <div className="text-xs text-(--text-muted) font-medium mb-1">Версия</div>
                             <p className="text-sm text-(--text-muted) mb-2">Moly v{APP_VERSION}</p>
                             <button
-                                className="px-4 py-2 bg-(--accent-color)/90 hover:bg-(--accent-color) border border-(--accent-color) text-(--text-color) rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                                className="px-4 py-2 bg-(--accent-color)/90 hover:bg-(--accent-color) border border-(--accent-color) text-(--text-color) rounded-lg text-sm font-medium transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                                 onClick={handleCheckUpdate}
+                                disabled={checking}
                             >
                                 <FontAwesomeIcon icon={faDesktop} style={{marginRight: 6}}/>
-                                Проверить версию
+                                {checking ? "Проверка…" : "Проверить версию"}
                             </button>
                         </div>
                     </div>
