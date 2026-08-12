@@ -8,7 +8,7 @@ import Link from "next/link";
 import {useRouter} from "next/navigation";
 import toast from "react-hot-toast";
 import {Password} from "@/types";
-import {generateTagColor} from "@/utils/color";
+import {generateTagColor, FALLBACK_TAG_COLOR} from "@/utils/color";
 import {STRENGTH_DETAILS} from "@/config";
 import {useConfigStore} from "@/store/configStore";
 import {copyWithAutoClear} from "@/utils/clipboard";
@@ -30,7 +30,7 @@ function ListRow({item}: { item: Password }) {
     const clipboardClearTimeout = useConfigStore((s) => s.clipboardClearTimeout);
 
     const domain = getDomain(item.url);
-    const tagColor = generateTagColor(item.tag?.color ?? '#6a7280');
+    const tagColor = generateTagColor(item.tag?.color ?? FALLBACK_TAG_COLOR);
     const strength = STRENGTH_DETAILS[item.strengthScore] ?? STRENGTH_DETAILS[0];
 
     const stop = (e: React.MouseEvent) => {
@@ -54,7 +54,7 @@ function ListRow({item}: { item: Password }) {
 
     return (
         <Link href={`/passwords/${item.id}`}
-              className="flex items-center gap-4 px-4 py-3 hover:bg-white/[0.02] transition-colors group">
+              className="flex items-center gap-4 px-4 py-3 hover:bg-(--hover-overlay) transition-colors group">
             <div className="w-9 h-9 rounded-lg bg-(--background-color) border border-(--border-color) flex items-center justify-center overflow-hidden shrink-0">
                 {domain && !imgFailed ? (
                     <img src={`https://www.google.com/s2/favicons?domain=${domain}&sz=64`} alt="" aria-hidden

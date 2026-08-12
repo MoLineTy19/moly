@@ -29,14 +29,14 @@ export default function MetaData({url, setUrl, title, setTitle, login, setLogin}
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--text-muted)">
                                 <FontAwesomeIcon icon={faGlobe}/>
                             </div>
-                            <input type="url" placeholder="https://example.com" className={`w-full pl-11 pr-4 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none transition-colors placeholder-gray-600 ${url.length >= 2 ? 'focus:border-(--accent-color)' : 'focus:border-red-500'}`} value={url} onChange={handleChangeUrl}/>
+                            <input type="url" placeholder="https://example.com" className={`w-full pl-11 pr-4 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none transition-colors placeholder-(--text-muted) ${url.length >= 2 ? 'focus:border-(--accent-color)' : 'focus:border-red-500'}`} value={url} onChange={handleChangeUrl}/>
                         </div>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-(--text-color)/80 mb-2">
                             Название записи*
                         </label>
-                        <input type="text" placeholder="Например: WoW 3" className={`w-full px-4 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none transition-colors placeholder-gray-600 ${title.length >= 2 ? 'focus:border-(--accent-color)' : 'focus:border-red-500'}`} value={title} onChange={handleChangeTitle}/>
+                        <input type="text" placeholder="Например: WoW 3" className={`w-full px-4 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none transition-colors placeholder-(--text-muted) ${title.length >= 2 ? 'focus:border-(--accent-color)' : 'focus:border-red-500'}`} value={title} onChange={handleChangeTitle}/>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
@@ -47,7 +47,7 @@ export default function MetaData({url, setUrl, title, setTitle, login, setLogin}
                                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--text-muted)">
                                     <FontAwesomeIcon icon={faUser}/>
                                 </div>
-                                <input type="text" placeholder="user@example.com" className={`w-full pl-11 pr-4 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none transition-colors placeholder-gray-600 ${login.length >= 2 ? 'focus:border-(--accent-color)' : 'focus:border-red-500'}`} value={login} onChange={handleChangeLogin}/>
+                                <input type="text" placeholder="user@example.com" className={`w-full pl-11 pr-4 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none transition-colors placeholder-(--text-muted) ${login.length >= 2 ? 'focus:border-(--accent-color)' : 'focus:border-red-500'}`} value={login} onChange={handleChangeLogin}/>
                             </div>
                         </div>
                         <div>

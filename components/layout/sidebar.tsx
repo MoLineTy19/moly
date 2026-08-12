@@ -30,28 +30,28 @@ export default function Sidebar() {
                 <Link href="/passwords">
                     <div className="flex items-center gap-3 text-(--text-color) font-semibold text-lg">
                         <div className="w-8 h-8 rounded-lg bg-(--accent-color) flex items-center justify-center shadow-glow">
-                            <FontAwesomeIcon icon={faShieldHalved} style={{color: "#ffffff", margin: "8px 6px"}}/>
+                            <FontAwesomeIcon icon={faShieldHalved} className="text-(--text-color) my-2 mx-1.5"/>
                         </div>
                         Moly
                     </div>
                 </Link>
                 <Link href="/passwords/addPassword">
-                    <button className="text-gray-400 hover:text-(--text-color) transition-colors">
+                    <button className="text-(--text-secondary) hover:text-(--text-color) transition-colors">
                         <FontAwesomeIcon icon={faPenToSquare} />
                     </button>
                 </Link>
             </div>
             <div className="px-4 mb-8 flex gap-2">
-                <button className="grow flex items-center justify-between bg-white/5 border border-(--border-input-color) hover:border-(--border-input-color)/80 rounded-lg px-3 py-2 text-xs text-gray-300 transition-colors">
+                <button className="grow flex items-center justify-between bg-(--hover-overlay) border border-(--border-input-color) hover:border-(--border-input-color)/80 rounded-lg px-3 py-2 text-xs text-(--text-secondary) transition-colors">
                     <span className="flex items-center gap-2">
                         <FontAwesomeIcon icon={faFile} />
                         Быстрые действия
                     </span>
-                    <span className="text-xs text-gray-500 bg-(--background-color) px-1.5 py-0.5 rounded border border-(--border-input-color)">
+                    <span className="text-xs text-(--text-muted) bg-(--background-color) px-1.5 py-0.5 rounded border border-(--border-input-color)">
                         ⌘K
                     </span>
                 </button>
-                <button className="w-10 h-10 flex items-center justify-center bg-white/5 border border-(--border-input-color) hover:border-(--border-input-color) rounded-lg text-gray-300 transition-colors">
+                <button className="w-10 h-10 flex items-center justify-center bg-(--hover-overlay) border border-(--border-input-color) hover:border-(--border-input-color) rounded-lg text-(--text-secondary) transition-colors">
                     <FontAwesomeIcon icon={faMagnifyingGlass} />
                 </button>
             </div>

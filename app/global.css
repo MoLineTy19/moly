@@ -1,23 +1,92 @@
 @import 'tailwindcss';
 
 @theme {
+    /* Семантические токены темы. Значения по умолчанию = пресет «Полночь»
+       (тёмная тема + зелёный акцент). Переопределяются блоками [data-theme] ниже. */
     --background-color: #030712;
     --background-secondary: #111827;
-    --logo-name-color: #fdfdfd;
     --text-color: #ffffff;
-    --secondary-color: #4d5365;
+    --text-secondary: #9ca3af;
     --text-muted: #6a7282;
+    --secondary-color: #4d5365;
     --accent-color: #00c950;
     --border-color: #1e2939;
     --border-input-color: #364153;
+    --hover-overlay: rgba(255, 255, 255, 0.05);
+    --hover-overlay-strong: rgba(255, 255, 255, 0.15);
+    --surface-inactive: #1f2937;
+
+    /* Шкала поверхностей. В тёмных пресетах совпадает с дефолтом, в светлых
+       переопределяется, поэтому классы bg-dark-* адаптируются без правок
+       в компонентах. */
+    --color-dark-700: #1f2937;
+    --color-dark-800: #111827;
+    --color-dark-900: #0b1018;
+    --color-dark-950: #030712;
+
+    --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.35);
+    --shadow-glow: 0 0 20px color-mix(in srgb, var(--accent-color) 35%, transparent);
+}
+
+/*
+  Пресеты темы. Каждый пресет задаёт полный набор семантических токенов и
+  переключается атрибутом data-theme на <html>. Тёмные пресеты разделяют общую
+  базу (группа селекторов), светлые — свою; акцент задаётся отдельно.
+*/
+
+/* — Тёмная база — */
+[data-theme="midnight"],
+[data-theme="coal"],
+[data-theme="orchid"],
+[data-theme="ember"] {
+    --background-color: #030712;
+    --background-secondary: #111827;
+    --text-color: #ffffff;
+    --text-secondary: #9ca3af;
+    --text-muted: #6a7282;
+    --secondary-color: #4d5365;
+    --border-color: #1e2939;
+    --border-input-color: #364153;
+    --hover-overlay: rgba(255, 255, 255, 0.05);
+    --hover-overlay-strong: rgba(255, 255, 255, 0.15);
+    --surface-inactive: #1f2937;
 
     --color-dark-700: #1f2937;
     --color-dark-800: #111827;
+    --color-dark-900: #0b1018;
     --color-dark-950: #030712;
-    --color-brand-400: #34d970;
-    --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.35);
-    --shadow-glow: 0 0 20px rgba(0, 201, 80, 0.30);
 }
+
+/* — Светлая база — */
+[data-theme="frost"],
+[data-theme="blossom"] {
+    --background-color: #ffffff;
+    --background-secondary: #f3f4f6;
+    --text-color: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --secondary-color: #64748b;
+    --border-color: #e5e7eb;
+    --border-input-color: #cbd5e1;
+    --hover-overlay: rgba(15, 23, 42, 0.06);
+    --hover-overlay-strong: rgba(15, 23, 42, 0.10);
+    --surface-inactive: #e2e8f0;
+
+    /* Шкала поверхностей для светлого режима: классы bg-dark-* становятся
+       светлыми карточками/чипами без правки компонентов. */
+    --color-dark-700: #e2e8f0;
+    --color-dark-800: #f3f4f6;
+    --color-dark-900: #e5e7eb;
+    --color-dark-950: #ffffff;
+}
+
+/* — Акценты — */
+[data-theme="midnight"] { --accent-color: #00c950; }
+[data-theme="coal"]     { --accent-color: #3b82f6; }
+[data-theme="orchid"]   { --accent-color: #a855f7; }
+[data-theme="ember"]    { --accent-color: #f97316; }
+[data-theme="frost"]    { --accent-color: #2563eb; }
+[data-theme="blossom"]  { --accent-color: #db2777; }
 
 @layer base {
     * {
@@ -26,6 +95,10 @@
     button {
     @apply cursor-pointer;
     }
+}
+
+.table-row-hover:hover {
+    background-color: var(--hover-overlay);
 }
 
 .custom-range::-webkit-slider-thumb {

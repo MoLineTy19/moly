@@ -85,10 +85,12 @@ export interface ConfigStore {
     autoLockTimeOut: number;
     clipboardClearTimeout: number;
     lockOnTabSwitch: boolean;
+    theme: string;
     setCurrentView: (view: string) => void;
     setAutoLockTimeOut: (timeout: number) => void;
     setClipboardClearTimeout: (timeout: number) => void;
     setOnTabSwitch: (enabled: boolean) => void;
+    setTheme: (theme: string) => void;
     resetConfig: () => void;
 }
 

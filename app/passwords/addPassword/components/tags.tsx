@@ -51,7 +51,7 @@ export default function Tags({selectedTag, setTag, note, setNote}: {
                         </div>
                         <input type="text" placeholder="Поиск тега..." value={query}
                                onChange={(e) => setQuery(e.target.value)}
-                               className="w-full pl-11 pr-4 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none focus:border-(--accent-color) transition-colors placeholder-gray-600"/>
+                               className="w-full pl-11 pr-4 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none focus:border-(--accent-color) transition-colors placeholder-(--text-muted)"/>
                     </div>
 
                     {/* Список доступных тегов */}
@@ -63,7 +63,7 @@ export default function Tags({selectedTag, setTag, note, setNote}: {
                         ) : availableTags.map((tag) => (
                             <button key={tag.id} type="button"
                                     onClick={() => setTag(tag)}
-                                    className="px-2.5 py-1 rounded-md bg-white/5 border border-(--border-input-color) text-xs text-(--text-color)/80 flex items-center gap-1.5 cursor-pointer hover:bg-(--background-secondary) transition-colors">
+                                    className="px-2.5 py-1 rounded-md bg-(--hover-overlay) border border-(--border-input-color) text-xs text-(--text-color)/80 flex items-center gap-1.5 cursor-pointer hover:bg-(--background-secondary) transition-colors">
                                 <FontAwesomeIcon icon={faPlus} className="text-(--text-muted) text-[10px]"/>
                                 <span className="w-2 h-2 rounded-full" style={{backgroundColor: tag.color}}/>
                                 {tag.title}
@@ -78,7 +78,7 @@ export default function Tags({selectedTag, setTag, note, setNote}: {
                     </label>
                     <textarea id="password-note" rows={3} value={note} onChange={handleNoteChange}
                               placeholder="Дополнительная информация, секретные вопросы и т.д."
-                              className="w-full px-4 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none focus:border-(--accent-color) transition-colors placeholder-gray-600 resize-none"/>
+                              className="w-full px-4 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none focus:border-(--accent-color) transition-colors placeholder-(--text-muted) resize-none"/>
                 </div>
             </div>
         </div>

@@ -43,7 +43,7 @@ export default function Modal({open, onClose, title, children, maxWidth = 'max-w
                         <h3 className="text-base font-semibold text-(--text-color)">{title}</h3>
                         <button
                             onClick={onClose}
-                            className="text-gray-500 hover:text-(--text-color) transition-colors"
+                            className="text-(--text-muted) hover:text-(--text-color) transition-colors"
                             aria-label="Закрыть"
                         >
                             <FontAwesomeIcon icon={faXmark}/>

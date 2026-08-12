@@ -106,7 +106,7 @@ export default function PasswordPage() {
                         {key: 'list', icon: faListUl, label: 'Список'},
                     ].map(v => (
                         <button key={v.key}
-                                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors border ${currentView === v.key ? 'bg-white/5 text-(--text-color) border-(--border-input-color)' : 'text-(--text-muted) hover:text-(--text-color) hover:bg-white/5 border-transparent'}`}
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors border ${currentView === v.key ? 'bg-(--hover-overlay) text-(--text-color) border-(--border-input-color)' : 'text-(--text-muted) hover:text-(--text-color) hover:bg-(--hover-overlay) border-transparent'}`}
                                 onClick={() => switchDisplayView(v.key)}>
                             <FontAwesomeIcon icon={v.icon}/>
                             {v.label}
@@ -150,7 +150,7 @@ export default function PasswordPage() {
 
                     <div className="relative">
                         <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-3 top-1/2 -translate-y-1/2 text-(--text-muted) text-sm"/>
-                        <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Поиск" className="pl-9 pr-4 py-2 bg-(--background-secondary) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none focus:border-(--accent-color) w-64 placeholder-gray-500 transition-colors"/>
+                        <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Поиск" className="pl-9 pr-4 py-2 bg-(--background-secondary) border border-(--border-input-color) rounded-lg text-sm text-(--text-color) focus:outline-none focus:border-(--accent-color) w-64 placeholder-(--text-muted) transition-colors"/>
                     </div>
                 </div>
             </div>

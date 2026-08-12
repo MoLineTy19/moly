@@ -6,14 +6,14 @@ import React from "react";
 export default function ButtonDefault({text, icon, backgroundColor, borderColor, onClick}: ButtonDefaultType) {
 
     return (
-        <button className={`px-4 py-2 hover:bg-(${backgroundColor}) border text-(--text-color) rounded-lg text-sm font-medium transition-colors whitespace-nowrap items-center bg-(${backgroundColor})/90 border-(${borderColor})`}
+        <button className="px-4 py-2 border rounded-lg text-sm font-medium text-(--text-color) transition-opacity whitespace-nowrap inline-flex items-center hover:opacity-90"
                 onClick={onClick}
                 style={{
                     backgroundColor: backgroundColor,
                     borderColor: borderColor,
                 }}
         >
-            {icon ? <FontAwesomeIcon icon={icon} style={{marginRight: 6}}/> : null}
+            {icon ? <FontAwesomeIcon icon={icon} className="mr-1.5"/> : null}
             {text}
         </button>
     )

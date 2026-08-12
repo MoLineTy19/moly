@@ -1,5 +1,17 @@
 import {StatusDetails} from "@/types";
 
+/** rgba(...) из hex-цвета (#rgb / #rrggbb) с заданной непрозрачностью */
+function hexToRgba(hex: string, alpha: number): string {
+    const clean = hex.replace('#', '');
+    const full = clean.length === 3
+        ? clean.split('').map(c => c + c).join('')
+        : clean;
+    const r = parseInt(full.slice(0, 2), 16);
+    const g = parseInt(full.slice(2, 4), 16);
+    const b = parseInt(full.slice(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 export const STRENGTH_WEIGHTS = {
     length: {
         min: 0,
@@ -22,36 +34,18 @@ export const STRENGTH_WEIGHTS = {
     },
 };
 
-export const STRENGTH_DETAILS: StatusDetails[] = [
-    {
-        color: "#6b7280",
-        backgroundColor: "rgba(107, 114, 128, 0.1)",
-        borderColor: "rgba(107, 114, 128, 0.2)",
-        title: "Очень слабый"
-    },
-    {
-        color: "#ef4444",
-        backgroundColor: "rgba(239, 68, 68, 0.1)",
-        borderColor: "rgba(239, 68, 68, 0.2)",
-        title: "Слабый"
-    },
-    {
-        color: "#f97316",
-        backgroundColor: "rgba(249, 115, 22, 0.1)",
-        borderColor: "rgba(249, 115, 22, 0.2)",
-        title: "Средний"
-    },
-    {
-        color: "#3b82f6",
-        backgroundColor: "rgba(59, 130, 246, 0.1)",
-        borderColor: "rgba(59, 130, 246, 0.2)",
-        title: "Надежный"
-    },
-    {
-        color: "#22c55e",
-        backgroundColor: "rgba(34, 197, 94, 0.1)",
-        borderColor: "rgba(34, 197, 94, 0.2)",
-        title: "Очень надежный"
-    },
-]
+const STRENGTH_RAW: Array<{ color: string; title: string }> = [
+    {color: "#6b7280", title: "Очень слабый"},
+    {color: "#ef4444", title: "Слабый"},
+    {color: "#f97316", title: "Средний"},
+    {color: "#3b82f6", title: "Надежный"},
+    {color: "#00c950", title: "Очень надежный"},
+];
+
+export const STRENGTH_DETAILS: StatusDetails[] = STRENGTH_RAW.map(({color, title}) => ({
+    color,
+    backgroundColor: hexToRgba(color, 0.1),
+    borderColor: hexToRgba(color, 0.2),
+    title,
+}));
 

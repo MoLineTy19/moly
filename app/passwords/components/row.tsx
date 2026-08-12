@@ -7,7 +7,7 @@ import Link from "next/link";
 import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
 import toast from "react-hot-toast";
 import {Password} from "@/types";
-import {generateTagColor} from "@/utils/color";
+import {generateTagColor, FALLBACK_TAG_COLOR} from "@/utils/color";
 import {STRENGTH_DETAILS} from "@/config";
 import {useConfigStore} from "@/store/configStore";
 import {copyWithAutoClear} from "@/utils/clipboard";
@@ -20,7 +20,6 @@ export default function Row({item}: { item: RowItem }) {
     const [isShow, setShow] = useState(false);
     const [isChecked, setIsChecked] = useState(item.isSelected);
 
-    const FALLBACK_TAG_COLOR = '#6a7282';
     const baseColor = generateTagColor(item.tag?.color ?? FALLBACK_TAG_COLOR);
     const passwordStatusDetails = STRENGTH_DETAILS[item.strengthScore] ?? STRENGTH_DETAILS[0];
 
@@ -63,13 +62,13 @@ export default function Row({item}: { item: RowItem }) {
                 <label className="relative flex  items-center justify-center cursor-pointer">
                     <input
                         type="checkbox"
-                        className="custom-checkbox opacity-0 absolute h-4 w-4 z-10 border-text-(--text-muted)/80"
+                        className="opacity-0 absolute h-4 w-4 z-10"
                         checked={isChecked}
                         onChange={(e) => setIsChecked(e.target.checked)}
                     />
                     <div className={`h-4 w-4 rounded flex items-center  border justify-center transition-colors 
         ${isChecked ? 'bg-(--accent-color) border-(--accent-color)' : 'bg-(--background-color) border-(--text-muted)/80 group-hover:border-(--text-muted)'}`}>
-                        {isChecked && <span className="text-white text-xs">✓</span>}
+                        {isChecked && <span className="text-(--text-color) text-xs">✓</span>}
                     </div>
                 </label>
             </td>
@@ -77,7 +76,7 @@ export default function Row({item}: { item: RowItem }) {
                 <Link href={`/passwords/${item.id}`}>
                     <div className="flex items-center gap-3">
                         {/*Здесь иконки*/}
-                        <span className="font-medium text-white">
+                        <span className="font-medium text-(--text-color)">
                         {item.title}
                     </span>
                     </div>
@@ -134,7 +133,7 @@ export default function Row({item}: { item: RowItem }) {
             <td className="py-3 px-4 text-right">
                 <Link href={`/passwords/edit/${item.id}`}>
                     <button
-                        className="text-(--text-muted) hover:text-white opacity-0 group-hover:opacity-100 transition-all">
+                        className="text-(--text-muted) hover:text-(--text-color) opacity-0 group-hover:opacity-100 transition-all">
                         <FontAwesomeIcon icon={faEllipsis}/>
                     </button>
                 </Link>

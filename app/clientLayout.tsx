@@ -8,6 +8,8 @@ import {usePasswordStore} from "@/store/passwordStore";
 import {useTagStore} from "@/store/tagStore";
 import UnlockScreen from "@/app/unlock/page";
 import {useAutoLock} from "@/app/hooks/useAutoLock";
+import {useConfigStore} from "@/store/configStore";
+import {applyTheme} from "@/config/theme";
 
 /**
  * Клиентское исполнение лайаута
@@ -17,6 +19,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
     const rehydrate = usePasswordStore((state) => state.rehydrate);
     const fetchTags = useTagStore((state) => state.fetchTags)
     const {isLocked, isSetup} = usePasswordStore();
+    const theme = useConfigStore((state) => state.theme);
 
     useEffect(() => {
         rehydrate();
@@ -24,6 +27,11 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
         fetchPasswords()
         fetchTags()
     }, [fetchPasswords, fetchTags, isLocked])
+
+    // Применяем пресет оформления и поддерживаем его в актуальном состоянии.
+    useEffect(() => {
+        applyTheme(theme);
+    }, [theme])
 
     // useAutoLock();
 

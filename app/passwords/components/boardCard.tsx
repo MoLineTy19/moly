@@ -4,7 +4,7 @@ import React, {useState} from "react";
 import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
 import {STRENGTH_DETAILS} from "@/config";
 import { useConfigStore } from "@/store/configStore";
-import {generateTagColor} from "@/utils/color";
+import {generateTagColor, FALLBACK_TAG_COLOR} from "@/utils/color";
 import {Password} from "@/types";
 import toast from "react-hot-toast";
 import {copyWithAutoClear} from "@/utils/clipboard";
@@ -28,7 +28,7 @@ export default function BoardCard({item}: { item: Password }) {
     const clipboardClearTimeout = useConfigStore((s) => s.clipboardClearTimeout);
 
     const domain = getDomain(item.url);
-    const tagColor = generateTagColor(item.tag?.color ?? '#6a7280');
+    const tagColor = generateTagColor(item.tag?.color ?? FALLBACK_TAG_COLOR);
     const strength = STRENGTH_DETAILS[item.strengthScore] ?? STRENGTH_DETAILS[0];
 
     const handleCopy = async (e: React.MouseEvent) => {

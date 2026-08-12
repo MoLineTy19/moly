@@ -13,7 +13,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import {useParams, useRouter} from "next/navigation";
 import {Password} from "@/types";
 import {STRENGTH_DETAILS} from "@/config";
-import {generateTagColor} from "@/utils/color";
+import {generateTagColor, FALLBACK_TAG_COLOR} from "@/utils/color";
 import toast from "react-hot-toast";
 import {useConfigStore} from "@/store/configStore";
 import {addPassword, deletePassword} from "@/store/passwordStore";
@@ -79,8 +79,6 @@ export default function ShowPage() {
         return <div className="grow p-8 text-(--text-muted)">Пароль не найден</div>;
     }
 
-    const FALLBACK_TAG_COLOR = '#6a7282';
-
     const strengthDetails = STRENGTH_DETAILS[password.strengthScore] ?? STRENGTH_DETAILS[0];
     const tagColor = generateTagColor(password.tag?.color ?? FALLBACK_TAG_COLOR);
     const tagTitle = password.tag?.title ?? 'Без тега';
@@ -133,7 +131,7 @@ export default function ShowPage() {
                     </div>
                     <div className="grow">
                         <h3 className="text-red-400 font-semibold text-sm mb-1">Скомпрометированный пароль</h3>
-                        <p className="text-gray-300 text-sm">
+                        <p className="text-(--text-secondary) text-sm">
                             Этот пароль был обнаружен в недавней утечке данных. Рекомендуется немедленно
                             изменить его для обеспечения безопасности вашего аккаунта.
                         </p>
@@ -283,7 +281,7 @@ export default function ShowPage() {
                         <div className="p-6">
                             {password.note ? (
                                 <div
-                                    className="p-4 bg-(--background-color) border border-(--border-color) rounded-lg text-sm text-gray-300 leading-relaxed font-mono whitespace-pre-wrap break-words">
+                                    className="p-4 bg-(--background-color) border border-(--border-color) rounded-lg text-sm text-(--text-secondary) leading-relaxed font-mono whitespace-pre-wrap break-words">
                                     {password.note}
                                 </div>
                             ) : (
@@ -345,21 +343,21 @@ export default function ShowPage() {
                             <div>
                                 <h3 className="text-xs font-medium text-(--text-muted) mb-4">История изменений</h3>
                                 <div
-                                    className="space-y-4 relative before:absolute before:inset-0 before:ml-2.25 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-linear-to-b before:from-transparent before:via-gray-800 before:to-transparent">
+                                    className="space-y-4 relative before:absolute before:inset-0 before:ml-2.25 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-linear-to-b before:from-transparent before:via-(--border-color) before:to-transparent">
                                     <div
                                         className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                                         <div
-                                            className="flex items-center justify-center w-5 h-5 rounded-full border border-gray-700 bg-(--background-secondary) text-gray-500 group-[.is-active]:text-(--accent-color) group-[.is-active]:border-(--accent-color)/30 group-[.is-active]:bg-(--accent-color)/10 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 relative">
+                                            className="flex items-center justify-center w-5 h-5 rounded-full border border-(--border-input-color) bg-(--background-secondary) text-(--text-muted) group-[.is-active]:text-(--accent-color) group-[.is-active]:border-(--accent-color)/30 group-[.is-active]:bg-(--accent-color)/10 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 relative">
                                             <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
                                         </div>
                                         <div
-                                            className="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.25rem)] p-3 rounded-lg border border-gray-800 bg-(--background-color) shadow-soft">
+                                            className="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.25rem)] p-3 rounded-lg border border-(--border-color) bg-(--background-color) shadow-soft">
                                             <div className="flex items-center justify-between mb-1">
                                                 <span className="text-xs font-medium text-(--text-color)">
                                                     Пароль изменен
                                                 </span>
                                             </div>
-                                            <div className="text-[10px] text-gray-500">
+                                            <div className="text-[10px] text-(--text-muted)">
                                                 {formatDate(password.lastModified)}
                                             </div>
                                         </div>
@@ -367,17 +365,17 @@ export default function ShowPage() {
                                     <div
                                         className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
                                         <div
-                                            className="flex items-center justify-center w-5 h-5 rounded-full border border-gray-700 bg-(--background-secondary) text-gray-600 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 relative">
+                                            className="flex items-center justify-center w-5 h-5 rounded-full border border-(--border-input-color) bg-(--background-secondary) text-(--text-muted) shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 relative">
                                             <div className="w-1.5 h-1.5 rounded-full bg-current"></div>
                                         </div>
                                         <div
-                                            className="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.25rem)] p-3 rounded-lg border border-gray-800 bg-(--background-color) shadow-soft">
+                                            className="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.25rem)] p-3 rounded-lg border border-(--border-color) bg-(--background-color) shadow-soft">
                                             <div className="flex items-center justify-between mb-1">
-                                                <span className="text-xs font-medium text-gray-300">
+                                                <span className="text-xs font-medium text-(--text-secondary)">
                                                     Запись создана
                                                 </span>
                                             </div>
-                                            <div className="text-[10px] text-gray-500">
+                                            <div className="text-[10px] text-(--text-muted)">
                                                 {formatDate(password.createdAt)}
                                             </div>
                                         </div>

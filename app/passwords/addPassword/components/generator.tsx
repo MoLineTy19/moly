@@ -106,7 +106,7 @@ export default function Generator({password, setPassword, reliability, setReliab
     return (
         <>
             <div className="bg-(--background-secondary) border border-(--text-muted)/20 rounded-xl shadow-soft overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-800 flex justify-between items-center bg-(--background-color)/20">
+                <div className="px-6 py-4 border-b border-(--border-color) flex justify-between items-center bg-(--background-color)/20">
                     <h2 className="text-sm font-medium text-(--text-muted) brightness-130 uppercase tracking-wider">Пароль</h2>
                     <button type="button" className="text-(--accent-color) hover:text-(--accent-color)/90 font-medium flex items-center gap-1.5 transition-colors" onClick={toggleGenerator}>
                         <FontAwesomeIcon icon={faWandMagicSparkles} />
@@ -120,7 +120,7 @@ export default function Generator({password, setPassword, reliability, setReliab
                                 <FontAwesomeIcon icon={faKey} />
                             </div>
                             <input type={isShow ? 'text': 'password'} placeholder="Введите пароль или сгенерируйте" className="w-full pl-11 pr-24 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color)
-                                     font-mono focus:outline-none focus:border-(--accent-color) transition-colors placeholder-gray-600" value={password} onChange={handlePasswordChange}/>
+                                     font-mono focus:outline-none focus:border-(--accent-color) transition-colors placeholder-(--text-muted)" value={password} onChange={handlePasswordChange}/>
                             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                                 <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={handleClickShow}>
                                     <FontAwesomeIcon icon={isShow ? faEye : faEyeLowVision } />
@@ -138,7 +138,7 @@ export default function Generator({password, setPassword, reliability, setReliab
                             <div className="flex gap-1 h-1.5 rounded-full overflow-hidden bg-dark-800">
                                 {
                                     [1, 2, 3, 4].map(level => (
-                                        <div key={level} className={`w-1/4 ${level <= reliability ? 'bg-(--accent-color)' : 'bg-gray-500'}`}>
+                                        <div key={level} className={`w-1/4 ${level <= reliability ? 'bg-(--accent-color)' : 'bg-(--surface-inactive)'}`}>
 
                                         </div>
                                     ))
@@ -146,14 +146,14 @@ export default function Generator({password, setPassword, reliability, setReliab
                             </div>
                         </div>
                     </div>
-                    <div id="generatorWidget" className="pt-4 border-t border-gray-800">
+                    <div id="generatorWidget" className="pt-4 border-t border-(--border-color)">
                         <div className="space-y-5">
                             <div>
                                 <div className="flex justify-between items-center mb-3">
                                     <label className="text-sm font-medium text-(--text-color)/80">Длина пароля</label>
                                     <span className="text-(--accent-color) font-mono text-sm bg-(--accent-color)/10 px-2 py-0.5 rounded border border-(--accent-color)/20" id="lengthDisplay">{passwordLength}</span>
                                 </div>
-                                <input type="range" min={8} max={64} value={passwordLength} className="w-full h-1.5 bg-gray-800 rounded-full appearance-none cursor-pointer custom-range" onChange={handleInputLengthPassword}/>
+                                <input type="range" min={8} max={64} value={passwordLength} className="w-full h-1.5 bg-(--surface-inactive) rounded-full appearance-none cursor-pointer custom-range" onChange={handleInputLengthPassword}/>
                                 <div className="flex justify-between text-[10px] text-(--text-muted) mt-1 mb-4">
                                     <span>8</span>
                                     <span>32</span>
@@ -170,8 +170,8 @@ export default function Generator({password, setPassword, reliability, setReliab
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                                <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-lg border border-gray-800 bg-dark-950 hover:border-(--border-input-color) transition-colors">
-                                    <div className="relative flex items-center justify-center w-5 h-5 rounded border border-gray-600 bg-dark-900 text-transparent">
+                                <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-lg border border-(--border-color) bg-dark-950 hover:border-(--border-input-color) transition-colors">
+                                    <div className="relative flex items-center justify-center w-5 h-5 rounded border border-(--border-input-color) bg-dark-900 text-transparent">
                                         <CheckBox isActive={isSimilar} setIsActive={setSimilar} color="(--secondary-color)"/>
                                     </div>
                                     <div>
@@ -183,8 +183,8 @@ export default function Generator({password, setPassword, reliability, setReliab
                                         </div>
                                     </div>
                                 </label>
-                                <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-lg border border-gray-800 bg-dark-950 hover:border-(--border-input-color) transition-colors">
-                                    <div className="relative flex items-center justify-center w-5 h-5 rounded border border-gray-600 bg-dark-900 text-transparent">
+                                <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-lg border border-(--border-color) bg-dark-950 hover:border-(--border-input-color) transition-colors">
+                                    <div className="relative flex items-center justify-center w-5 h-5 rounded border border-(--border-input-color) bg-dark-900 text-transparent">
                                         <CheckBox isActive={isUnique} setIsActive={setUnique} color="(--secondary-color)"/>
                                     </div>
                                     <div>
@@ -197,7 +197,7 @@ export default function Generator({password, setPassword, reliability, setReliab
                                     </div>
                                 </label>
                             </div>
-                            <button type="button" className="w-full py-3 bg-white/10 hover:bg-dark-700 border border-(--border-input-color) text-(--text-color) rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2" onClick={toggleGenerator}>
+                            <button type="button" className="w-full py-3 bg-(--hover-overlay) hover:bg-dark-700 border border-(--border-input-color) text-(--text-color) rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2" onClick={toggleGenerator}>
                                 <FontAwesomeIcon icon={faArrowsRotate} />
                                 Сгенерировать новый пароль
                             </button>

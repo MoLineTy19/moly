@@ -21,7 +21,7 @@ export default function TableView({passwords, currentPage, itemPerPage, isChecke
                     <label className="relative flex items-center justify-center cursor-pointer">
                         <input
                             type="checkbox"
-                            className="custom-checkbox opacity-0 absolute h-4 w-4 z-10"
+                            className="opacity-0 absolute h-4 w-4 z-10"
                             checked={isChecked}
                             onChange={(e) => setIsChecked(e.target.checked)}
                         />

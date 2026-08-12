@@ -4,14 +4,15 @@ import {useEffect, useState} from "react";
 import type {ChangeEvent, FormEvent, MouseEventHandler} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
-    faAngleDown, faArrowRightToBracket, faArrowUp, faBorderAll, faCircleInfo, faCodeBranch,
-    faDesktop, faFileExport, faFileImport, faGears, faKey, faListUl,
+    faAngleDown, faArrowRightToBracket, faArrowUp, faBorderAll, faCheck, faCircleInfo, faCodeBranch,
+    faDesktop, faFileExport, faFileImport, faGears, faKey, faListUl, faPalette,
     faLock, faShieldHalved, faTableList, faClock, faWindowMinimize,
 } from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
 import {useConfigStore} from "@/store/configStore";
 import {addPassword, usePasswordStore} from "@/store/passwordStore";
 import {APP_VERSION, GITHUB_REPO} from "@/config/app";
+import {THEMES} from "@/config/theme";
 import Modal from "@/components/ui/modal";
 import Toggle from "@/components/ui/toggle";
 import {
@@ -46,6 +47,7 @@ export default function Security() {
         autoLockTimeOut, setAutoLockTimeOut,
         clipboardClearTimeout, setClipboardClearTimeout,
         lockOnTabSwitch, setOnTabSwitch,
+        theme, setTheme,
     } = useConfigStore();
 
     const {masterKeyCreatedAt, passwords, lock, changeMasterPassword} = usePasswordStore();
@@ -250,7 +252,7 @@ export default function Security() {
 
                     {/* Возраст мастер-пароля */}
                     <div className="bg-(--background-secondary) border border-(--border-color) rounded-xl p-5 shadow-soft flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-lg bg-dark-800 border border-(--border-color) flex items-center justify-center shrink-0 text-gray-300">
+                        <div className="w-10 h-10 rounded-lg bg-dark-800 border border-(--border-color) flex items-center justify-center shrink-0 text-(--text-secondary)">
                             <FontAwesomeIcon icon={faKey}/>
                         </div>
                         <div>
@@ -277,7 +279,7 @@ export default function Security() {
                                 onClick={handleCheckUpdate}
                                 disabled={checking}
                             >
-                                <FontAwesomeIcon icon={faDesktop} style={{marginRight: 6}}/>
+                                <FontAwesomeIcon icon={faDesktop} className="mr-1.5"/>
                                 {checking ? "Проверка…" : "Проверить версию"}
                             </button>
                         </div>
@@ -289,6 +291,57 @@ export default function Security() {
 
                     {/* Левая колонка */}
                     <div className="lg:col-span-7 flex flex-col gap-6">
+
+                        {/* Оформление */}
+                        <section className="bg-(--background-secondary) border border-(--border-color) rounded-xl shadow-soft overflow-hidden">
+                            <div className="px-6 py-4 border-b border-(--border-color)">
+                                <h2 className="text-lg font-medium text-(--text-color) flex items-center gap-2">
+                                    <FontAwesomeIcon icon={faPalette}/>
+                                    Оформление
+                                </h2>
+                            </div>
+                            <div className="p-6">
+                                <div className="max-w-md mb-4">
+                                    <h3 className="text-sm font-medium text-(--text-color) mb-1">Тема приложения</h3>
+                                    <p className="text-xs text-(--text-muted)">
+                                        Готовые пресеты: фон, текст и акцент. Применяется ко всему приложению сразу.
+                                    </p>
+                                </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                    {THEMES.map((p) => {
+                                        const active = theme === p.id;
+                                        return (
+                                            <button
+                                                key={p.id}
+                                                onClick={() => setTheme(p.id)}
+                                                className={`relative text-left rounded-lg border p-2 transition-colors ${active ? "border-(--accent-color)" : "border-(--border-color) hover:border-(--border-input-color)"}`}
+                                                aria-pressed={active}
+                                            >
+                                                {/* Мини-превью с честными цветами пресета */}
+                                                <div className="rounded-md p-2 h-16 flex flex-col justify-between overflow-hidden" style={{background: p.preview.bg}}>
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{background: p.accent}}/>
+                                                        <span className="h-1.5 rounded-full" style={{background: p.preview.text, width: 28}}/>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 rounded px-1.5 py-1" style={{background: p.preview.surface}}>
+                                                        <span className="w-1.5 h-1.5 rounded-full" style={{background: p.accent}}/>
+                                                        <span className="h-1 rounded-full" style={{background: p.preview.muted, width: 22}}/>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-2 flex items-center justify-between">
+                                                    <span className="text-xs font-medium text-(--text-color)">{p.name}</span>
+                                                    {active && (
+                                                        <span className="text-(--accent-color) text-xs">
+                                                            <FontAwesomeIcon icon={faCheck}/>
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </section>
 
                         {/* Общие настройки */}
                         <section className="bg-(--background-secondary) border border-(--border-color) rounded-xl shadow-soft overflow-hidden">
@@ -314,7 +367,7 @@ export default function Security() {
                                         ] as const).map((opt) => (
                                             <button
                                                 key={opt.v}
-                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-(--text-color) text-sm shadow-sm hover:bg-white/5 border transition-colors ${currentView === opt.v ? "bg-white/5 border-(--border-input-color)" : "border-transparent"}`}
+                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-(--text-color) text-sm shadow-sm hover:bg-(--hover-overlay) border transition-colors ${currentView === opt.v ? "bg-(--hover-overlay) border-(--border-input-color)" : "border-transparent"}`}
                                                 onClick={() => switchDisplayView(opt.v)}
                                             >
                                                 <FontAwesomeIcon icon={opt.icon}/>
@@ -344,7 +397,7 @@ export default function Security() {
                                         </p>
                                     </div>
                                     <button
-                                        className="px-4 py-2 bg-white/5 hover:bg-dark-700 border border-(--border-input-color) text-(--text-color) rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                                        className="px-4 py-2 bg-(--hover-overlay) hover:bg-dark-700 border border-(--border-input-color) text-(--text-color) rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
                                         onClick={() => setChangeOpen(true)}
                                     >
                                         Сменить пароль
@@ -359,10 +412,10 @@ export default function Security() {
                                         </p>
                                     </div>
                                     <button
-                                        className="px-4 py-2 bg-white/5 hover:bg-dark-700 border border-(--border-input-color) text-(--text-color) rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                                        className="px-4 py-2 bg-(--hover-overlay) hover:bg-dark-700 border border-(--border-input-color) text-(--text-color) rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
                                         onClick={handleLockNow}
                                     >
-                                        <FontAwesomeIcon icon={faLock} style={{marginRight: 6}}/>
+                                        <FontAwesomeIcon icon={faLock} className="mr-1.5"/>
                                         Заблокировать сейчас
                                     </button>
                                 </div>
@@ -396,7 +449,7 @@ export default function Security() {
                                             <option value={60}>1 час</option>
                                             <option value={0}>Никогда (не рекомендуется)</option>
                                         </select>
-                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-(--text-muted) pointer-events-none">
                                             <FontAwesomeIcon icon={faAngleDown}/>
                                         </div>
                                     </div>
@@ -417,7 +470,7 @@ export default function Security() {
                                             <option value={60}>60 секунд</option>
                                             <option value={0}>Никогда</option>
                                         </select>
-                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-(--text-muted) pointer-events-none">
                                             <FontAwesomeIcon icon={faAngleDown}/>
                                         </div>
                                     </div>
@@ -441,19 +494,19 @@ export default function Security() {
                             </div>
                             <div className="p-5 flex flex-col gap-3">
                                 <div className="flex items-center justify-between gap-3">
-                                    <span className="flex items-center gap-3 text-sm text-gray-300">
+                                    <span className="flex items-center gap-3 text-sm text-(--text-secondary)">
                                         <FontAwesomeIcon icon={faFileExport}/> Экспорт
                                     </span>
                                     <div className="flex gap-2">
-                                        <button onClick={() => handleExport("json")} className="px-3 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 border border-(--border-input-color) text-gray-300 text-xs font-medium transition-colors">JSON</button>
-                                        <button onClick={() => handleExport("csv")} className="px-3 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 border border-(--border-input-color) text-gray-300 text-xs font-medium transition-colors">CSV</button>
+                                        <button onClick={() => handleExport("json")} className="px-3 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 border border-(--border-input-color) text-(--text-secondary) text-xs font-medium transition-colors">JSON</button>
+                                        <button onClick={() => handleExport("csv")} className="px-3 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 border border-(--border-input-color) text-(--text-secondary) text-xs font-medium transition-colors">CSV</button>
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between gap-3">
-                                    <span className="flex items-center gap-3 text-sm text-gray-300">
+                                    <span className="flex items-center gap-3 text-sm text-(--text-secondary)">
                                         <FontAwesomeIcon icon={faFileImport}/> Импорт
                                     </span>
-                                    <button onClick={() => setImportOpen(true)} className="px-3 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 border border-(--border-input-color) text-gray-300 text-xs font-medium transition-colors">Выбрать файл</button>
+                                    <button onClick={() => setImportOpen(true)} className="px-3 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 border border-(--border-input-color) text-(--text-secondary) text-xs font-medium transition-colors">Выбрать файл</button>
                                 </div>
                             </div>
                         </section>
@@ -463,11 +516,11 @@ export default function Security() {
                             <div className="px-5 py-4 border-b border-(--border-color) flex justify-between items-center">
                                 <h2 className="text-sm font-medium text-(--text-color) uppercase tracking-wider">Журнал активности</h2>
                                 <div className="flex gap-3">
-                                    <button onClick={openJournalAll} className="text-xs text-(--accent-color) hover:text-brand-400 transition-colors">Смотреть все</button>
-                                    <button onClick={clearActivity} className="text-xs text-gray-500 hover:text-(--text-color) transition-colors">Очистить</button>
+                                    <button onClick={openJournalAll} className="text-xs text-(--accent-color) hover:text-(--accent-color) transition-colors">Смотреть все</button>
+                                    <button onClick={clearActivity} className="text-xs text-(--text-muted) hover:text-(--text-color) transition-colors">Очистить</button>
                                 </div>
                             </div>
-                            <div className="divide-y divide-gray-800/50">
+                            <div className="divide-y divide-(--border-color)/50">
                                 {activity.length === 0 ? (
                                     <div className="px-5 py-6 text-center text-sm text-(--text-muted)">Событий пока нет</div>
                                 ) : activity.map((a) => {
@@ -478,7 +531,7 @@ export default function Security() {
                                                 <FontAwesomeIcon icon={meta.icon}/>
                                             </div>
                                             <div>
-                                                <div className="text-sm text-gray-300">{meta.text}{a.message ? ` · ${a.message}` : ""}</div>
+                                                <div className="text-sm text-(--text-secondary)">{meta.text}{a.message ? ` · ${a.message}` : ""}</div>
                                                 <div className="text-xs text-(--text-muted) mt-0.5">{formatActivityTime(a.createdAt)}</div>
                                             </div>
                                         </div>
@@ -513,16 +566,16 @@ export default function Security() {
                         {next.length > 0 && (
                             <div className="flex gap-1 h-1 rounded-full overflow-hidden bg-dark-800">
                                 {[1, 2, 3, 4].map((lvl) => (
-                                    <div key={lvl} className={`w-1/4 ${lvl <= strengthPreview ? "bg-(--accent-color)" : "bg-gray-700"}`}/>
+                                    <div key={lvl} className={`w-1/4 ${lvl <= strengthPreview ? "bg-(--accent-color)" : "bg-(--surface-inactive)"}`}/>
                                 ))}
                             </div>
                         )}
-                        <button type="button" onClick={() => setShowPw((s) => !s)} className="text-xs text-(--accent-color) hover:text-brand-400 transition-colors self-start">
+                        <button type="button" onClick={() => setShowPw((s) => !s)} className="text-xs text-(--accent-color) hover:text-(--accent-color) transition-colors self-start">
                             {showPw ? "Скрыть пароли" : "Показать пароли"}
                         </button>
                         {changeErr && <p className="text-xs text-red-400">{changeErr}</p>}
                         <div className="flex gap-2 justify-end pt-2">
-                            <button type="button" onClick={() => setChangeOpen(false)} className="px-4 py-2 rounded-lg bg-white/5 hover:bg-dark-700 border border-(--border-input-color) text-(--text-color) text-sm font-medium transition-colors">Отмена</button>
+                            <button type="button" onClick={() => setChangeOpen(false)} className="px-4 py-2 rounded-lg bg-(--hover-overlay) hover:bg-dark-700 border border-(--border-input-color) text-(--text-color) text-sm font-medium transition-colors">Отмена</button>
                             <button type="submit" disabled={saving || !cur || !next || !confirm} className="px-4 py-2 rounded-lg bg-(--accent-color)/90 hover:bg-(--accent-color) border border-(--accent-color) text-(--text-color) text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                                 {saving ? "…" : "Сменить пароль"}
                             </button>
@@ -542,11 +595,11 @@ export default function Security() {
                             onChange={onFile}
                             className="text-sm text-(--text-muted) file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-(--accent-color)/90 file:text-(--text-color) file:font-medium file:cursor-pointer file:hover:bg-(--accent-color) cursor-pointer"
                         />
-                        {importName && <div className="text-xs text-gray-300">Файл: {importName}</div>}
+                        {importName && <div className="text-xs text-(--text-secondary)">Файл: {importName}</div>}
                         {parsed && parsed.length > 0 && <div className="text-xs text-(--accent-color)">Найдено записей: {parsed.length}</div>}
                         {importErr && <p className="text-xs text-red-400">{importErr}</p>}
                         <div className="flex gap-2 justify-end pt-2">
-                            <button type="button" onClick={() => setImportOpen(false)} className="px-4 py-2 rounded-lg bg-white/5 hover:bg-dark-700 border border-(--border-input-color) text-(--text-color) text-sm font-medium transition-colors">Отмена</button>
+                            <button type="button" onClick={() => setImportOpen(false)} className="px-4 py-2 rounded-lg bg-(--hover-overlay) hover:bg-dark-700 border border-(--border-input-color) text-(--text-color) text-sm font-medium transition-colors">Отмена</button>
                             <button type="button" onClick={doImport} disabled={!parsed || parsed.length === 0 || importing} className="px-4 py-2 rounded-lg bg-(--accent-color)/90 hover:bg-(--accent-color) border border-(--accent-color) text-(--text-color) text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                                 {importing ? "Импорт…" : "Импортировать"}
                             </button>
@@ -559,7 +612,7 @@ export default function Security() {
                     {allActivity.length === 0 ? (
                         <div className="text-center text-sm text-(--text-muted) py-6">Событий пока нет</div>
                     ) : (
-                        <div className="flex flex-col divide-y divide-gray-800/50">
+                        <div className="flex flex-col divide-y divide-(--border-color)/50">
                             {allActivity.map((a) => {
                                 const meta = ACTIVITY_META[a.type] ?? {icon: faGears, text: a.type};
                                 return (
@@ -568,7 +621,7 @@ export default function Security() {
                                             <FontAwesomeIcon icon={meta.icon}/>
                                         </div>
                                         <div>
-                                            <div className="text-sm text-gray-300">{meta.text}{a.message ? ` · ${a.message}` : ""}</div>
+                                            <div className="text-sm text-(--text-secondary)">{meta.text}{a.message ? ` · ${a.message}` : ""}</div>
                                             <div className="text-xs text-(--text-muted) mt-0.5">{formatActivityTime(a.createdAt)}</div>
                                         </div>
                                     </div>
