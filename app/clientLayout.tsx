@@ -33,9 +33,9 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
         applyTheme(theme);
     }, [theme])
 
-    // useAutoLock();
+    useAutoLock();
 
-    // if (isLocked) return <UnlockScreen />;
+    if (isLocked) return <UnlockScreen />;
 
     return (
         <>

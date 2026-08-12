@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
 
     return (
-        <html>
+        <html suppressHydrationWarning>
             <head>
                 <script dangerouslySetInnerHTML={{__html: themeBootstrap}}/>
             </head>

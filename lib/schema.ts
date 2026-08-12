@@ -22,6 +22,7 @@ export const PasswordTable = sqliteTable('passwords', {
     strength_score: integer().notNull(),
     tag_id: integer().references(() => TagTable.id),
     note: text(),
+    is_favorite: integer().notNull().default(0),
     created_at: text().notNull().default(sql`(current_timestamp)`),
     updated_at: text().notNull().default(sql`(current_timestamp)`),
     }, (table) => ({

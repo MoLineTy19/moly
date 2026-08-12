@@ -12,13 +12,10 @@ import {STRENGTH_DETAILS} from "@/config";
 import {useConfigStore} from "@/store/configStore";
 import {copyWithAutoClear} from "@/utils/clipboard";
 
-type RowItem = Password & { isSelected?: boolean };
-
-export default function Row({item}: { item: RowItem }) {
+export default function Row({item, selected, onToggle}: { item: Password; selected: boolean; onToggle: (id: number) => void }) {
     const createdDate = new Date(item.createdAt);
 
     const [isShow, setShow] = useState(false);
-    const [isChecked, setIsChecked] = useState(item.isSelected);
 
     const baseColor = generateTagColor(item.tag?.color ?? FALLBACK_TAG_COLOR);
     const passwordStatusDetails = STRENGTH_DETAILS[item.strengthScore] ?? STRENGTH_DETAILS[0];
@@ -57,18 +54,18 @@ export default function Row({item}: { item: RowItem }) {
 
     return (
         <tr className="table-row-hover border-b border-(--text-muted)/20 transition-colors group cursor-pointer"
-            style={{backgroundColor: item.strengthScore <= 2 ? 'rgba(255, 0, 0, 0.02)' : ''}}>
+            style={{backgroundColor: item.strengthScore <= 2 ? 'rgba(255, 0, 0, 0.02)' : '' /* слабые пароли подсвечиваются бледно-красным */}}>
             <td className="py-3 px-4 text-center">
                 <label className="relative flex  items-center justify-center cursor-pointer">
                     <input
                         type="checkbox"
                         className="opacity-0 absolute h-4 w-4 z-10"
-                        checked={isChecked}
-                        onChange={(e) => setIsChecked(e.target.checked)}
+                        checked={selected}
+                        onChange={() => onToggle(item.id)}
                     />
-                    <div className={`h-4 w-4 rounded flex items-center  border justify-center transition-colors 
-        ${isChecked ? 'bg-(--accent-color) border-(--accent-color)' : 'bg-(--background-color) border-(--text-muted)/80 group-hover:border-(--text-muted)'}`}>
-                        {isChecked && <span className="text-(--text-color) text-xs">✓</span>}
+                    <div className={`h-4 w-4 rounded flex items-center  border justify-center transition-colors
+        ${selected ? 'bg-(--accent-color) border-(--accent-color)' : 'bg-(--background-color) border-(--text-muted)/80 group-hover:border-(--text-muted)'}`}>
+                        {selected && <span className="text-(--text-color) text-xs">✓</span>}
                     </div>
                 </label>
             </td>

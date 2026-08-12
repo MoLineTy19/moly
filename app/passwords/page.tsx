@@ -8,14 +8,16 @@ import {
     faMagnifyingGlass,
     faPlus,
     faShieldHalved,
+    faStar as faStarSolid,
     faTableList, faXmark
 } from "@fortawesome/free-solid-svg-icons";
-import {faFolder} from "@fortawesome/free-regular-svg-icons";
+import {faFolder, faStar as faStarOutline} from "@fortawesome/free-regular-svg-icons";
 import React, {useEffect, useMemo, useState} from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import TableView from "@/app/passwords/components/tableView";
 import BoardView from "@/app/passwords/components/boardView";
-import {usePasswordStore} from "@/store/passwordStore";
+import {usePasswordStore, setPasswordsFavorite} from "@/store/passwordStore";
 import {useConfigStore} from "@/store/configStore";
 import {useTagStore} from "@/store/tagStore";
 import ListView from "@/app/passwords/components/listView";
@@ -35,9 +37,27 @@ export default function PasswordPage() {
     const [filterTag, setFilterTag] = useState<number | null>(null);
     const [filterStrength, setFilterStrength] = useState<number | null>(null);
 
-    const [isChecked, setIsChecked] = useState(false);
+    // Выделение строк в табличном виде (множественный выбор).
+    const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
     const [currentPage, setCurrentPage] = useState(0);
     const itemPerPage = 10;
+
+    const toggleRow = (id: number) => {
+        setSelectedIds((prev) => {
+            const next = new Set(prev);
+            next.has(id) ? next.delete(id) : next.add(id);
+            return next;
+        });
+    };
+    const togglePage = (ids: number[], selectAll: boolean) => {
+        setSelectedIds((prev) => {
+            const next = new Set(prev);
+            if (selectAll) ids.forEach((id) => next.add(id));
+            else ids.forEach((id) => next.delete(id));
+            return next;
+        });
+    };
+    const clearSelection = () => setSelectedIds(new Set());
 
     const filteredPasswords = useMemo(() => {
         const q = searchQuery.trim().toLowerCase();
@@ -55,6 +75,8 @@ export default function PasswordPage() {
     const totalPage = Math.max(1, Math.ceil(filteredPasswords.length / itemPerPage));
 
     useEffect(() => {
+        // Фильтры могут сократить число страниц; если currentPage оказался
+        // за пределами доступного диапазона, возвращаемся на первую.
         if (currentPage > totalPage - 1) setCurrentPage(0);
     }, [currentPage, totalPage]);
 
@@ -72,6 +94,22 @@ export default function PasswordPage() {
 
     const shownCount = filteredPasswords.length;
 
+    // Логика массового действия с избранным по выбранным строкам.
+    const selectedArr = [...selectedIds];
+    const allSelectedFavorite = selectedArr.length > 0
+        && selectedArr.every((id) => passwords.find((p) => p.id === id)?.favorite);
+    const nextFavoriteValue = !allSelectedFavorite;
+
+    const handleBulkFavorite = async () => {
+        if (!selectedArr.length) return;
+        try {
+            await setPasswordsFavorite(selectedArr, nextFavoriteValue);
+            toast.success(nextFavoriteValue ? 'Добавлено в избранное' : 'Удалено из избранного');
+        } catch {
+            toast.error('Не удалось изменить избранное');
+        }
+    };
+
 
     return (
         <div className="grow overflow-y-auto p-8">
@@ -85,7 +123,7 @@ export default function PasswordPage() {
                         </span>
                     </h1>
                     <p className="text-sm text-(--text-muted)">
-                        Управляйте вашими сохраненными учетными записями и безопасными заметками.
+                        Управляйте сохранёнными учётными записями и заметками.
                     </p>
                 </div>
                 <Link href="/passwords/addPassword">
@@ -174,11 +212,18 @@ export default function PasswordPage() {
                     {currentView === 'table' && (
                         <>
                             <div className="bg-(--background-secondary) border border-(--border-color) rounded-xl overflow-hidden shadow-soft">
-                                <TableView passwords={filteredPasswords} currentPage={currentPage} itemPerPage={itemPerPage} isChecked={isChecked} setIsChecked={setIsChecked}/>
+                                <TableView
+                                passwords={filteredPasswords}
+                                currentPage={currentPage}
+                                itemPerPage={itemPerPage}
+                                selectedIds={selectedIds}
+                                onToggleRow={toggleRow}
+                                onTogglePage={togglePage}
+                            />
                             </div>
                             <div className="mt-4 flex items-center justify-between text-sm text-(--text-muted)">
                                 <div>
-                                    Показано {currentPage * itemPerPage + 1}–{Math.min((currentPage + 1) * itemPerPage, shownCount)} из {shownCount}
+                                    Показано {currentPage * itemPerPage + 1}-{Math.min((currentPage + 1) * itemPerPage, shownCount)} из {shownCount}
                                     {hasActiveFilters && ` (всего ${passwordCount})`}
                                 </div>
                                 <div className="flex gap-2">
@@ -197,6 +242,35 @@ export default function PasswordPage() {
                     {currentView === 'board' && <BoardView passwords={filteredPasswords}/>}
                     {currentView === 'list' && <ListView passwords={filteredPasswords}/>}
                 </>
+            )}
+
+            {/* Плавающая панель массовых действий для выделенных строк */}
+            {selectedIds.size > 0 && (
+                <div className="sticky bottom-0 z-30 mt-6 flex justify-center pointer-events-none">
+                    <div className="pointer-events-auto flex items-center gap-3 bg-(--background-secondary) border border-(--border-input-color) shadow-lg rounded-xl px-4 py-2.5">
+                        <span className="text-sm text-(--text-color) font-medium">
+                            Выбрано: {selectedIds.size}
+                        </span>
+                        <div className="h-5 w-px bg-(--border-color)"/>
+                        <button
+                            onClick={handleBulkFavorite}
+                            title={nextFavoriteValue ? "Добавить в избранное" : "Убрать из избранного"}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
+                                nextFavoriteValue
+                                    ? "bg-amber-500/15 text-amber-400 hover:bg-amber-500/25 border-amber-500/30"
+                                    : "text-(--text-secondary) hover:text-(--text-color) hover:bg-(--hover-overlay) border-transparent"
+                            }`}>
+                            <FontAwesomeIcon icon={nextFavoriteValue ? faStarSolid : faStarOutline}/>
+                            {nextFavoriteValue ? "В избранное" : "Убрать из избранного"}
+                        </button>
+                        <button
+                            onClick={clearSelection}
+                            title="Снять выделение"
+                            className="w-8 h-8 rounded-md text-(--text-muted) hover:text-(--text-color) hover:bg-(--hover-overlay) flex items-center justify-center transition-colors">
+                            <FontAwesomeIcon icon={faXmark}/>
+                        </button>
+                    </div>
+                </div>
             )}
         </div>
     );

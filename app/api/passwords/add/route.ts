@@ -13,6 +13,7 @@ const AddSchema = z.object({
         strengthScore: z.number().int().min(0).max(4),
         note: z.string().nullable().optional(),
         tag: z.object({ id: z.number().int() }).nullable(),
+        favorite: z.boolean().optional().default(false),
     }),
 });
 
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({error: parsed.error.flatten()}, {status: 400});
     }
 
-    const {title, login, password, strengthScore, url, note, tag} = parsed.data.password;
+    const {title, login, password, strengthScore, url, note, tag, favorite} = parsed.data.password;
 
     const [inserted] = await db.insert(PasswordTable).values({
         url,
@@ -33,10 +34,11 @@ export async function POST(request: NextRequest) {
         strength_score: strengthScore,
         tag_id: tag?.id ?? null,
         note,
+        is_favorite: favorite ? 1 : 0,
     }).returning({ id: PasswordTable.id });
 
     // Возвращаем запись в той же форме, что и GET /api/passwords:
-    // camelCase-алиасы + вложенный tag — чтобы стор сразу корректно отрисовал строку.
+    // camelCase-алиасы и вложенный tag, чтобы стор сразу корректно отрисовал строку.
     const [row] = await db.select({
         id: PasswordTable.id,
         url: PasswordTable.url,
@@ -45,6 +47,7 @@ export async function POST(request: NextRequest) {
         password: PasswordTable.password,
         strengthScore: PasswordTable.strength_score,
         note: PasswordTable.note,
+        favorite: PasswordTable.is_favorite,
         createdAt: PasswordTable.created_at,
         tag: TagTable,
     })
@@ -52,5 +55,5 @@ export async function POST(request: NextRequest) {
         .leftJoin(TagTable, eq(PasswordTable.tag_id, TagTable.id))
         .where(eq(PasswordTable.id, inserted.id));
 
-    return NextResponse.json({success: true, data: row});
+    return NextResponse.json({success: true, data: {...row, favorite: Boolean(row.favorite)}});
 }

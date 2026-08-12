@@ -12,6 +12,7 @@ const PatchSchema = z.object({
     strength_score: z.number().int().min(0).max(4).optional(),
     note: z.string().nullable().optional(),
     tag_id: z.number().int().nullable().optional(),
+    favorite: z.boolean().optional(),
 });
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }>}) {
@@ -35,7 +36,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (v.strength_score !== undefined) updateData.strength_score = v.strength_score;
     if (v.note !== undefined)          updateData.note = v.note;
     if (v.tag_id !== undefined)        updateData.tag_id = v.tag_id;
-    updateData.updated_at = new Date().toISOString();   // ← ИСПРАВЛЕНО: было updatedAt
+    if (v.favorite !== undefined)      updateData.is_favorite = v.favorite ? 1 : 0;
+    updateData.updated_at = new Date().toISOString();   // обновляем timestamp редактирования (колонка updated_at)
 
     await db.update(PasswordTable).set(updateData).where(eq(PasswordTable.id, id));
     return NextResponse.json({success: true});
@@ -49,7 +51,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         return NextResponse.json({ error: "Invalid id", status: 400 });
     }
 
-    const [password] = await db.select({
+    const [row] = await db.select({
         id: PasswordTable.id,
         url: PasswordTable.url,
         title: PasswordTable.title,
@@ -57,6 +59,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         password: PasswordTable.password,
         strengthScore: PasswordTable.strength_score,
         note: PasswordTable.note,
+        favorite: PasswordTable.is_favorite,
         createdAt: PasswordTable.created_at,
         updatedAt: PasswordTable.updated_at,
         tag: TagTable,
@@ -65,7 +68,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     .leftJoin(TagTable, eq(PasswordTable.tag_id, TagTable.id))
     .where(eq(PasswordTable.id, id));
 
-    if (!password) return NextResponse.json({ error: "Password not found", status: 404 });
+    if (!row) return NextResponse.json({ error: "Password not found", status: 404 });
+    // SQLite boolean → JS boolean на границе API.
+    const password = {...row, favorite: Boolean(row.favorite)};
 
     return NextResponse.json({ success: true, data: password })
 }

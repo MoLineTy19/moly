@@ -1,0 +1,1 @@
+ALTER TABLE `passwords` ADD `is_favorite` integer DEFAULT 0 NOT NULL;

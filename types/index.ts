@@ -10,6 +10,7 @@ export interface Password {
     strengthScore: number;
     tag: Tag | null;
     note: string;
+    favorite: boolean;
     lastModified: number;
     createdAt: number;
 }
@@ -58,6 +59,8 @@ export interface PasswordStore {
     fetchPasswords: () => Promise<void>;
     addPassword: (entry: Omit<Password, 'id' | 'createdAt' | 'lastModified'>) => Promise<void>;
     editPassword: (entry: Password) => Promise<void>;
+    toggleFavorite: (id: number) => Promise<void>;
+    setFavorite: (ids: number[], favorite: boolean) => Promise<void>;
     deletePassword: (id: number) => Promise<void>;
     isLoading: boolean;
     error: string | null;

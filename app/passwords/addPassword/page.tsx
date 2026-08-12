@@ -26,7 +26,7 @@ export default function AddPage() {
     const [selectedTag, setTag] = useState<Tag | null>(null);
     const [note, setNote] = useState("");
 
-    const handleClickConfirmSave: MouseEventHandler = (e) => {
+    const handleClickConfirmSave: MouseEventHandler = async (e) => {
         e.preventDefault();
 
         const data: Omit<Password, 'id' | 'createdAt' | 'lastModified'> = {
@@ -37,20 +37,25 @@ export default function AddPage() {
             url: url,
             tag: selectedTag,
             note: note,
+            favorite: false,
         }
 
         if (!url || !title || !login) {
-            toast.error("Заполните поля помеченные *")
+            toast.error("Заполните поля, помеченные *")
             return
         }
 
         if (!password) {
-            toast.error("Необходимо придумать самое важное (пароль)")
+            toast.error("Укажите пароль")
             return;
         }
 
-        addPassword(data)
-        toast.success("Даннные добавлены")
+        try {
+            await addPassword(data);
+            toast.success("Данные добавлены");
+        } catch {
+            toast.error("Не удалось сохранить запись");
+        }
     }
 
     return (
@@ -58,7 +63,7 @@ export default function AddPage() {
             <div className="w-full max-w-3xl pb-20">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-(--text-color) mb-2">Создать запись</h1>
-                    <p className="text-(--text-muted) brightness-130 text-sm">Добавьте новые учетные данные в ваш безопасный сейф.</p>
+                    <p className="text-(--text-muted) brightness-130 text-sm">Добавьте учётные данные в сейф.</p>
                 </div>
                 <form className="space-y-6">
                     <MetaData url={url} setUrl={setUrl} title={title} setTitle={setTitle} login={login} setLogin={setLogin}/>

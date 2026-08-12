@@ -1,19 +1,21 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faGithub} from "@fortawesome/free-brands-svg-icons";
 import React, {useState} from "react";
-import {faCopy, faEye} from "@fortawesome/free-regular-svg-icons";
+import {faCopy, faEye, faStar as faStarOutline} from "@fortawesome/free-regular-svg-icons";
 import {STRENGTH_DETAILS} from "@/config";
 import { useConfigStore } from "@/store/configStore";
 import {generateTagColor, FALLBACK_TAG_COLOR} from "@/utils/color";
 import {Password} from "@/types";
 import toast from "react-hot-toast";
 import {copyWithAutoClear} from "@/utils/clipboard";
-import {faEyeLowVision} from "@fortawesome/free-solid-svg-icons";
+import {faEyeLowVision, faStar as faStarSolid} from "@fortawesome/free-solid-svg-icons";
+import {togglePasswordFavorite} from "@/store/passwordStore";
 import Link from "next/link";
 
 function getDomain(url: string): string | null {
     try {
         if (!url) return null;
+        // Дописываем https://: без протокола new URL выбросит ошибку.
         const u = new URL(url.startsWith('http') ? url : `https://${url}`);
         return u.hostname;
     } catch {
@@ -52,12 +54,32 @@ export default function BoardCard({item}: { item: Password }) {
         setShow(v => !v);
     };
 
+    const handleToggleFavorite = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        togglePasswordFavorite(item.id);
+    };
+
+    // Число точек маски фиксируем в диапазоне 8..14, чтобы по нему нельзя было вычислить длину пароля.
     const dots = Math.max(8, Math.min(item.password?.length ?? 8, 14));
 
 
     return (
         <Link href={`/passwords/${item.id}`}
               className="group relative border border-(--border-color) rounded-xl overflow-hidden flex flex-col bg-(--background-secondary) hover:border-(--border-input-color) transition-colors p-5">
+            <button
+                onClick={handleToggleFavorite}
+                title={item.favorite ? "Убрать из избранного" : "Добавить в избранное"}
+                aria-label={item.favorite ? "Убрать из избранного" : "Добавить в избранное"}
+                aria-pressed={item.favorite}
+                className={`absolute top-3 right-3 w-8 h-8 rounded-md flex items-center justify-center transition-colors ${
+                    item.favorite
+                        ? "text-amber-400 hover:text-amber-300 opacity-100"
+                        : "text-(--text-muted) hover:text-(--text-color) opacity-0 group-hover:opacity-100 focus:opacity-100"
+                }`}
+            >
+                <FontAwesomeIcon icon={item.favorite ? faStarSolid : faStarOutline}/>
+            </button>
             <div className="flex items-start gap-3 mb-4">
                 <div className="w-11 h-11 rounded-lg bg-(--background-color) border border-(--border-color) flex items-center justify-center overflow-hidden shrink-0">
                     {domain && !imgFailed ? (
@@ -88,7 +110,7 @@ export default function BoardCard({item}: { item: Password }) {
 
             <div className="mt-auto flex items-center gap-1 bg-(--background-color) border border-(--border-color) rounded-lg pl-3 py-1.5 pr-1">
                 <code className="grow text-sm font-mono text-(--text-color) truncate">
-                    {show ? (item.password || '—') : '•'.repeat(dots)}
+                    {show ? (item.password || '') : '•'.repeat(dots)}
                 </code>
                 <button onClick={toggleShow} title={show ? "Скрыть" : "Показать"}
                         className="w-8 h-8 rounded-md text-(--text-muted) hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
