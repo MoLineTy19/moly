@@ -21,7 +21,7 @@ export default function Topbar() {
     const path = usePathname().split("/").filter((value) => value.trim());
 
     return (
-        <header className="h-16 border-b border-(--border-color) flex items-center justify-between px-8 shrink-0 bg-dark-950/80 backdrop-blur-md z-10">
+        <header className="h-16 border-b border-(--border-color) flex items-center justify-between px-8 shrink-0 bg-(--background-color)/80 backdrop-blur-md z-10">
             <div className="text-sm text-(--text-secondary) flex items-center gap-2">
                 <span className="hover:text-(--text-color) cursor-pointer transition-colors">Moly</span>
                 <span className="text-(--text-muted)">/</span>
@@ -33,7 +33,7 @@ export default function Topbar() {
                 ))}
             </div>
             <div className="flex items-center gap-4">
-                <button className="w-8 h-8 flex items-center justify-center rounded-lg text-(--text-secondary) hover:text-(--text-color) hover:bg-(--background-secondary) transition-colors relative">
+                <button aria-label="Уведомления" className="w-8 h-8 flex items-center justify-center rounded-lg text-(--text-secondary) hover:text-(--text-color) hover:bg-(--background-secondary) transition-colors relative">
                     <FontAwesomeIcon icon={faBell} />
                     <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-(--accent-color) border border-(--background-secondary)"></span>
                 </button>

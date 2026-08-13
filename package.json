@@ -1,6 +1,6 @@
 {
   "name": "moly",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "Локальный менеджер паролей (zero-knowledge, Next.js + Electron)",
   "author": "MoLineTy19",
   "main": "electron/main.cjs",

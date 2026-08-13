@@ -53,7 +53,7 @@ export default function Sidebar() {
                     </div>
                 </Link>
                 <Link href="/passwords/addPassword">
-                    <button className="text-(--text-secondary) hover:text-(--text-color) transition-colors">
+                    <button aria-label="Добавить пароль" className="text-(--text-secondary) hover:text-(--text-color) transition-colors">
                         <FontAwesomeIcon icon={faPenToSquare} />
                     </button>
                 </Link>
@@ -69,7 +69,7 @@ export default function Sidebar() {
                         ⌘K
                     </span>
                 </Link>
-                <Link href="/search"
+                <Link href="/search" aria-label="Поиск"
                       className="w-10 h-10 flex items-center justify-center bg-(--hover-overlay) border border-(--border-input-color) hover:border-(--border-input-color) rounded-lg text-(--text-secondary) transition-colors">
                     <FontAwesomeIcon icon={faMagnifyingGlass} />
                 </Link>

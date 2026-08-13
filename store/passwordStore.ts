@@ -6,6 +6,7 @@ import {
     saveVerifierPrev, clearVerifierPrev,
 } from "@/lib/encryption";
 import {logActivity} from "@/lib/activity";
+import {invalidateLocalAudit, clearSecurityAudit} from "@/store/securityStore";
 
 export const usePasswordStore = create<PasswordStore>((set, get) => ({
     masterKey: null,
@@ -51,6 +52,10 @@ export const usePasswordStore = create<PasswordStore>((set, get) => ({
         if (get().isLocked) return;
         set({masterKey: null, isLocked: true, passwords: [],
             masterKeyCreatedAt: null});
+
+        // Результаты аудита — производные от расшифрованных паролей.
+        // При блокировке сейфа они не должны оставаться в памяти.
+        clearSecurityAudit();
 
         const messages: Record<LockReason, string> = {
             manual: 'Ручная блокировка',
@@ -139,6 +144,11 @@ export const usePasswordStore = create<PasswordStore>((set, get) => ({
             set({passwords: decrypted, passwordCount: decrypted.length,
                 isLoading: false});
 
+            // После загрузки/расшифровки записей сразу пересчитываем локальные
+            // бейджи (слабые/дубликаты/устаревшие), чтобы они были видны без
+            // дополнительных действий пользователя.
+            invalidateLocalAudit();
+
             if (failed > 0) {
                 console.warn(`[passwordStore] пропущено ${failed} нерасшифрованных записей`);
             }
@@ -179,6 +189,8 @@ export const usePasswordStore = create<PasswordStore>((set, get) => ({
                 }, ...state.passwords],
                 passwordCount: state.passwordCount + 1,
             }));
+            // Новый пароль мог стать дубликатом/слабым — пересчитываем бейджи.
+            invalidateLocalAudit();
         } catch (err) {
             set({error: (err as Error).message});
             throw err;
@@ -199,6 +211,8 @@ export const usePasswordStore = create<PasswordStore>((set, get) => ({
                 passwordCount: Math.max(0, state.passwordCount - 1),
                 error: null,
             }));
+            // Удаление могло «разрушить» дубликат — пересчитываем бейджи.
+            invalidateLocalAudit();
         } catch (err) {
             set({error: (err as Error).message});
             throw err;
@@ -237,6 +251,8 @@ export const usePasswordStore = create<PasswordStore>((set, get) => ({
                 ),
                 error: null,
             }));
+            // Сила/значение пароля могли измениться — пересчитываем бейджи.
+            invalidateLocalAudit();
         } catch (err) {
             set({error: (err as Error).message});
             throw err;

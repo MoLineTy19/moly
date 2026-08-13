@@ -12,6 +12,7 @@ import {generateTagColor, FALLBACK_TAG_COLOR} from "@/utils/color";
 import {STRENGTH_DETAILS} from "@/config";
 import {useConfigStore} from "@/store/configStore";
 import {copyWithAutoClear} from "@/utils/clipboard";
+import SecurityBadges from "./securityBadges";
 
 function getDomain(url: string): string | null {
     try {
@@ -43,7 +44,7 @@ function ListRow({item}: { item: Password }) {
     const handleCopy = async (e: React.MouseEvent) => {
         stop(e);
         if (!item.password) {
-            toast.error("Поле пароля пустое!");
+            toast.error("Поле пароля пустое");
             return;
         }
         try {
@@ -77,24 +78,25 @@ function ListRow({item}: { item: Password }) {
                   style={{color: tagColor.color, backgroundColor: tagColor.backgroundColor, borderColor: tagColor.borderColor}}>
                 {item.tag?.title ?? 'Без тега'}
             </span>
-            <span className="hidden md:inline-flex text-[10px] px-2 py-0.5 rounded border"
+            <span className="hidden md:inline-flex text-[10px] px-2 py-0.5 rounded-md border"
                   style={{color: strength.color, backgroundColor: strength.backgroundColor, borderColor: strength.borderColor}}>
                 {strength.title}
             </span>
+            <SecurityBadges id={item.id} compact showLabels={false} className="hidden md:flex"/>
             <code className="hidden lg:block text-xs font-mono text-(--text-muted) w-28 truncate">
                 {show ? item.password : '•'.repeat(10)}
             </code>
 
             <div className="flex items-center gap-1">
-                <button onClick={(e) => { stop(e); setShow(v => !v); }} title={show ? "Скрыть" : "Показать"}
+                <button onClick={(e) => { stop(e); setShow(v => !v); }} title={show ? "Скрыть" : "Показать"} aria-label={show ? "Скрыть пароль" : "Показать пароль"}
                         className="w-8 h-8 rounded-md text-(--text-muted) hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
                     <FontAwesomeIcon icon={show ? faEyeLowVision : faEye}/>
                 </button>
-                <button onClick={handleCopy} title="Скопировать пароль"
+                <button onClick={handleCopy} title="Скопировать пароль" aria-label="Скопировать пароль"
                         className="w-8 h-8 rounded-md text-(--text-muted) hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
                     <FontAwesomeIcon icon={faCopy}/>
                 </button>
-                <button onClick={(e) => { stop(e); router.push(`/passwords/edit/${item.id}`); }} title="Редактировать"
+                <button onClick={(e) => { stop(e); router.push(`/passwords/edit/${item.id}`); }} title="Редактировать" aria-label="Редактировать"
                         className="w-8 h-8 rounded-md text-(--text-muted) hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
                     <FontAwesomeIcon icon={faEllipsis}/>
                 </button>
@@ -107,7 +109,11 @@ export default function ListView({passwords}: { passwords: Password[] }) {
     if (!passwords?.length) return null;
     return (
         <div className="bg-(--background-secondary) border border-(--border-color) rounded-xl overflow-hidden shadow-soft divide-y divide-(--border-color)">
-            {passwords.map(item => <ListRow key={item.id} item={item}/>)}
+            {passwords.map((item, i) => (
+                <div key={item.id} className="stagger-in" style={{animationDelay: `${Math.min(i, 12) * 40}ms`}}>
+                    <ListRow item={item}/>
+                </div>
+            ))}
         </div>
     );
 }

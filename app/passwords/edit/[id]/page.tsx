@@ -15,6 +15,8 @@ import {editPassword, deletePassword, usePasswordStore} from "@/store/passwordSt
 import toast from "react-hot-toast";
 import {STRENGTH_DETAILS} from "@/config";
 import {useRouter} from "next/navigation";
+import Skeleton from "@/components/ui/skeleton";
+import ConfirmDialog from "@/components/ui/confirmDialog";
 
 /**
  * Страница с изменением записей связанных с паролем
@@ -39,6 +41,7 @@ export default function EditPassword() {
     const [selectedTag, setTag] = useState<Tag | null>(null);
     const [note, setNote] = useState("");
     const [initialized, setInitialized] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState(false);
 
     // Заполняем форму расшифрованными данными один раз, когда запись появилась.
     useEffect(() => {
@@ -61,7 +64,19 @@ export default function EditPassword() {
     }
 
     if (isLoading && !password) {
-        return <div className="grow p-8 text-(--text-muted)">Загрузка…</div>;
+        return (
+            <div className="grow overflow-y-auto p-8 flex justify-center">
+                <div className="w-full max-w-3xl space-y-6">
+                    <div className="space-y-3">
+                        <Skeleton className="h-8 w-56"/>
+                        <Skeleton className="h-4 w-72"/>
+                    </div>
+                    <Skeleton className="h-52 w-full rounded-xl"/>
+                    <Skeleton className="h-72 w-full rounded-xl"/>
+                    <Skeleton className="h-40 w-full rounded-xl"/>
+                </div>
+            </div>
+        );
     }
     if (!password) {
         return <div className="grow p-8 text-(--text-muted)">Пароль не найден</div>;
@@ -87,6 +102,18 @@ export default function EditPassword() {
         }
     }
 
+    const handleDelete = async () => {
+        try {
+            await deletePassword(password.id);
+            toast.success("Удалено");
+            router.push("/passwords");
+        } catch {
+            toast.error("Не удалось удалить запись");
+        } finally {
+            setConfirmDelete(false);
+        }
+    };
+
     return (
         <>
             <div className="grow overflow-y-auto p-8 relative flex justify-center">
@@ -102,16 +129,7 @@ export default function EditPassword() {
                         </div>
                         <div className="flex items-center gap-3">
                             <button type="button"
-                                    onClick={async () => {
-                                        if (!confirm("Удалить запись безвозвратно?")) return;
-                                        try {
-                                            await deletePassword(password.id);
-                                            toast.success("Удалено");
-                                            router.push("/passwords");
-                                        } catch {
-                                            toast.error("Не удалось удалить запись");
-                                        }
-                                    }}
+                                    onClick={() => setConfirmDelete(true)}
                                     className="px-4 py-2 rounded-lg border border-(--border-input-color) text-(--text-secondary) hover:text-red-400 hover:border-red-500/50 font-medium text-sm transition-colors flex items-center gap-2">
                                 <FontAwesomeIcon icon={faTrashCan} />
                                 Удалить
@@ -168,21 +186,21 @@ export default function EditPassword() {
                                     </span>
                             </div>
                             <div className="p-4 md:p-6">
-                                <div className="space-y-4 relative before:absolute before:inset-0 before:ml-2.75 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-(--border-color)">
-                                    <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                <ol className="space-y-4 relative before:absolute before:inset-0 before:ml-2.75 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-(--border-color)">
+                                    <li className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                                         <div className="flex items-center justify-center w-6 h-6 rounded-full border border-(--border-input-color) bg-(--background-secondary) text-(--text-secondary) shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
                                             <FontAwesomeIcon icon={faKey} />
                                         </div>
                                         <div className="w-[calc(100%-3rem)] md:w-[calc(50%-1.5rem)] text-xs">
                                             <div className="text-(--text-secondary) font-medium">
-                                                Пароль обновлен
+                                                Пароль обновлён
                                             </div>
-                                            <div className="text-(--text-muted) mt-0.5">
+                                            <time className="text-(--text-muted) mt-0.5 block">
                                                 2 дня назад • 14:30
-                                            </div>
+                                            </time>
                                         </div>
-                                    </div>
-                                    <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                    </li>
+                                    <li className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                                         <div className="flex items-center justify-center w-6 h-6 rounded-full border border-(--border-input-color) bg-(--background-secondary) text-(--text-secondary) shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
                                             <FontAwesomeIcon icon={faTag}/>
                                         </div>
@@ -190,12 +208,12 @@ export default function EditPassword() {
                                             <div className="text-(--text-secondary) font-medium">
                                                 Добавлен тег google
                                             </div>
-                                            <div className="text-(--text-muted) mt-0.5">
+                                            <time className="text-(--text-muted) mt-0.5 block">
                                                 1 месяц назад
-                                            </div>
+                                            </time>
                                         </div>
-                                    </div>
-                                </div>
+                                    </li>
+                                </ol>
 
                             </div>
                         </div>
@@ -210,6 +228,11 @@ export default function EditPassword() {
                     </form>
                 </div>
             </div>
+            <ConfirmDialog open={confirmDelete} title="Удалить запись?" danger
+                           message="Запись будет удалена безвозвратно."
+                           confirmLabel="Удалить"
+                           onConfirm={handleDelete}
+                           onCancel={() => setConfirmDelete(false)}/>
         </>
     )
 }

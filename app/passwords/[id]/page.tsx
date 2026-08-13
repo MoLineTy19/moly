@@ -5,7 +5,7 @@ import {
     faEyeLowVision,
     faPen, faStar as faStarSolid, faTag,
     faTrashCan,
-    faTriangleExclamation, faUpRightFromSquare
+    faUpRightFromSquare
 } from "@fortawesome/free-solid-svg-icons";
 import {faGithub} from "@fortawesome/free-brands-svg-icons";
 import {faCopy, faEye, faStar as faStarOutline, faUser} from "@fortawesome/free-regular-svg-icons";
@@ -18,6 +18,8 @@ import {useConfigStore} from "@/store/configStore";
 import {addPassword, deletePassword, togglePasswordFavorite, usePasswordStore} from "@/store/passwordStore";
 import {copyWithAutoClear} from "@/utils/clipboard";
 import Link from "next/link";
+import Skeleton from "@/components/ui/skeleton";
+import ConfirmDialog from "@/components/ui/confirmDialog";
 
 function getDomain(url: string): string | null {
     try {
@@ -55,18 +57,36 @@ export default function ShowPage() {
     const id = params.id;
     const router = useRouter();
 
-    const isDetectedLeak = false;
-
     // Запись уже расшифрована в сторе (fetchPasswords). Прямой fetch к API
     // отдал бы шифртекст: вся криптография клиентская, сервер не расшифровывает.
     const password = usePasswordStore((s) => s.passwords.find((p) => p.id === Number(id)));
     const isLoading = usePasswordStore((s) => s.isLoading);
     const [isShow, setShow] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState(false);
 
     const clipboardClearTimeout = useConfigStore((s) => s.clipboardClearTimeout);
 
     if (isLoading && !password) {
-        return <div className="grow p-8 text-(--text-muted)">Загрузка…</div>;
+        return (
+            <div className="grow overflow-y-auto p-8">
+                <div className="mb-8 flex items-center gap-5">
+                    <Skeleton className="w-16 h-16 rounded-2xl shrink-0"/>
+                    <div className="space-y-3">
+                        <Skeleton className="h-8 w-64"/>
+                        <Skeleton className="h-4 w-40"/>
+                    </div>
+                </div>
+                <div className="flex flex-col lg:flex-row gap-6 max-w-6xl">
+                    <div className="grow lg:w-2/3 space-y-6">
+                        <Skeleton className="h-56 w-full rounded-xl"/>
+                        <Skeleton className="h-40 w-full rounded-xl"/>
+                    </div>
+                    <div className="lg:w-1/3">
+                        <Skeleton className="h-72 w-full rounded-xl"/>
+                    </div>
+                </div>
+            </div>
+        );
     }
     if (!password) {
         return <div className="grow p-8 text-(--text-muted)">Пароль не найден</div>;
@@ -86,9 +106,14 @@ export default function ShowPage() {
         });
     };
 
+    // ISO-форма для атрибута dateTime у <time>. В отличие от прямого
+    // new Date(ts).toISOString() не падает RangeError при undefined/0 —
+    // возвращаем undefined, и атрибут просто не рендерится.
+    const isoDate = (ts?: number) => (ts ? new Date(ts).toISOString() : undefined);
+
     const handleCopy = async (text: string, label: string) => {
         if (!text || !text.length) {
-            toast.error(`Поле ${label} пустое!`);
+            toast.error(`Поле ${label} пустое`);
             return;
         }
         try {
@@ -102,13 +127,14 @@ export default function ShowPage() {
     };
 
     const handleDelete = async () => {
-        if (!confirm("Удалить запись безвозвратно?")) return;
         try {
             await deletePassword(password.id);
             toast.success("Удалено");
             router.push("/passwords");
         } catch {
             toast.error("Не удалось удалить запись");
+        } finally {
+            setConfirmDelete(false);
         }
     };
 
@@ -132,24 +158,6 @@ export default function ShowPage() {
 
     return (
         <div className="grow overflow-y-auto p-8 relative">
-            {isDetectedLeak && (
-                <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-500 shrink-0 mt-0.5">
-                        <FontAwesomeIcon icon={faTriangleExclamation}/>
-                    </div>
-                    <div className="grow">
-                        <h3 className="text-red-400 font-semibold text-sm mb-1">Скомпрометированный пароль</h3>
-                        <p className="text-(--text-secondary) text-sm">
-                            Этот пароль найден в утечке данных. Рекомендуется как можно скорее сменить его.
-                        </p>
-                    </div>
-                    <div
-                        className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/30 whitespace-nowrap">
-                        Изменить пароль
-                    </div>
-                </div>
-            )}
-
             {/* Шапка */}
             <div className="mb-8 flex items-start justify-between gap-4 flex-wrap">
                 <div className="flex items-center gap-5">
@@ -185,11 +193,11 @@ export default function ShowPage() {
                             }`}>
                         <FontAwesomeIcon icon={password.favorite ? faStarSolid : faStarOutline}/>
                     </button>
-                    <button onClick={handleDuplicate} title="Дублировать"
+                    <button onClick={handleDuplicate} title="Дублировать" aria-label="Дублировать"
                             className="w-10 h-10 rounded-lg bg-(--background-secondary) border border-(--border-color) text-(--text-muted) hover:text-(--text-color) hover:bg-(--background-secondary)/80 flex items-center justify-center transition-colors">
                         <FontAwesomeIcon icon={faCopy}/>
                     </button>
-                    <button onClick={handleDelete} title="Удалить"
+                    <button onClick={() => setConfirmDelete(true)} title="Удалить" aria-label="Удалить запись"
                             className="w-10 h-10 rounded-lg bg-(--background-secondary) border border-(--border-color) text-red-400 hover:text-red-300 hover:bg-red-900/20 hover:border-red-900/50 flex items-center justify-center transition-colors">
                         <FontAwesomeIcon icon={faTrashCan}/>
                     </button>
@@ -228,7 +236,7 @@ export default function ShowPage() {
                                     />
                                     <button
                                         onClick={() => handleCopy(password.login, 'логина')}
-                                        title="Скопировать логин"
+                                        title="Скопировать логин" aria-label="Скопировать логин"
                                         className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-md text-(--text-muted) hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
                                         <FontAwesomeIcon icon={faCopy}/>
                                     </button>
@@ -239,7 +247,7 @@ export default function ShowPage() {
                             <div>
                                 <label className="text-xs font-medium text-(--text-muted) mb-2 flex justify-between items-end">
                                     <span>Пароль</span>
-                                    <span className="text-[10px] px-2 py-0.5 rounded border"
+                                    <span className="text-[10px] px-2 py-0.5 rounded-md border"
                                           style={{
                                               color: strengthDetails.color,
                                               backgroundColor: strengthDetails.backgroundColor,
@@ -259,13 +267,13 @@ export default function ShowPage() {
                                     <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                                         <button
                                             onClick={() => setShow(v => !v)}
-                                            title={isShow ? "Скрыть пароль" : "Показать пароль"}
+                                            title={isShow ? "Скрыть пароль" : "Показать пароль"} aria-label={isShow ? "Скрыть пароль" : "Показать пароль"}
                                             className="w-8 h-8 rounded-md text-(--text-muted) hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
                                             <FontAwesomeIcon icon={isShow ? faEyeLowVision : faEye}/>
                                         </button>
                                         <button
                                             onClick={() => handleCopy(password.password, 'пароля')}
-                                            title="Скопировать пароль"
+                                            title="Скопировать пароль" aria-label="Скопировать пароль"
                                             className="w-8 h-8 rounded-md text-(--text-muted) hover:text-(--text-color) hover:bg-(--background-secondary) flex items-center justify-center transition-colors">
                                             <FontAwesomeIcon icon={faCopy}/>
                                         </button>
@@ -360,9 +368,9 @@ export default function ShowPage() {
                             {/* История изменений */}
                             <div>
                                 <h3 className="text-xs font-medium text-(--text-muted) mb-4">История изменений</h3>
-                                <div
+                                <ol
                                     className="space-y-4 relative before:absolute before:inset-0 before:ml-2.25 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-linear-to-b before:from-transparent before:via-(--border-color) before:to-transparent">
-                                    <div
+                                    <li
                                         className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                                         <div
                                             className="flex items-center justify-center w-5 h-5 rounded-full border border-(--border-input-color) bg-(--background-secondary) text-(--text-muted) group-[.is-active]:text-(--accent-color) group-[.is-active]:border-(--accent-color)/30 group-[.is-active]:bg-(--accent-color)/10 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 relative">
@@ -372,15 +380,15 @@ export default function ShowPage() {
                                             className="w-[calc(100%-2.5rem)] md:w-[calc(50%-1.25rem)] p-3 rounded-lg border border-(--border-color) bg-(--background-color) shadow-soft">
                                             <div className="flex items-center justify-between mb-1">
                                                 <span className="text-xs font-medium text-(--text-color)">
-                                                    Пароль изменен
+                                                    Пароль изменён
                                                 </span>
                                             </div>
-                                            <div className="text-[10px] text-(--text-muted)">
+                                            <time className="text-[10px] text-(--text-muted) block" dateTime={isoDate(password.lastModified)}>
                                                 {formatDate(password.lastModified)}
-                                            </div>
+                                            </time>
                                         </div>
-                                    </div>
-                                    <div
+                                    </li>
+                                    <li
                                         className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
                                         <div
                                             className="flex items-center justify-center w-5 h-5 rounded-full border border-(--border-input-color) bg-(--background-secondary) text-(--text-muted) shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 relative">
@@ -393,17 +401,23 @@ export default function ShowPage() {
                                                     Запись создана
                                                 </span>
                                             </div>
-                                            <div className="text-[10px] text-(--text-muted)">
+                                            <time className="text-[10px] text-(--text-muted) block" dateTime={isoDate(password.createdAt)}>
                                                 {formatDate(password.createdAt)}
-                                            </div>
+                                            </time>
                                         </div>
-                                    </div>
-                                </div>
+                                    </li>
+                                </ol>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <ConfirmDialog open={confirmDelete} title="Удалить запись?" danger
+                           message="Запись будет удалена безвозвратно."
+                           confirmLabel="Удалить"
+                           onConfirm={handleDelete}
+                           onCancel={() => setConfirmDelete(false)}/>
         </div>
     )
 }

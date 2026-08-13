@@ -1,10 +1,24 @@
 import React from "react";
 import './global.css'
 import {Metadata} from "next";
+import {Inter, JetBrains_Mono} from "next/font/google";
 import ClientLayout from "@/app/clientLayout";
 
+const inter = Inter({
+    subsets: ['latin', 'cyrillic'],
+    variable: '--font-inter',
+    display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+    subsets: ['latin', 'cyrillic'],
+    variable: '--font-jetbrains',
+    display: 'swap',
+});
+
 export const metadata: Metadata = {
-    title: 'Moly - Password Manager'
+    title: 'Moly - Password Manager',
+    description: 'Локальный менеджер паролей с клиентским шифрованием AES-256-GCM. Главный пароль не покидает устройство.',
 }
 
 /**
@@ -21,10 +35,10 @@ export default function RootLayout({
       children,
     }: Readonly<{
       children: React.ReactNode;
-}>) {
+    }>) {
 
     return (
-        <html suppressHydrationWarning>
+        <html suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable}`}>
             <head>
                 <script dangerouslySetInnerHTML={{__html: themeBootstrap}}/>
             </head>

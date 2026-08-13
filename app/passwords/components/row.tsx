@@ -11,6 +11,7 @@ import {generateTagColor, FALLBACK_TAG_COLOR} from "@/utils/color";
 import {STRENGTH_DETAILS} from "@/config";
 import {useConfigStore} from "@/store/configStore";
 import {copyWithAutoClear} from "@/utils/clipboard";
+import SecurityBadges from "./securityBadges";
 
 export default function Row({item, selected, onToggle}: { item: Password; selected: boolean; onToggle: (id: number) => void }) {
     const createdDate = new Date(item.createdAt);
@@ -36,7 +37,7 @@ export default function Row({item, selected, onToggle}: { item: Password; select
         e.preventDefault();
 
         if (!item.password || !item.password.length) {
-            toast.error("Поле пароля пустое!")
+            toast.error("Поле пароля пустое")
             return
         }
 
@@ -93,12 +94,12 @@ export default function Row({item, selected, onToggle}: { item: Password; select
                                value={isShow ? item.password : "*".repeat(16)}/>
                     </div>
                     <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center">
-                        <button type="button"
+                        <button type="button" aria-label={isShow ? "Скрыть пароль" : "Показать пароль"}
                                 className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors"
                                 onClick={(handleClickShow)}>
                             <FontAwesomeIcon icon={isShow ? faEye : faEyeLowVision}/>
                         </button>
-                        <button type="button"
+                        <button type="button" aria-label="Скопировать пароль"
                                 className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors"
                                 onClick={handleCopy}>
                             <FontAwesomeIcon icon={faCopy}/>
@@ -117,19 +118,22 @@ export default function Row({item, selected, onToggle}: { item: Password; select
                 </span>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50">
-                <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs"
-                      style={{
-                          color: passwordStatusDetails.color,
-                          backgroundColor: passwordStatusDetails.backgroundColor,
-                          borderColor: passwordStatusDetails.borderColor,
-                      }}>
-                    {passwordStatusDetails.title}
-                </span>
+                <div className="flex flex-col gap-1">
+                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs w-fit"
+                          style={{
+                              color: passwordStatusDetails.color,
+                              backgroundColor: passwordStatusDetails.backgroundColor,
+                              borderColor: passwordStatusDetails.borderColor,
+                          }}>
+                        {passwordStatusDetails.title}
+                    </span>
+                    <SecurityBadges id={item.id} compact showLabels={false}/>
+                </div>
             </td>
             <td className="py-3 px-4 border-l border-(--border-color)/50 text-(--text-muted)">{formattedDate}</td>
             <td className="py-3 px-4 text-right">
                 <Link href={`/passwords/edit/${item.id}`}>
-                    <button
+                    <button aria-label="Редактировать"
                         className="text-(--text-muted) hover:text-(--text-color) opacity-0 group-hover:opacity-100 transition-all">
                         <FontAwesomeIcon icon={faEllipsis}/>
                     </button>
