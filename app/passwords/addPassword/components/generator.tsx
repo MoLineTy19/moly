@@ -86,7 +86,7 @@ export default function Generator({password, setPassword, reliability, setReliab
     const handleCopy: MouseEventHandler = async (e) => {
         e.preventDefault();
         if (!password || !password.length) {
-            toast.error("Поле пароля пустое!");
+            toast.error("Поле пароля пустое");
             return;
         }
         try {
@@ -124,10 +124,10 @@ export default function Generator({password, setPassword, reliability, setReliab
                             <input type={isShow ? 'text': 'password'} placeholder="Введите пароль или сгенерируйте" className="w-full pl-11 pr-24 py-3 bg-(--background-color) border border-(--border-input-color) rounded-lg text-sm text-(--text-color)
                                      font-mono focus:outline-none focus:border-(--accent-color) transition-colors placeholder-(--text-muted)" value={password} onChange={handlePasswordChange}/>
                             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                                <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={handleClickShow}>
+                                <button type="button" aria-label={isShow ? "Скрыть пароль" : "Показать пароль"} className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={handleClickShow}>
                                     <FontAwesomeIcon icon={isShow ? faEye : faEyeLowVision } />
                                 </button>
-                                <button type="button" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={handleCopy}>
+                                <button type="button" aria-label="Скопировать пароль" className="w-8 h-8 rounded-md text-(--text-muted) brightness-130 hover:text-(--text-color) hover:bg-(--background-color) flex items-center justify-center transition-colors" onClick={handleCopy}>
                                     <FontAwesomeIcon icon={faCopy} />
                                 </button>
                             </div>
@@ -174,7 +174,7 @@ export default function Generator({password, setPassword, reliability, setReliab
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                                 <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-lg border border-(--border-color) bg-dark-950 hover:border-(--border-input-color) transition-colors">
                                     <div className="relative flex items-center justify-center w-5 h-5 rounded border border-(--border-input-color) bg-dark-900 text-transparent">
-                                        <CheckBox isActive={isSimilar} setIsActive={setSimilar} color="(--secondary-color)"/>
+                                        <CheckBox isActive={isSimilar} setIsActive={setSimilar}/>
                                     </div>
                                     <div>
                                         <div className="text-sm font-medium text-(--text-color)/80 group-hover:text-(--text-color)">
@@ -187,7 +187,7 @@ export default function Generator({password, setPassword, reliability, setReliab
                                 </label>
                                 <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-lg border border-(--border-color) bg-dark-950 hover:border-(--border-input-color) transition-colors">
                                     <div className="relative flex items-center justify-center w-5 h-5 rounded border border-(--border-input-color) bg-dark-900 text-transparent">
-                                        <CheckBox isActive={isUnique} setIsActive={setUnique} color="(--secondary-color)"/>
+                                        <CheckBox isActive={isUnique} setIsActive={setUnique}/>
                                     </div>
                                     <div>
                                         <div className="text-sm font-medium text-(--text-color)/80 group-hover:text-(--text-color)">

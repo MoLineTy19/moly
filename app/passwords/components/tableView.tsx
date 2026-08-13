@@ -29,7 +29,7 @@ export default function TableView({
     const someSelected = !allSelected && pageIds.some((id) => selectedIds.has(id));
 
     return (
-        <table className="w-full text-left border-collapse">
+        <table className="w-full text-left border-collapse stagger-in">
             <thead>
             <tr className="border-b border-(--border-color) text-xs font-medium text-(--text-muted) uppercase tracking-wider bg-(--background-secondary)">
                 <th className="py-4 px-4 w-12 text-center">

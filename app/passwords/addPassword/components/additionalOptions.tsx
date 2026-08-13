@@ -8,7 +8,7 @@ export default function AdditionOption({name, isActive, setIsActive}: {name: str
             <label className="text-sm font-medium mb-3 block">
                 <div className="flex flex-wrap gap-3">
                     <label className="flex items-center gap-2 cursor-pointer group">
-                        <CheckBox isActive={isActive} setIsActive={setIsActive} color="(--accent-color)"/>
+                        <CheckBox isActive={isActive} setIsActive={setIsActive}/>
                         <span className="text-(--text-color)/80 group-hover:text-(--text-color) transition-colors">{name}</span>
                     </label>
                 </div>

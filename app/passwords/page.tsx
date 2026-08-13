@@ -4,6 +4,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
     faAngleDown,
     faBorderAll,
+    faBug,
     faListUl,
     faMagnifyingGlass,
     faPlus,
@@ -20,8 +21,12 @@ import BoardView from "@/app/passwords/components/boardView";
 import {usePasswordStore, setPasswordsFavorite} from "@/store/passwordStore";
 import {useConfigStore} from "@/store/configStore";
 import {useTagStore} from "@/store/tagStore";
+import {useSecurityStore} from "@/store/securityStore";
 import ListView from "@/app/passwords/components/listView";
 import {STRENGTH_DETAILS} from "@/config";
+
+/** Тип фильтра «Проблемные»: null = все, иначе конкретный тип проблемы. */
+type ProblemFilter = "weak" | "duplicates" | "stale" | "breach" | null;
 
 /**
  * Страница с отображением паролей
@@ -36,6 +41,16 @@ export default function PasswordPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [filterTag, setFilterTag] = useState<number | null>(null);
     const [filterStrength, setFilterStrength] = useState<number | null>(null);
+    const [filterProblem, setFilterProblem] = useState<ProblemFilter>(null);
+
+    // Подписка на стор аудита — для фильтра и пересчёта при изменениях.
+    const localAudit = useSecurityStore((s) => s.localAudit);
+    const breaches = useSecurityStore((s) => s.breaches);
+    const breachStatus = useSecurityStore((s) => s.breachStatus);
+    const breachProgress = useSecurityStore((s) => s.breachProgress);
+    const runBreachCheck = useSecurityStore((s) => s.runBreachCheck);
+
+    const isCheckingBreaches = breachStatus === "checking";
 
     // Выделение строк в табличном виде (множественный выбор).
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -68,28 +83,39 @@ export default function PasswordPage() {
             }
             if (filterTag !== null && p.tag?.id !== filterTag) return false;
             if (filterStrength !== null && p.strengthScore !== filterStrength) return false;
+            if (filterProblem !== null) {
+                switch (filterProblem) {
+                    case "weak":       if (!localAudit?.weak.has(p.id)) return false; break;
+                    case "duplicates": if (!localAudit?.duplicates.has(p.id)) return false; break;
+                    case "stale":      if (!localAudit?.stale.has(p.id)) return false; break;
+                    case "breach":     if (!breaches?.has(p.id)) return false; break;
+                }
+            }
             return true;
         });
-    }, [passwords, searchQuery, filterTag, filterStrength]);
+    }, [passwords, searchQuery, filterTag, filterStrength, filterProblem, localAudit, breaches]);
 
     const totalPage = Math.max(1, Math.ceil(filteredPasswords.length / itemPerPage));
 
     useEffect(() => {
-        // Фильтры могут сократить число страниц; если currentPage оказался
-        // за пределами доступного диапазона, возвращаемся на первую.
         if (currentPage > totalPage - 1) setCurrentPage(0);
     }, [currentPage, totalPage]);
+
+    useEffect(() => {
+        useSecurityStore.getState().runLocalAudit();
+    }, [passwords]);
 
 
     const goToNextPage = () => setCurrentPage(p => Math.min(p + 1, totalPage - 1));
     const goToPreviousPage = () => setCurrentPage(p => Math.max(p - 1, 0));
     const switchDisplayView = (view: string) => setCurrentView(view);
 
-    const hasActiveFilters = searchQuery.trim() !== "" || filterTag !== null || filterStrength !== null;
+    const hasActiveFilters = searchQuery.trim() !== "" || filterTag !== null || filterStrength !== null || filterProblem !== null;
     const resetFilters = () => {
         setSearchQuery("");
         setFilterTag(null);
         setFilterStrength(null);
+        setFilterProblem(null);
     };
 
     const shownCount = filteredPasswords.length;
@@ -107,6 +133,24 @@ export default function PasswordPage() {
             toast.success(nextFavoriteValue ? 'Добавлено в избранное' : 'Удалено из избранного');
         } catch {
             toast.error('Не удалось изменить избранное');
+        }
+    };
+
+    // Проверка паролей на утечки через HIBP range-API.
+    // Онлайн-операция: запускается только по явному клику пользователя.
+    const handleBreachCheck = async () => {
+        if (isCheckingBreaches) return;
+        try {
+            await runBreachCheck();
+            const breachedCount = useSecurityStore.getState().breaches?.size ?? 0;
+            if (breachedCount > 0) {
+                toast(`Найдено утечек: ${breachedCount} ${breachedCount === 1 ? 'запись' : 'записей'}`,
+                    {icon: <FontAwesomeIcon icon={faBug} className="text-red-400"/>});
+            } else {
+                toast.success('Утечек не найдено');
+            }
+        } catch {
+            toast.error('Не удалось проверить утечки (нет сети или сервис недоступен)');
         }
     };
 
@@ -175,6 +219,32 @@ export default function PasswordPage() {
                         </select>
                         <FontAwesomeIcon icon={faAngleDown} className="absolute right-3 top-1/2 -translate-y-1/2 text-(--text-muted) pointer-events-none text-xs"/>
                     </div>
+
+                    <div className="relative">
+                        <select
+                            value={filterProblem ?? ""}
+                            onChange={(e) => setFilterProblem((e.target.value || null) as ProblemFilter)}
+                            className="appearance-none pl-3 pr-9 py-2 rounded-lg bg-(--background-secondary) border border-(--border-input-color) text-(--text-muted) hover:text-(--text-color) text-sm transition-colors cursor-pointer focus:outline-none focus:border-(--accent-color)">
+                            <option value="">Без проблем</option>
+                            <option value="weak">Слабые</option>
+                            <option value="duplicates">Дубликаты</option>
+                            <option value="stale">Устаревшие</option>
+                            <option value="breach">В утечке</option>
+                        </select>
+                        <FontAwesomeIcon icon={faAngleDown} className="absolute right-3 top-1/2 -translate-y-1/2 text-(--text-muted) pointer-events-none text-xs"/>
+                    </div>
+
+                    {/* Проверка утечек через HIBP. Онлайн: только по явному клику. */}
+                    <button
+                        onClick={handleBreachCheck}
+                        disabled={isCheckingBreaches || passwordCount === 0}
+                        title="Проверить пароли по базе утечек Have I Been Pwned. Пароль не покидает браузер."
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-(--background-secondary) border border-(--border-input-color) text-(--text-muted) hover:text-(--text-color) hover:border-red-500/40 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        <FontAwesomeIcon icon={faBug} className={isCheckingBreaches ? "text-red-400" : ""}/>
+                        {isCheckingBreaches && breachProgress
+                            ? `${breachProgress.done}/${breachProgress.total}`
+                            : (breachStatus === "done" ? "Утечки" : "Проверить утечки")}
+                    </button>
 
                     {hasActiveFilters && (
                         <button onClick={resetFilters}

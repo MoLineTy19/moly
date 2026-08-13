@@ -22,6 +22,7 @@ import {arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSor
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {addTag, deleteTag, editTag, reorderTags, useTagStore} from "@/store/tagStore";
 import {generateTagColor} from "@/utils/color";
+import ConfirmDialog from "@/components/ui/confirmDialog";
 
 /**
  * Страница с тегами
@@ -35,6 +36,7 @@ export default function Categories() {
     const [color, setColor] = useState<string>('');
     const [icon, setIcon] = useState<number | undefined>(undefined);
     const [title, setTitle] = useState<string>('');
+    const [pendingDelete, setPendingDelete] = useState<Tag | null>(null);
 
     const colors = DEFAULT_TAG_COLORS;
     const icons = DEFAULT_TAG_ICON;
@@ -60,14 +62,18 @@ export default function Categories() {
         setColor(tag.color);
     }, []);
 
-    const handleDelete = async (tag: Tag) => {
-        if (!confirm(`Удалить тег «${tag.title}»? Пароли с этим тегом останутся, но станут без тега.`)) return;
+    const requestDelete = useCallback((tag: Tag) => setPendingDelete(tag), []);
+
+    const handleDeleteConfirm = async () => {
+        if (!pendingDelete) return;
         try {
-            await deleteTag(tag.id);
+            await deleteTag(pendingDelete.id);
             toast.success('Тег удалён');
-            if (editingTag?.id === tag.id) closePanel();
+            if (editingTag?.id === pendingDelete.id) closePanel();
         } catch {
             toast.error('Не удалось удалить тег');
+        } finally {
+            setPendingDelete(null);
         }
     };
 
@@ -76,9 +82,9 @@ export default function Categories() {
     const handleChangeTitle = (event: React.ChangeEvent<HTMLInputElement>) => setTitle(event.target.value);
 
     const handleClickConfirm: MouseEventHandler = async () => {
-        if (!color) return toast.error("Выбери цвет!");
-        if (icon === undefined) return toast.error("Выбери иконку!");
-        if (!title.trim()) return toast.error("Укажи название!");
+        if (!color) return toast.error("Выберите цвет");
+        if (icon === undefined) return toast.error("Выберите иконку");
+        if (!title.trim()) return toast.error("Укажите название");
 
         const baseColor = generateTagColor(color);
         const payload = {
@@ -92,11 +98,11 @@ export default function Categories() {
         try {
             if (isCreating) {
                 await addTag(payload);
-                toast.success('Тег создан!');
+                toast.success('Тег создан');
                 closePanel();
             } else if (editingTag) {
                 await editTag({...editingTag, ...payload});
-                toast.success('Тег обновлён!');
+                toast.success('Тег обновлён');
                 closePanel();
             }
         } catch (err) {
@@ -122,9 +128,9 @@ export default function Categories() {
 
     const tagRows = useMemo(() =>
             tags.map((tag) => (
-                <TagRow key={tag.id} {...tag} onEdit={handleEdit} onDelete={handleDelete}/>
+                <TagRow key={tag.id} {...tag} onEdit={handleEdit} onDelete={requestDelete}/>
             )),
-        [tags, handleEdit, handleDelete],
+        [tags, handleEdit, requestDelete],
     );
 
     const panelOpen = isCreating || editingTag !== null;
@@ -226,6 +232,11 @@ export default function Categories() {
                     </div>
                 )}
             </div>
+            <ConfirmDialog open={!!pendingDelete} title="Удалить тег?" danger
+                           message={pendingDelete ? <>Тег «{pendingDelete.title}» будет удалён. Пароли с этим тегом останутся, но станут без тега.</> : null}
+                           confirmLabel="Удалить"
+                           onConfirm={handleDeleteConfirm}
+                           onCancel={() => setPendingDelete(null)}/>
         </div>
     )
 }

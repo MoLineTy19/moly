@@ -14,6 +14,7 @@ import {addPassword, usePasswordStore} from "@/store/passwordStore";
 import {APP_VERSION, GITHUB_REPO} from "@/config/app";
 import {THEMES} from "@/config/theme";
 import Modal from "@/components/ui/modal";
+import ConfirmDialog from "@/components/ui/confirmDialog";
 import Toggle from "@/components/ui/toggle";
 import {
     exportToJSON, exportToCSV, downloadFile, parseImport, strengthOf,
@@ -73,6 +74,7 @@ export default function Security() {
     const [activity, setActivity] = useState<ActivityEntry[]>([]);
     const [journalAllOpen, setJournalAllOpen] = useState(false);
     const [allActivity, setAllActivity] = useState<ActivityEntry[]>([]);
+    const [confirmClear, setConfirmClear] = useState(false);
 
     /* --------- Метрики защиты --------- */
     const ageDays = masterKeyCreatedAt
@@ -114,7 +116,6 @@ export default function Security() {
     };
 
     const clearActivity = async () => {
-        if (!window.confirm("Очистить весь журнал активности?")) return;
         await fetch("/api/activity", {method: "DELETE"});
         setActivity([]); setAllActivity([]);
         toast.success("Журнал очищен");
@@ -525,7 +526,7 @@ export default function Security() {
                                 <h2 className="text-sm font-medium text-(--text-color) uppercase tracking-wider">Журнал активности</h2>
                                 <div className="flex gap-3">
                                     <button onClick={openJournalAll} className="text-xs text-(--accent-color) hover:text-(--accent-color) transition-colors">Смотреть все</button>
-                                    <button onClick={clearActivity} className="text-xs text-(--text-muted) hover:text-(--text-color) transition-colors">Очистить</button>
+                                    <button onClick={() => setConfirmClear(true)} className="text-xs text-(--text-muted) hover:text-(--text-color) transition-colors">Очистить</button>
                                 </div>
                             </div>
                             <div className="divide-y divide-(--border-color)/50">
@@ -639,6 +640,11 @@ export default function Security() {
                     )}
                 </Modal>
 
+                <ConfirmDialog open={confirmClear} title="Очистить журнал?" danger
+                               message="Все записи журнала активности будут удалены безвозвратно."
+                               confirmLabel="Очистить"
+                               onConfirm={async () => { await clearActivity(); setConfirmClear(false); }}
+                               onCancel={() => setConfirmClear(false)}/>
             </div>
         </div>
     );
